@@ -1,0 +1,515 @@
+# LubaUI — AI Agent Reference
+
+> For human documentation, see README.md
+> For Claude Code guidance, see CLAUDE.md
+> Last updated: 2026-02-11
+
+---
+
+## Philosophy (The Why)
+
+LubaUI is built on three pillars:
+
+**1. Radical Composability** — Behaviors are extracted into primitives. The press interaction isn't locked in `LubaButton` — it's `.lubaPressable()` so any view can use it.
+
+**2. AI-Native Architecture** — Semantic naming, strict tokenization, documented rationale. Every magic number has a name and reason.
+
+**3. Low-Friction Adoption** — `LubaButton("Save") { }` just works. Customize when you want, not because you have to.
+
+---
+
+## The Rules (Non-Negotiable)
+
+1. **Never hardcode values** — Use tokens (LubaColors, LubaSpacing, LubaMotion)
+2. **Never hardcode animations** — Use LubaMotion for values, LubaAnimations for applied presets
+3. **Always read LubaConfig** — Check `@Environment(\.lubaConfig)` for haptics/animations
+4. **Preserve backwards compatibility** — Old APIs must continue to work
+
+---
+
+## Architecture
+
+```
+Sources/LubaUI/
+├── LubaUI.swift                  # Entry point, version info
+├── Tokens/                       # Design tokens (the DNA)
+│   ├── LubaPrimitives.swift      # Tier 1: Raw hex/numbers — NEVER use in components
+│   ├── LubaColors.swift          # Tier 2: Semantic adaptive colors
+│   ├── LubaSpacing.swift         # Tier 2: 4pt grid spacing
+│   ├── LubaTypography.swift      # Tier 2: SF Rounded type scale
+│   ├── LubaRadius.swift          # Tier 2: Corner radii
+│   ├── LubaMotion.swift          # Tier 2: Animation constants ★
+│   ├── LubaControlTokens.swift   # Tier 3: Form control tokens
+│   └── LubaFeedbackTokens.swift  # Tier 3: Feedback component tokens
+├── Primitives/                   # Reusable behaviors ★
+│   ├── LubaPressable.swift       # .lubaPressable() — tap with scale + haptics
+│   ├── LubaButtonStyling.swift   # Button style protocol
+│   ├── LubaExpandable.swift      # .lubaExpandable() — expand/collapse + accordion
+│   ├── LubaLongPressable.swift   # .lubaLongPressable() — long press + progress ring
+│   ├── LubaShimmerable.swift     # .lubaShimmerable() — loading shimmer effect
+│   └── LubaSwipeable.swift       # .lubaSwipeable() — swipe actions (delete, archive, pin)
+├── Components/                   # UI components (25 files)
+│   ├── LubaAlert.swift           # Inline notification banner
+│   ├── LubaAvatar.swift          # Profile image/initials + AvatarGroup
+│   ├── LubaBadge.swift           # Status indicator
+│   ├── LubaButton.swift          # Multi-style button
+│   ├── LubaCard.swift            # Container with elevation
+│   ├── LubaCheckbox.swift        # Binary toggle
+│   ├── LubaChip.swift            # Filter/tag pill
+│   ├── LubaDivider.swift         # Separator with optional label
+│   ├── LubaIcon.swift            # Icon + IconButton + CircledIcon
+│   ├── LubaLink.swift            # Inline text link
+│   ├── LubaMenu.swift            # Context menu
+│   ├── LubaProgress.swift        # Bar + circular progress
+│   ├── LubaRadio.swift           # Radio button + RadioGroup
+│   ├── LubaRating.swift          # Star rating
+│   ├── LubaSearchBar.swift       # Search input
+│   ├── LubaSheet.swift           # Bottom sheet modal
+│   ├── LubaSkeleton.swift        # Shimmer loading placeholders
+│   ├── LubaSlider.swift          # Value slider
+│   ├── LubaStepper.swift         # Numeric +/- adjuster
+│   ├── LubaTabs.swift            # Segmented + underline tabs
+│   ├── LubaTextArea.swift        # Multi-line text editor
+│   ├── LubaTextField.swift       # Text input with states
+│   ├── LubaToast.swift           # Overlay notification
+│   ├── LubaToggle.swift          # Switch control
+│   └── LubaTooltip.swift         # Contextual help popup
+├── Config/
+│   └── LubaConfig.swift          # Runtime config (haptics, a11y, debug)
+├── Theme/
+│   └── LubaTheme.swift           # Theme configuration + environment
+└── Utilities/
+    ├── LubaAccessibility.swift   # A11y helpers, WCAG contrast, announcements
+    ├── LubaAnimations.swift      # Applied animation presets + transitions
+    └── LubaHaptics.swift         # Cross-platform haptic feedback
+```
+
+---
+
+## Token Reference
+
+### Colors (LubaColors)
+```swift
+.textPrimary, .textSecondary, .textTertiary, .textDisabled  // Text hierarchy
+.textOnAccent                                                 // Text on accent bg
+.accent, .accentHover, .accentSubtle                         // Brand (sage green)
+.success, .warning, .error                                    // Semantic states
+.successSubtle, .warningSubtle, .errorSubtle                 // Subtle semantic bg
+.surface, .surfaceSecondary, .surfaceTertiary, .background   // Surfaces
+.border, .borderFocused                                       // Borders
+.gray900, .gray800, .gray600, .gray500, .gray400, .gray200, .gray100, .gray50  // Greyscale
+```
+
+### Spacing (LubaSpacing) — 4pt base
+```swift
+.xs = 4, .sm = 8, .md = 12, .lg = 16, .xl = 24, .xxl = 32, .xxxl = 48, .huge = 64
+.custom(_ multiplier: Int) -> CGFloat   // multiplier * 4
+.insets(_ spacing: CGFloat) -> EdgeInsets
+```
+
+### Radius (LubaRadius)
+```swift
+.none = 0, .xs = 4, .sm = 8, .md = 12, .lg = 16, .xl = 24, .full = 9999
+```
+
+### Motion (LubaMotion) — animation constants
+```swift
+// Press scale hierarchy: smaller elements → more scale, larger elements → less
+.pressScaleCompact = 0.95      // Icon buttons, chips (5% shrink)
+.pressScale = 0.97              // Standard press feedback (3% shrink)
+.pressScaleProminent = 0.98     // Subtle press for large elements (2% shrink)
+.pressAnimation                 // spring(0.25, 0.65) — quick bounce
+.colorAnimation                 // easeOut(0.12) — color transitions
+.stateAnimation                 // spring(0.35, 0.75) — state changes
+.micro                          // spring(0.2, 0.7) — ultra-quick
+.gentle                         // spring(0.4, 0.8) — soft
+.bouncy                         // spring(0.35, 0.5) — playful
+.disabledOpacity = 0.45
+.loadingContentOpacity = 0.7
+.iconLabelSpacing = 6
+.stagger(index:base:)           // Stagger delay for list animations
+```
+
+### Animations (LubaAnimations) — applied animation presets
+Use `LubaMotion` for raw values/constants. Use `LubaAnimations` for applied `Animation` objects and transitions.
+```swift
+// Spring presets (return Animation)
+.quick    // spring(0.3, 0.7) — button presses, toggles
+.standard // spring(0.4, 0.75) — cards, panels
+.gentle   // spring(0.5, 0.8) — page transitions
+.bouncy   // spring(0.4, 0.6) — success states
+
+// Eased presets
+.fadeIn   // easeOut(0.2) — appearing elements
+.smooth   // easeInOut(0.25) — color/opacity
+.subtle   // easeInOut(0.4) — background changes
+
+// Helpers
+.staggerDelay(for: index)  // index * 0.05
+
+// Transitions (on AnyTransition)
+.lubaSlideUp   // Asymmetric slide + fade
+.lubaScale     // Scale 0.9→1.0 + fade
+.lubaFade      // Simple opacity
+
+// View modifier
+.lubaAnimation(.bouncy, value: isActive)
+```
+
+### Component Tokens
+
+**Form Controls** (LubaControlTokens.swift):
+- `LubaSelectionTokens` — controlSize: 20, indicatorSize: 10, checkboxRadius: 5, borderWidth: 1.5, checkmarkSize: 11, labelSpacing: 10, minTouchTarget: 44
+- `LubaToggleTokens` — trackWidth: 48, trackHeight: 28, thumbSize: 24, thumbPadding: 2, labelSpacing: 12, minTouchTarget: 44
+- `LubaSliderTokens` — trackHeight: 4, thumbSize: 22, thumbBorderWidth: 2, thumbDragScale: 1.1
+
+**Text Fields** (LubaTextField.swift):
+- `LubaFieldTokens` — minHeight: 48, cornerRadius: 10, horizontalPadding: 14, iconSize: 18, iconFrameWidth: 20, labelFontSize: 13, helperFontSize: 12, borderWidth: 1, borderWidthFocused: 1.5, clearButtonSize: 16
+
+**Cards** (LubaCard.swift):
+- `LubaCardTokens` — cornerRadius, padding, elevation levels (.flat, .low, .medium, .high)
+
+**Feedback** (LubaFeedbackTokens.swift):
+- `LubaToastTokens` — cornerRadius: 12, shadowBlur: 8, shadowY: 4, shadowOpacity: 0.08, defaultDuration: 3.0
+- `LubaProgressTokens` — barHeight: 6, circularSize: 64, circularStrokeWidth: 6
+- `LubaSpinnerTokens` — arcTrim: 0.65, arcDuration: 0.75, pulseDuration: 1.0, dotsDuration: 0.4
+- `LubaSkeletonTokens` — shimmerDuration: 1.5, cornerRadius: 4, defaultHeight: 14
+- `LubaTabsTokens` — tabHeight: 32, underlineHeight: 44, segmentedContainerRadius: 10
+- `LubaSheetTokens` — headerPadding: 16, closeButtonSize: 28, titleFontSize: 18
+- `LubaIconTokens` — touchTarget: 44, pressScale: 0.95 (refs LubaMotion.pressScaleCompact), circledPaddingMultiplier: 1.8
+- `LubaMenuTokens` — minWidth: 200, itemHeight: 44, cornerRadius: 12, iconSize: 16
+- `LubaTooltipTokens` — maxWidth: 240, padding: 10, cornerRadius: 8, dismissDuration: 3.0
+
+---
+
+## Component API Reference
+
+### LubaButton
+```swift
+LubaButton(
+    _ title: String,
+    style: LubaButtonStyle = .primary,  // .primary | .secondary | .ghost | .destructive | .subtle
+    size: LubaButtonSize = .medium,     // .small | .medium | .large
+    isLoading: Bool = false,
+    isDisabled: Bool = false,
+    icon: Image? = nil,
+    iconPosition: LubaIconPosition = .leading,
+    fullWidth: Bool? = nil,
+    action: () -> Void
+)
+
+// Custom styling via protocol
+LubaButton("Save", styling: MyCustomStyle()) { }
+```
+
+### LubaTextField
+```swift
+LubaTextField(
+    _ label: String,
+    text: Binding<String>,
+    placeholder: String = "",
+    helperText: String? = nil,
+    error: String? = nil,
+    leadingIcon: Image? = nil,
+    trailingIcon: Image? = nil,
+    isSecure: Bool = false,
+    isDisabled: Bool = false,
+    showClearButton: Bool = true
+)
+
+// Convenience initializers
+LubaTextField.email(text: $email)
+LubaTextField.secure("Password", text: $password)
+```
+
+### LubaCard
+```swift
+LubaCard(
+    elevation: LubaCardElevation = .low,  // .flat | .low | .medium | .high
+    style: LubaCardStyle = .filled,       // .filled | .outlined | .ghost
+    cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
+    padding: CGFloat = LubaCardTokens.padding,
+    content: () -> Content
+)
+
+// Make it tappable via composition
+LubaCard { content }
+    .lubaPressable { action() }
+```
+
+### LubaTextArea
+```swift
+LubaTextArea(
+    _ label: String,
+    text: Binding<String>,
+    placeholder: String = "",
+    characterLimit: Int? = nil,
+    minHeight: CGFloat = 100
+)
+```
+
+### LubaSearchBar
+```swift
+LubaSearchBar(
+    text: Binding<String>,
+    placeholder: String = "Search",
+    showCancelButton: Bool = true,
+    onSubmit: (() -> Void)? = nil,
+    onCancel: (() -> Void)? = nil
+)
+```
+
+### LubaStepper
+```swift
+LubaStepper(
+    value: Binding<Int>,
+    in range: ClosedRange<Int> = 0...99,
+    step: Int = 1,
+    label: String? = nil
+)
+```
+
+### LubaRating
+```swift
+LubaRating(
+    value: Binding<Int>,
+    maxStars: Int = 5,
+    isReadOnly: Bool = false,
+    label: String? = nil
+)
+```
+
+### LubaLink
+```swift
+LubaLink(
+    _ label: String,
+    style: LubaLinkStyle = .default,  // .default | .subtle | .external
+    action: () -> Void
+)
+```
+
+### LubaAlert
+```swift
+LubaAlert(
+    _ message: String,
+    style: LubaAlertStyle = .info,  // .info | .success | .warning | .error
+    title: String? = nil,
+    isDismissible: Bool = false,
+    onDismiss: (() -> Void)? = nil
+)
+```
+
+### LubaChip
+```swift
+LubaChip(
+    _ label: String,
+    style: LubaChipStyle = .filled,  // .filled | .outlined
+    icon: Image? = nil,
+    isSelected: Bool = false,
+    isDismissible: Bool = false,
+    onDismiss: (() -> Void)? = nil,
+    onTap: (() -> Void)? = nil
+)
+```
+
+### LubaMenu
+```swift
+// With custom label
+LubaMenu(items: [
+    LubaMenuItem("Edit", icon: Image(systemName: "pencil")) { edit() },
+    LubaMenuItem("Delete", icon: Image(systemName: "trash"), role: .destructive) { delete() }
+]) {
+    Image(systemName: "ellipsis")
+}
+
+// With default ellipsis label
+LubaMenu(items: [...])
+```
+
+### LubaTooltip
+```swift
+LubaTooltip("Helpful info", position: .top) {  // .top | .bottom
+    Image(systemName: "questionmark.circle")
+}
+
+// Or as modifier
+Text("Hover me")
+    .lubaTooltip("Helpful info", position: .bottom)
+```
+
+### Form Controls
+```swift
+LubaCheckbox(isChecked: $checked, label: "Accept terms")
+LubaToggle(isOn: $enabled, label: "Notifications")
+LubaRadio(isSelected: $selected, label: "Option A")
+LubaSlider(value: $volume, label: "Volume", showValue: true)
+```
+
+### Tabs
+```swift
+LubaTabs(selection: $tab, tabs: [
+    (value: 0, label: "Daily"),
+    (value: 1, label: "Weekly")
+])
+
+LubaUnderlineTabs(selection: $tab, tabs: [...])
+```
+
+### Feedback
+```swift
+LubaToast("Message saved", style: .success)
+.lubaToast(isPresented: $showToast, message: "Saved", style: .success)
+
+LubaProgressBar(value: 0.65, showLabel: true)
+LubaCircularProgress(value: 0.75)
+LubaSpinner(style: .arc)  // .arc | .pulse | .dots | .breathe
+```
+
+### Data Display
+```swift
+LubaAvatar(name: "John Doe", size: .large)
+LubaBadge("New", style: .accent)
+LubaIcon("heart.fill", size: .md, color: LubaColors.accent)
+LubaIconButton("bell") { showNotifications() }
+LubaSkeleton(height: 14)
+LubaSkeletonCard()
+```
+
+### Layout
+```swift
+LubaDivider()
+LubaDivider(label: "or continue with")
+LubaSheetHeader("Settings", subtitle: "Customize") { dismiss() }
+.lubaSheet(isPresented: $show, size: .medium) { content }
+```
+
+---
+
+## Key Patterns
+
+### Pattern 1: Config-Aware Components
+```swift
+@Environment(\.lubaConfig) private var config
+
+// Haptics
+if config.hapticsEnabled {
+    LubaHaptics.light()
+}
+
+// Animations
+.animation(config.animationsEnabled ? LubaMotion.stateAnimation : nil, value: state)
+```
+
+### Pattern 2: Using Motion Tokens
+```swift
+// ✅ CORRECT
+.animation(LubaMotion.pressAnimation, value: isPressed)
+.scaleEffect(isPressed ? LubaMotion.pressScale : 1.0)
+
+// ❌ WRONG
+.animation(.spring(response: 0.25), value: isPressed)
+.scaleEffect(isPressed ? 0.97 : 1.0)
+```
+
+### Pattern 3: Composable Press Behavior
+```swift
+// Any view can be pressable
+LubaCard { content }
+    .lubaPressable(scale: LubaMotion.pressScaleProminent) { navigate() }
+
+Image(systemName: "heart")
+    .lubaPressable(haptic: .medium) { toggleFavorite() }
+```
+
+### Pattern 4: Custom Button Styling
+```swift
+struct BrandStyle: LubaButtonStyling {
+    func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
+        isPressed ? .purple.opacity(0.8) : .purple
+    }
+    func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color { .white }
+    func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? { nil }
+    var borderWidth: CGFloat { 0 }
+    var defaultsToFullWidth: Bool { false }
+    var haptic: LubaHapticStyle { .medium }
+}
+
+LubaButton("Custom", styling: BrandStyle()) { }
+```
+
+### Pattern 5: Semantic Token Usage
+```swift
+// ✅ CORRECT
+Text("Hello").foregroundStyle(LubaColors.textPrimary)
+VStack(spacing: LubaSpacing.lg) { }
+.animation(LubaMotion.stateAnimation, value: state)
+
+// ❌ WRONG
+Text("Hello").foregroundStyle(Color(hex: 0x1A1A1A))
+VStack(spacing: 16) { }
+.animation(.spring(response: 0.35), value: state)
+```
+
+### Pattern 6: Using Animation Presets
+```swift
+// Applied animations (LubaAnimations) for withAnimation and .animation
+withAnimation(LubaAnimations.quick) { toggle() }
+.animation(LubaAnimations.standard, value: isExpanded)
+
+// Staggered list animations
+ForEach(items.indices) { i in
+    row.animation(LubaAnimations.standard.delay(LubaAnimations.staggerDelay(for: i)), value: isVisible)
+}
+
+// Transitions
+.transition(.lubaSlideUp)
+.transition(.lubaScale)
+```
+
+---
+
+## New Component Checklist
+
+When creating a component:
+
+- [ ] Create `LubaFooTokens` if component has magic numbers
+- [ ] Add `@Environment(\.lubaConfig) private var config`
+- [ ] Use `LubaMotion` for ALL animation values
+- [ ] Use `LubaAnimations` for applied `Animation` objects when needed
+- [ ] Check `config.hapticsEnabled` before haptics
+- [ ] Check `config.animationsEnabled` before animations
+- [ ] Use `LubaColors` semantic colors
+- [ ] Use `LubaSpacing` for padding/spacing
+- [ ] Add #Preview with multiple states
+- [ ] Preserve backwards compatibility
+
+---
+
+## Build Commands
+
+```bash
+swift build    # Build package
+swift test     # Run tests
+```
+
+---
+
+## Agent Instructions
+
+When generating LubaUI code:
+
+1. Import LubaUI
+2. Use semantic tokens — never raw values
+3. Use LubaMotion for animation values — never hardcode springs/durations
+4. Use LubaAnimations for applied animation presets and transitions
+5. Use `.lubaPressable()` to make custom views tappable
+6. Use `.lubaSwipeable()` for swipe actions, `.lubaLongPressable()` for long press
+7. Use `.lubaShimmerable()` for loading shimmer on any view
+8. Wrap content in LubaCard for elevation
+9. Use LubaButton for buttons — never custom Button styling
+10. Check LubaConfig for haptics/animations in custom components
+11. Prefer composition (`.lubaPressable()`, `.lubaToast()`) over inheritance
+
+---
+
+End of AI agent reference.
