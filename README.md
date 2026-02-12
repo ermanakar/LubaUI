@@ -356,7 +356,7 @@ LubaUI welcomes contributions. When adding new components:
 5. Extract reusable behavior to primitives
 6. Maintain backwards compatibility
 
-See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
+See [llms.txt](llms.txt) for detailed architecture documentation.
 
 ---
 

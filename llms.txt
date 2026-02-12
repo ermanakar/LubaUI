@@ -1,7 +1,7 @@
 # LubaUI — AI Agent Reference
 
 > For human documentation, see README.md
-> For Claude Code guidance, see CLAUDE.md
+> For Claude Code guidance, see the project's CLAUDE.md (not included in repo)
 > Last updated: 2026-02-11
 
 ---
