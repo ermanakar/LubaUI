@@ -53,7 +53,7 @@ public struct LubaTextArea: View {
 
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $text)
-                    .font(.system(size: 16, design: .rounded))
+                    .font(LubaTypography.body)
                     .focused($isFocused)
                     .frame(minHeight: minHeight)
                     .scrollContentBackground(.hidden)
@@ -61,7 +61,7 @@ public struct LubaTextArea: View {
 
                 if text.isEmpty {
                     Text(placeholder)
-                        .font(.system(size: 16, design: .rounded))
+                        .font(LubaTypography.body)
                         .foregroundStyle(LubaColors.textTertiary)
                         .padding(LubaSpacing.sm)
                         .padding(.top, 8)

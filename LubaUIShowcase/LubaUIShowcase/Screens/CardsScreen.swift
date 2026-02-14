@@ -95,7 +95,7 @@ struct CardsScreen: View {
                         Text("    .lubaPressable { action() }")
                             .foregroundStyle(LubaColors.accent)
                     }
-                    .font(.system(size: 13, design: .monospaced))
+                    .font(LubaTypography.code)
                 }
             }
                 
@@ -202,7 +202,7 @@ struct CardsScreen: View {
     private func featureCheck(_ text: String) -> some View {
         HStack(spacing: LubaSpacing.sm) {
             Image(systemName: "checkmark")
-                .font(.system(size: 12, weight: .semibold))
+                .font(LubaTypography.custom(size: 12, weight: .semibold))
                 .foregroundStyle(LubaColors.accent)
             Text(text)
                 .font(LubaTypography.body)

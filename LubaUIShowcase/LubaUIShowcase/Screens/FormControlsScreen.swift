@@ -164,7 +164,7 @@ struct FormControlsScreen: View {
 
                         settingsRow(icon: "speaker.wave.2.fill", title: "Volume") {
                             Text("\(Int(volumeLevel * 100))%")
-                                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                .font(LubaTypography.custom(size: 13, weight: .medium, design: .monospaced))
                                 .foregroundStyle(LubaColors.textSecondary)
                         }
 

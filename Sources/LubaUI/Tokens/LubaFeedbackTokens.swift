@@ -16,7 +16,7 @@ public enum LubaToastTokens {
     public static let iconSize: CGFloat = 16
 
     /// Horizontal padding - 14pt provides comfortable breathing room
-    public static let horizontalPadding: CGFloat = 14
+    public static let horizontalPadding: CGFloat = LubaSpacing.lg
 
     /// Vertical padding - 12pt (slightly less than horizontal for visual balance)
     public static let verticalPadding: CGFloat = 12
@@ -37,7 +37,7 @@ public enum LubaToastTokens {
     public static let defaultDuration: Double = 3.0
 
     /// Spacing between icon and message
-    public static let iconSpacing: CGFloat = 10
+    public static let iconSpacing: CGFloat = LubaSpacing.sm
 
     /// Message font size
     public static let messageFontSize: CGFloat = 14
@@ -151,7 +151,7 @@ public enum LubaSkeletonTokens {
     public static let lastLineRatio: CGFloat = 0.6
 
     /// Text skeleton line spacing
-    public static let lineSpacing: CGFloat = 10
+    public static let lineSpacing: CGFloat = LubaSpacing.sm
 
     /// Card skeleton avatar size
     public static let cardAvatarSize: CGFloat = 40
@@ -160,19 +160,65 @@ public enum LubaSkeletonTokens {
     public static let cardPadding: CGFloat = 16
 
     /// Card skeleton corner radius
-    public static let cardCornerRadius: CGFloat = 14
+    public static let cardCornerRadius: CGFloat = LubaCardTokens.cornerRadius
 
     /// Card skeleton header spacing
     public static let headerSpacing: CGFloat = 12
 
     /// Card skeleton section spacing
-    public static let sectionSpacing: CGFloat = 14
+    public static let sectionSpacing: CGFloat = LubaSpacing.lg
 
     /// Row skeleton height
     public static let rowHeight: CGFloat = 60
 
     /// Row skeleton avatar size
     public static let rowAvatarSize: CGFloat = 44
+}
+
+// MARK: - SearchBar Tokens
+
+/// Design tokens for LubaSearchBar
+public enum LubaSearchBarTokens {
+    /// Search bar height — 40pt is compact, distinct from LubaTextField's 48pt
+    public static let height: CGFloat = 40
+
+    /// Horizontal padding inside the bar
+    public static let horizontalPadding: CGFloat = LubaSpacing.md
+
+    /// Search icon size
+    public static let iconSize: CGFloat = 16
+
+    /// Clear button icon size
+    public static let clearIconSize: CGFloat = 14
+}
+
+// MARK: - Alert Tokens
+
+/// Design tokens for LubaAlert
+public enum LubaAlertTokens {
+    /// Corner radius — on the LubaRadius grid
+    public static let cornerRadius: CGFloat = LubaRadius.md
+
+    /// Horizontal padding
+    public static let horizontalPadding: CGFloat = LubaSpacing.lg
+
+    /// Vertical padding
+    public static let verticalPadding: CGFloat = LubaSpacing.md
+
+    /// Status icon size
+    public static let iconSize: CGFloat = 18
+
+    /// Icon frame width for alignment
+    public static let iconFrameWidth: CGFloat = 20
+
+    /// Spacing between icon and text content
+    public static let iconSpacing: CGFloat = LubaSpacing.sm
+
+    /// Dismiss button icon size
+    public static let dismissIconSize: CGFloat = 12
+
+    /// Dismiss button tap target
+    public static let dismissButtonSize: CGFloat = 24
 }
 
 // MARK: - Tabs Tokens
@@ -186,19 +232,19 @@ public enum LubaTabsTokens {
     public static let segmentedPadding: CGFloat = 4
 
     /// Segmented container corner radius
-    public static let segmentedContainerRadius: CGFloat = 10
+    public static let segmentedContainerRadius: CGFloat = LubaRadius.md
 
     /// Segmented tab corner radius
-    public static let segmentedTabRadius: CGFloat = 7
+    public static let segmentedTabRadius: CGFloat = LubaRadius.sm
 
     /// Tab height
     public static let tabHeight: CGFloat = 32
 
     /// Tab horizontal padding
-    public static let tabHorizontalPadding: CGFloat = 14
+    public static let tabHorizontalPadding: CGFloat = LubaSpacing.lg
 
     /// Tab icon-label spacing
-    public static let iconLabelSpacing: CGFloat = 5
+    public static let iconLabelSpacing: CGFloat = LubaSpacing.xs
 
     /// Tab font size
     public static let fontSize: CGFloat = 13
@@ -279,7 +325,7 @@ public enum LubaMenuTokens {
     public static let itemHeight: CGFloat = 44
 
     /// Item horizontal padding
-    public static let itemPadding: CGFloat = 14
+    public static let itemPadding: CGFloat = LubaSpacing.lg
 
     /// Corner radius — matches card aesthetic
     public static let cornerRadius: CGFloat = 12
@@ -297,7 +343,7 @@ public enum LubaMenuTokens {
     public static let iconSize: CGFloat = 16
 
     /// Spacing between icon and label
-    public static let iconSpacing: CGFloat = 10
+    public static let iconSpacing: CGFloat = LubaSpacing.sm
 }
 
 // MARK: - Tooltip Tokens
@@ -308,7 +354,7 @@ public enum LubaTooltipTokens {
     public static let maxWidth: CGFloat = 240
 
     /// Internal padding
-    public static let padding: CGFloat = 10
+    public static let padding: CGFloat = LubaSpacing.md
 
     /// Corner radius — smaller than cards for a tight feel
     public static let cornerRadius: CGFloat = 8

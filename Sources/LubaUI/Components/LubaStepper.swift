@@ -55,7 +55,7 @@ public struct LubaStepper: View {
                 stepButton(systemName: "minus", action: decrement, isEnabled: canDecrement)
 
                 Text("\(value)")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .font(LubaTypography.headline)
                     .foregroundStyle(LubaColors.textPrimary)
                     .frame(minWidth: 40)
                     .monospacedDigit()

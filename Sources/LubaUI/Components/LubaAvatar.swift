@@ -96,7 +96,7 @@ public struct LubaAvatar: View {
                 LubaColors.accentSubtle
                 
                 Text(initials)
-                    .font(.system(size: size.fontSize, weight: .semibold, design: .rounded))
+                    .font(LubaTypography.custom(size: size.fontSize, weight: .semibold))
                     .foregroundStyle(LubaColors.accent)
             } else {
                 LubaColors.gray100
@@ -152,7 +152,7 @@ public struct LubaAvatarGroup: View {
                         .fill(LubaColors.gray200)
                     
                     Text("+\(avatars.count - maxVisible)")
-                        .font(.system(size: size.fontSize, weight: .semibold, design: .rounded))
+                        .font(LubaTypography.custom(size: size.fontSize, weight: .semibold))
                         .foregroundStyle(LubaColors.textSecondary)
                 }
                 .frame(width: size.dimension, height: size.dimension)

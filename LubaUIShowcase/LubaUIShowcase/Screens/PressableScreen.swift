@@ -78,7 +78,7 @@ struct PressableScreen: View {
             DemoSection(title: "Custom Scale & Haptics") {
                 VStack(spacing: LubaSpacing.lg) {
                     Text("\(tapCount)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .font(LubaTypography.custom(size: 64, weight: .bold))
                         .foregroundStyle(LubaColors.accent)
                         .frame(width: 120, height: 120)
                         .background(LubaColors.accentSubtle)
@@ -121,7 +121,7 @@ struct PressableScreen: View {
                     Text("    .lubaPressable(scale: 0.98) { }")
                         .foregroundStyle(LubaColors.accent)
                 }
-                .font(.system(size: 13, design: .monospaced))
+                .font(LubaTypography.code)
             }
         }
     }

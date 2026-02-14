@@ -88,7 +88,7 @@ public struct LubaCheckbox: View {
     private var labelView: some View {
         if let label = label {
             Text(label)
-                .font(.system(size: LubaSelectionTokens.labelFontSize, design: .rounded))
+                .font(LubaTypography.custom(size: LubaSelectionTokens.labelFontSize, weight: .regular))
                 .foregroundStyle(LubaColors.textPrimary)
         }
     }

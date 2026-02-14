@@ -49,11 +49,11 @@ public struct LubaSearchBar: View {
         HStack(spacing: LubaSpacing.sm) {
             HStack(spacing: LubaSpacing.sm) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textTertiary)
 
                 TextField(placeholder, text: $text)
-                    .font(.system(size: 16, design: .rounded))
+                    .font(LubaTypography.body)
                     .focused($isFocused)
                     .submitLabel(.search)
                     .onSubmit { onSubmit?() }
@@ -61,7 +61,7 @@ public struct LubaSearchBar: View {
                 if !text.isEmpty {
                     Button(action: clearText) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 14))
+                            .font(LubaTypography.bodySmall)
                             .foregroundStyle(LubaColors.textTertiary)
                     }
                     .buttonStyle(.plain)
@@ -69,15 +69,15 @@ public struct LubaSearchBar: View {
                     .accessibilityLabel("Clear search")
                 }
             }
-            .padding(.horizontal, 12)
-            .frame(height: 40)
+            .padding(.horizontal, LubaSearchBarTokens.horizontalPadding)
+            .frame(height: LubaSearchBarTokens.height)
             .background(LubaColors.surfaceSecondary)
             .clipShape(Capsule())
 
             if showCancelButton && isFocused {
                 Button(action: cancel) {
                     Text("Cancel")
-                        .font(.system(size: 16, design: .rounded))
+                        .font(LubaTypography.body)
                         .foregroundStyle(LubaColors.accent)
                 }
                 .buttonStyle(.plain)

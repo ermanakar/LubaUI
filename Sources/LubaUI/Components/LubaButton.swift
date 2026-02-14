@@ -31,6 +31,7 @@ public enum LubaButtonStyle {
     case ghost      // Text only, no background
     case destructive // Red, for dangerous actions
     case subtle     // Minimal, for secondary actions
+    case glass      // Translucent glass background
 
     var styling: any LubaButtonStyling {
         switch self {
@@ -39,8 +40,11 @@ public enum LubaButtonStyle {
         case .ghost: return LubaGhostStyle()
         case .destructive: return LubaDestructiveStyle()
         case .subtle: return LubaSubtleStyle()
+        case .glass: return LubaGlassButtonStyle()
         }
     }
+
+    var isGlass: Bool { self == .glass }
 }
 
 // MARK: - Icon Position
@@ -95,7 +99,7 @@ public enum LubaButtonSize {
     var cornerRadius: CGFloat {
         switch self {
         case .small: return LubaRadius.sm    // 8
-        case .medium: return 10
+        case .medium: return LubaRadius.md   // 12
         case .large: return LubaRadius.md    // 12
         }
     }
@@ -142,6 +146,7 @@ public struct LubaButton: View {
     private let icon: Image?
     private let iconPosition: LubaIconPosition
     private let fullWidth: Bool?
+    private let useGlass: Bool
     private let action: () -> Void
 
     @State private var isPressed = false
@@ -170,6 +175,7 @@ public struct LubaButton: View {
         self.icon = icon
         self.iconPosition = iconPosition
         self.fullWidth = fullWidth
+        self.useGlass = style.isGlass
         self.action = action
     }
 
@@ -195,6 +201,7 @@ public struct LubaButton: View {
         self.icon = icon
         self.iconPosition = iconPosition
         self.fullWidth = fullWidth
+        self.useGlass = styling is LubaGlassButtonStyle
         self.action = action
     }
 
@@ -220,7 +227,7 @@ public struct LubaButton: View {
 
     @ViewBuilder
     private var buttonContent: some View {
-        HStack(spacing: LubaMotion.iconLabelSpacing) {
+        let label = HStack(spacing: LubaMotion.iconLabelSpacing) {
             // Leading icon
             if !isLoading, let icon = icon, iconPosition == .leading {
                 iconView(icon)
@@ -250,10 +257,18 @@ public struct LubaButton: View {
         .frame(minHeight: size.minHeight)
         .frame(maxWidth: resolvedFullWidth ? .infinity : nil)
         .foregroundStyle(foregroundColor)
-        .background(backgroundColor)
-        .overlay(borderOverlay)
-        .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous))
-        .animation(LubaMotion.colorAnimation, value: isPressed)
+
+        if useGlass {
+            label
+                .lubaGlass(.regular, cornerRadius: size.cornerRadius)
+                .animation(LubaMotion.colorAnimation, value: isPressed)
+        } else {
+            label
+                .background(backgroundColor)
+                .overlay(borderOverlay)
+                .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous))
+                .animation(LubaMotion.colorAnimation, value: isPressed)
+        }
     }
 
     @ViewBuilder
@@ -327,6 +342,23 @@ public struct LubaButton: View {
     }
     .padding(20)
     .background(LubaColors.background)
+}
+
+#Preview("Glass Button") {
+    ZStack {
+        LinearGradient(
+            colors: [Color(hex: 0x6B8068), Color(hex: 0x3D5A3E)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        VStack(spacing: LubaSpacing.lg) {
+            LubaButton("Glass Button", style: .glass) { }
+            LubaButton("Glass + Icon", style: .glass, icon: Image(systemName: "sparkles")) { }
+        }
+        .padding(LubaSpacing.xl)
+    }
 }
 
 #Preview("Button Features") {

@@ -131,7 +131,7 @@ public struct LubaRadioButton: View {
 
     private var labelView: some View {
         Text(label)
-            .font(.system(size: LubaSelectionTokens.labelFontSize, design: .rounded))
+            .font(LubaTypography.custom(size: LubaSelectionTokens.labelFontSize, weight: .regular))
             .foregroundStyle(LubaColors.textPrimary)
     }
 

@@ -96,7 +96,7 @@ struct CodeBlock<Content: View>: View {
             VStack(alignment: .leading, spacing: LubaSpacing.sm) {
                 content
             }
-            .font(.system(size: 13, design: .monospaced))
+            .font(LubaTypography.code)
         }
     }
 }
@@ -118,7 +118,7 @@ struct CopyableCode: View {
             Spacer()
 
             Image(systemName: copied ? "checkmark" : "doc.on.doc")
-                .font(.system(size: 12, weight: .medium))
+                .font(LubaTypography.custom(size: 12, weight: .medium))
                 .foregroundStyle(copied ? LubaColors.success : LubaColors.textTertiary)
         }
         .padding(LubaSpacing.md)

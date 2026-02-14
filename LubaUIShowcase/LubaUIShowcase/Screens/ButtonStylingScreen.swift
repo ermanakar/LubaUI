@@ -147,7 +147,7 @@ struct ButtonStylingScreen: View {
                         Text("LubaButton(\"Save\", styling: MyBrandStyle()) { }")
                             .foregroundStyle(LubaColors.accent)
                     }
-                    .font(.system(size: 13, design: .monospaced))
+                    .font(LubaTypography.code)
                 }
             }
 
@@ -187,7 +187,7 @@ struct ButtonStylingScreen: View {
             Spacer()
 
             Text(code)
-                .font(.system(size: 10, design: .monospaced))
+                .font(LubaTypography.custom(size: 10, weight: .regular, design: .monospaced))
                 .foregroundStyle(LubaColors.textTertiary)
                 .lineLimit(1)
         }
@@ -195,7 +195,7 @@ struct ButtonStylingScreen: View {
 
     private func codeSnippet(_ code: String) -> some View {
         Text(code)
-            .font(.system(size: 12, weight: .medium, design: .monospaced))
+            .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
             .foregroundStyle(LubaColors.accent)
     }
 }

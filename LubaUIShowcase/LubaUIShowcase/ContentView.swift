@@ -44,7 +44,9 @@ enum ShowcaseSection: String, CaseIterable {
                 ShowcaseItem(icon: "hand.draw.fill", title: "Swipeable", description: "Swipe actions for any row", destination: AnyView(SwipeableScreen())),
                 ShowcaseItem(icon: "rectangle.expand.vertical", title: "Expandable", description: "Expand/collapse any content", destination: AnyView(ExpandableScreen())),
                 ShowcaseItem(icon: "paintbrush.pointed.fill", title: "Button Styling", description: "Protocol-based style system", destination: AnyView(ButtonStylingScreen())),
-                ShowcaseItem(icon: "wand.and.stars", title: "Motion", description: "Animation tokens & feel", destination: AnyView(MotionScreen()))
+                ShowcaseItem(icon: "cube.transparent", title: "Glass", description: "Frosted glass effects", destination: AnyView(GlassScreen())),
+                ShowcaseItem(icon: "wand.and.stars", title: "Motion", description: "Animation tokens & feel", destination: AnyView(MotionScreen())),
+                ShowcaseItem(icon: "puzzlepiece.extension", title: "Composability", description: "Modifiers over inheritance", destination: AnyView(ComposabilityScreen()))
             ]
         case .foundation:
             return [
@@ -79,7 +81,11 @@ enum ShowcaseSection: String, CaseIterable {
                 ShowcaseItem(icon: "plusminus", title: "Stepper", description: "Numeric increment/decrement", destination: AnyView(StepperScreen())),
                 ShowcaseItem(icon: "star", title: "Rating", description: "Star-based input for reviews", destination: AnyView(RatingScreen())),
                 ShowcaseItem(icon: "text.alignleft", title: "Text Area", description: "Multi-line text input", destination: AnyView(TextAreaScreen())),
-                ShowcaseItem(icon: "link", title: "Link", description: "Inline text links", destination: AnyView(LinkScreen()))
+                ShowcaseItem(icon: "link", title: "Link", description: "Inline text links", destination: AnyView(LinkScreen())),
+                ShowcaseItem(icon: "switch.2", title: "Toggle", description: "Binary on/off switch", destination: AnyView(ToggleScreen())),
+                ShowcaseItem(icon: "checkmark.square", title: "Checkbox", description: "Multi-select controls", destination: AnyView(CheckboxScreen())),
+                ShowcaseItem(icon: "circle.inset.filled", title: "Radio", description: "Exclusive selection groups", destination: AnyView(RadioScreen())),
+                ShowcaseItem(icon: "slider.horizontal.3", title: "Slider", description: "Continuous & stepped range input", destination: AnyView(SliderScreen()))
             ]
         case .patterns:
             return [
@@ -192,29 +198,10 @@ struct ContentView: View {
     // MARK: - Search
 
     private var searchBar: some View {
-        HStack(spacing: LubaSpacing.sm) {
-            Image(systemName: "magnifyingglass")
-                .font(LubaTypography.body)
-                .foregroundStyle(LubaColors.textTertiary)
-
-            TextField("Search components...", text: $searchText)
-                .font(LubaTypography.bodySmall)
-
-            if !searchText.isEmpty {
-                Button(action: { searchText = "" }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(LubaTypography.body)
-                        .foregroundStyle(LubaColors.textTertiary)
-                }
-            }
-        }
-        .padding(.horizontal, LubaSpacing.md)
-        .frame(height: 44)
-        .background(LubaColors.surface)
-        .lubaCornerRadius(LubaRadius.md)
-        .overlay(
-            RoundedRectangle.luba(LubaRadius.md)
-                .strokeBorder(LubaColors.border, lineWidth: 1)
+        LubaSearchBar(
+            text: $searchText,
+            placeholder: "Search components...",
+            showCancelButton: false
         )
     }
 

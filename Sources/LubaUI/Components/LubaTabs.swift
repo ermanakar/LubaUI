@@ -17,25 +17,30 @@ import SwiftUI
 public struct LubaTabs<T: Hashable>: View {
     @Binding private var selection: T
     private let tabs: [(value: T, label: String, icon: String?)]
+    private let useGlass: Bool
 
     @Environment(\.lubaConfig) private var config
     @Namespace private var namespace
 
     public init(
         selection: Binding<T>,
-        tabs: [(value: T, label: String, icon: String?)]
+        tabs: [(value: T, label: String, icon: String?)],
+        useGlass: Bool = false
     ) {
         self._selection = selection
         self.tabs = tabs
+        self.useGlass = useGlass
     }
 
     /// Convenience init without icons
     public init(
         selection: Binding<T>,
-        tabs: [(value: T, label: String)]
+        tabs: [(value: T, label: String)],
+        useGlass: Bool = false
     ) {
         self._selection = selection
         self.tabs = tabs.map { ($0.value, $0.label, nil) }
+        self.useGlass = useGlass
     }
 
     /// Backwards-compatible init with haptic parameter (now reads from config)
@@ -46,6 +51,7 @@ public struct LubaTabs<T: Hashable>: View {
     ) {
         self._selection = selection
         self.tabs = tabs
+        self.useGlass = false
     }
 
     /// Backwards-compatible convenience init
@@ -56,17 +62,25 @@ public struct LubaTabs<T: Hashable>: View {
     ) {
         self._selection = selection
         self.tabs = tabs.map { ($0.value, $0.label, nil) }
+        self.useGlass = false
     }
 
     public var body: some View {
-        HStack(spacing: LubaTabsTokens.segmentedSpacing) {
+        let container = HStack(spacing: LubaTabsTokens.segmentedSpacing) {
             ForEach(tabs, id: \.value) { tab in
                 tabButton(for: tab)
             }
         }
         .padding(LubaTabsTokens.segmentedPadding)
-        .background(LubaColors.gray100)
-        .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius, style: .continuous))
+
+        if useGlass {
+            container
+                .lubaGlass(.subtle, cornerRadius: LubaTabsTokens.segmentedContainerRadius)
+        } else {
+            container
+                .background(LubaColors.gray100)
+                .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius, style: .continuous))
+        }
     }
 
     private func tabButton(for tab: (value: T, label: String, icon: String?)) -> some View {
@@ -86,7 +100,7 @@ public struct LubaTabs<T: Hashable>: View {
                 }
 
                 Text(tab.label)
-                    .font(.system(size: LubaTabsTokens.fontSize, weight: .semibold, design: .rounded))
+                    .font(LubaTypography.buttonSmall)
             }
             .foregroundStyle(selection == tab.value ? LubaColors.textPrimary : LubaColors.textSecondary)
             .padding(.horizontal, LubaTabsTokens.tabHorizontalPadding)
@@ -160,7 +174,7 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
         } label: {
             VStack(spacing: LubaTabsTokens.underlineSpacing) {
                 Text(tab.label)
-                    .font(.system(size: LubaTabsTokens.underlineFontSize, weight: selection == tab.value ? .bold : .medium, design: .rounded))
+                    .font(LubaTypography.custom(size: LubaTabsTokens.underlineFontSize, weight: selection == tab.value ? .bold : .medium))
                     .foregroundStyle(selection == tab.value ? LubaColors.accent : LubaColors.textTertiary)
 
                 ZStack(alignment: .bottom) {

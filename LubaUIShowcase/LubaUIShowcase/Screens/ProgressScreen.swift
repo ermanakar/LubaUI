@@ -97,25 +97,25 @@ struct ProgressScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             LubaSpinner(size: 16)
                             Text("16pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                         VStack(spacing: LubaSpacing.sm) {
                             LubaSpinner(size: 24)
                             Text("24pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                         VStack(spacing: LubaSpacing.sm) {
                             LubaSpinner(size: 32)
                             Text("32pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                         VStack(spacing: LubaSpacing.sm) {
                             LubaSpinner(size: 48)
                             Text("48pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                     }
@@ -244,7 +244,7 @@ struct ProgressScreen: View {
 
             if status == .downloading {
                 Text("\(Int(progress * 100))%")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(LubaColors.textSecondary)
             }
         }

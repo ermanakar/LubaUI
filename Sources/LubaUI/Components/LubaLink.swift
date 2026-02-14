@@ -70,9 +70,9 @@ public struct LubaLink: View {
     private var labelFont: Font {
         switch style {
         case .default, .external:
-            return .system(size: 16, weight: .medium, design: .rounded)
+            return LubaTypography.custom(size: 16, weight: .medium)
         case .subtle:
-            return .system(size: 14, weight: .regular, design: .rounded)
+            return LubaTypography.bodySmall
         }
     }
 

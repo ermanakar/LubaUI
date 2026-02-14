@@ -9,12 +9,33 @@ import SwiftUI
 import LubaUI
 
 struct DarkModeScreen: View {
+    @State private var isDarkMode = false
+    @Environment(\.colorScheme) private var systemColorScheme
+
     var body: some View {
         ShowcaseScreen("Dark Mode") {
             ShowcaseHeader(
                 title: "Dark Mode",
                 description: "Every LubaUI color is adaptive — see how tokens transform between light and dark."
             )
+
+            // Interactive Toggle
+            DemoSection(title: "Try It") {
+                LubaCard(elevation: .low) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                            Text(isDarkMode ? "Dark Mode" : "Light Mode")
+                                .font(LubaTypography.headline)
+                                .foregroundStyle(LubaColors.textPrimary)
+                            Text("Toggle to see tokens adapt live")
+                                .font(LubaTypography.caption)
+                                .foregroundStyle(LubaColors.textSecondary)
+                        }
+                        Spacer()
+                        LubaToggle(isOn: $isDarkMode)
+                    }
+                }
+            }
 
             // Side-by-Side Colors
             DemoSection(title: "Color Tokens") {
@@ -47,6 +68,8 @@ struct DarkModeScreen: View {
                 description: "LubaColors.adaptive(light:dark:) handles everything. Shadows get 50% stronger in dark mode. Borders become visible on filled cards. No manual overrides needed — it just works."
             )
         }
+        .preferredColorScheme(isDarkMode ? .dark : .light)
+        .onAppear { isDarkMode = systemColorScheme == .dark }
     }
 
     // MARK: - Components
@@ -82,7 +105,7 @@ struct DarkModeScreen: View {
                 )
 
             Text(name)
-                .font(.system(size: 9, design: .monospaced))
+                .font(LubaTypography.custom(size: 9, weight: .regular, design: .monospaced))
                 .foregroundStyle(LubaColors.textTertiary)
                 .lineLimit(1)
 

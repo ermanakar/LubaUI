@@ -80,7 +80,7 @@ public struct LubaTooltip<Content: View>: View {
 
     private var tooltipView: some View {
         Text(message)
-            .font(.system(size: LubaTooltipTokens.fontSize, design: .rounded))
+            .font(LubaTypography.footnote)
             .foregroundStyle(LubaColors.textPrimary)
             .padding(LubaTooltipTokens.padding)
             .frame(maxWidth: LubaTooltipTokens.maxWidth)

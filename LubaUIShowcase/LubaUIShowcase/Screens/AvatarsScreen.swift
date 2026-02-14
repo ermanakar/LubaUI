@@ -23,28 +23,28 @@ struct AvatarsScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             LubaAvatar(name: "Small", size: .small)
                             Text("32pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
 
                         VStack(spacing: LubaSpacing.sm) {
                             LubaAvatar(name: "Medium", size: .medium)
                             Text("40pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
 
                         VStack(spacing: LubaSpacing.sm) {
                             LubaAvatar(name: "Large", size: .large)
                             Text("56pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
 
                         VStack(spacing: LubaSpacing.sm) {
                             LubaAvatar(name: "XL", size: .xlarge)
                             Text("80pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                     }

@@ -22,13 +22,13 @@ public enum LubaSelectionTokens {
     public static let borderWidth: CGFloat = 1.5
 
     /// Corner radius for checkbox
-    public static let checkboxRadius: CGFloat = 5
+    public static let checkboxRadius: CGFloat = LubaRadius.xs
 
     /// Checkmark icon size
     public static let checkmarkSize: CGFloat = 11
 
     /// Spacing between control and label
-    public static let labelSpacing: CGFloat = 10
+    public static let labelSpacing: CGFloat = LubaSpacing.sm
 
     /// Label font size
     public static let labelFontSize: CGFloat = 15

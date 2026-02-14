@@ -76,7 +76,7 @@ public struct LubaSlider: View {
             HStack {
                 if let label = label {
                     Text(label)
-                        .font(.system(size: LubaSliderTokens.labelFontSize, design: .rounded))
+                        .font(LubaTypography.custom(size: LubaSliderTokens.labelFontSize, weight: .regular))
                         .foregroundStyle(LubaColors.textPrimary)
                 }
 
@@ -84,7 +84,7 @@ public struct LubaSlider: View {
 
                 if showValue {
                     Text(formattedValue)
-                        .font(.system(size: LubaSliderTokens.valueFontSize, weight: .medium, design: .monospaced))
+                        .font(LubaTypography.custom(size: LubaSliderTokens.valueFontSize, weight: .medium, design: .monospaced))
                         .foregroundStyle(LubaColors.textSecondary)
                 }
             }

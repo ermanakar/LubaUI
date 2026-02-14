@@ -65,7 +65,7 @@ public struct LubaChip: View {
             }
 
             Text(label)
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(LubaTypography.subheadline)
 
             if isDismissible {
                 Button(action: dismiss) {

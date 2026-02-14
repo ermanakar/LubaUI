@@ -104,7 +104,7 @@ public extension LubaMenu where Label == LubaMenuLabel {
 public struct LubaMenuLabel: View {
     public var body: some View {
         Image(systemName: "ellipsis")
-            .font(.system(size: 16, weight: .medium))
+            .font(LubaTypography.custom(size: 16, weight: .medium))
             .foregroundStyle(LubaColors.textSecondary)
             .frame(width: LubaMenuTokens.itemHeight, height: LubaMenuTokens.itemHeight)
             .contentShape(Rectangle())

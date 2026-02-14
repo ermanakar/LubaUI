@@ -62,7 +62,7 @@ public struct LubaToggle: View {
     private var labelView: some View {
         if let label = label {
             Text(label)
-                .font(.system(size: LubaToggleTokens.labelFontSize, design: .rounded))
+                .font(LubaTypography.custom(size: LubaToggleTokens.labelFontSize, weight: .regular))
                 .foregroundStyle(LubaColors.textPrimary)
 
             Spacer()

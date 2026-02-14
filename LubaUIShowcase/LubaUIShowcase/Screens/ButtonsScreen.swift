@@ -46,14 +46,14 @@ struct ButtonsScreen: View {
                             VStack(spacing: LubaSpacing.xs) {
                                 LubaButton("Small", size: .small) { }
                                 Text("32pt")
-                                    .font(.system(size: 11, design: .monospaced))
+                                    .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                     .foregroundStyle(LubaColors.textTertiary)
                             }
 
                             VStack(spacing: LubaSpacing.xs) {
                                 LubaButton("Medium", size: .medium) { }
                                 Text("44pt")
-                                    .font(.system(size: 11, design: .monospaced))
+                                    .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                     .foregroundStyle(LubaColors.textTertiary)
                             }
                         }
@@ -61,7 +61,7 @@ struct ButtonsScreen: View {
                         VStack(spacing: LubaSpacing.xs) {
                             LubaButton("Large", size: .large) { }
                             Text("52pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                     }

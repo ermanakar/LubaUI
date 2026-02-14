@@ -12,6 +12,7 @@ struct StepperScreen: View {
     @State private var quantity = 1
     @State private var volume = 50
     @State private var guests = 2
+    @State private var cartQuantity = 2
 
     var body: some View {
         ShowcaseScreen("Stepper") {
@@ -38,7 +39,7 @@ struct StepperScreen: View {
                 }
             }
 
-            // No Label
+            // Standalone
             DemoSection(title: "Standalone") {
                 HStack {
                     Text("Items in cart")
@@ -46,6 +47,36 @@ struct StepperScreen: View {
                         .foregroundStyle(LubaColors.textSecondary)
                     Spacer()
                     LubaStepper(value: $quantity, in: 0...99)
+                }
+            }
+
+            // Shopping Cart
+            DemoSection(title: "Shopping Cart") {
+                LubaCard(elevation: .low) {
+                    VStack(spacing: 0) {
+                        cartRow(
+                            name: "Wireless Earbuds",
+                            price: "$79.99",
+                            quantity: $cartQuantity
+                        )
+                        LubaDivider()
+                        cartRow(
+                            name: "USB-C Cable",
+                            price: "$12.99",
+                            quantity: $quantity
+                        )
+                        LubaDivider()
+                        HStack {
+                            Text("Total")
+                                .font(LubaTypography.headline)
+                                .foregroundStyle(LubaColors.textPrimary)
+                            Spacer()
+                            Text("$\(String(format: "%.2f", Double(cartQuantity) * 79.99 + Double(quantity) * 12.99))")
+                                .font(LubaTypography.headline)
+                                .foregroundStyle(LubaColors.accent)
+                        }
+                        .padding(.top, LubaSpacing.md)
+                    }
                 }
             }
 
@@ -63,6 +94,24 @@ struct StepperScreen: View {
                 description: "Steppers give users exact control over numeric values. Each tap provides haptic feedback, making counting feel tangible."
             )
         }
+    }
+
+    // MARK: - Components
+
+    private func cartRow(name: String, price: String, quantity: Binding<Int>) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                Text(name)
+                    .font(LubaTypography.body)
+                    .foregroundStyle(LubaColors.textPrimary)
+                Text(price)
+                    .font(LubaTypography.caption)
+                    .foregroundStyle(LubaColors.textSecondary)
+            }
+            Spacer()
+            LubaStepper(value: quantity, in: 0...99)
+        }
+        .padding(.vertical, LubaSpacing.xs)
     }
 }
 

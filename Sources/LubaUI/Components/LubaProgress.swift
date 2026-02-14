@@ -105,7 +105,7 @@ public struct LubaCircularProgress: View {
             // Label
             if showLabel {
                 Text("\(Int(value * 100))")
-                    .font(.system(size: size * LubaProgressTokens.labelFontRatio, weight: .semibold, design: .rounded))
+                    .font(LubaTypography.custom(size: size * LubaProgressTokens.labelFontRatio, weight: .semibold))
                     .foregroundStyle(LubaColors.textPrimary)
             }
         }

@@ -17,34 +17,34 @@ import UIKit
 public enum LubaHaptics {
     
     /// Light impact — for subtle interactions
-    public static func light() {
+    public static func light(intensity: CGFloat? = nil) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
+        generator.impactOccurred(intensity: intensity ?? LubaConfig.shared.hapticIntensity)
         #endif
     }
-    
+
     /// Medium impact — for button presses
-    public static func medium() {
+    public static func medium(intensity: CGFloat? = nil) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        generator.impactOccurred(intensity: intensity ?? LubaConfig.shared.hapticIntensity)
         #endif
     }
-    
+
     /// Heavy impact — for significant actions
-    public static func heavy() {
+    public static func heavy(intensity: CGFloat? = nil) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
+        generator.impactOccurred(intensity: intensity ?? LubaConfig.shared.hapticIntensity)
         #endif
     }
-    
+
     /// Soft impact — for gentle feedback
-    public static func soft() {
+    public static func soft(intensity: CGFloat? = nil) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         let generator = UIImpactFeedbackGenerator(style: .soft)
-        generator.impactOccurred()
+        generator.impactOccurred(intensity: intensity ?? LubaConfig.shared.hapticIntensity)
         #endif
     }
     

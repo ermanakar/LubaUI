@@ -222,7 +222,7 @@ public struct LubaSwipeableModifier: ViewModifier {
 
                 if let label = action.label {
                     Text(label)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(LubaTypography.custom(size: 11, weight: .medium))
                 }
             }
             .foregroundStyle(.white)

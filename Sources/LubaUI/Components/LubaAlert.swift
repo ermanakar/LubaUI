@@ -6,8 +6,8 @@
 //  Unlike LubaToast (overlay), LubaAlert lives in the layout flow.
 //
 //  Design Decisions:
-//  - 14×12pt padding for comfortable density
-//  - 10pt corner radius (slightly smaller than cards)
+//  - 16×12pt padding (on the spacing grid)
+//  - 12pt corner radius (LubaRadius.md, on-grid)
 //  - Color-tinted subtle background with accent border
 //  - Optional dismiss button with haptic feedback
 //
@@ -62,6 +62,7 @@ public struct LubaAlert: View {
     private let message: String
     private let style: LubaAlertStyle
     private let title: String?
+    private let useGlass: Bool
     private let isDismissible: Bool
     private let onDismiss: (() -> Void)?
 
@@ -71,32 +72,34 @@ public struct LubaAlert: View {
         _ message: String,
         style: LubaAlertStyle = .info,
         title: String? = nil,
+        useGlass: Bool = false,
         isDismissible: Bool = false,
         onDismiss: (() -> Void)? = nil
     ) {
         self.message = message
         self.style = style
         self.title = title
+        self.useGlass = useGlass
         self.isDismissible = isDismissible
         self.onDismiss = onDismiss
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: 10) {
+        let content = HStack(alignment: .top, spacing: LubaAlertTokens.iconSpacing) {
             Image(systemName: style.icon)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: LubaAlertTokens.iconSize, weight: .medium))
                 .foregroundStyle(style.color)
-                .frame(width: 20)
+                .frame(width: LubaAlertTokens.iconFrameWidth)
 
             VStack(alignment: .leading, spacing: 2) {
                 if let title = title {
                     Text(title)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(LubaTypography.subheadline)
                         .foregroundStyle(LubaColors.textPrimary)
                 }
 
                 Text(message)
-                    .font(.system(size: 14, design: .rounded))
+                    .font(LubaTypography.bodySmall)
                     .foregroundStyle(LubaColors.textSecondary)
             }
 
@@ -105,26 +108,36 @@ public struct LubaAlert: View {
             if isDismissible {
                 Button(action: dismiss) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: LubaAlertTokens.dismissIconSize, weight: .semibold))
                         .foregroundStyle(LubaColors.textTertiary)
-                        .frame(width: 24, height: 24)
+                        .frame(width: LubaAlertTokens.dismissButtonSize, height: LubaAlertTokens.dismissButtonSize)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Dismiss alert")
                 .accessibilityAddTraits(.isButton)
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(style.backgroundColor)
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(style.color.opacity(0.2), lineWidth: 1)
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
-        .accessibilityAddTraits(isDismissible ? .isButton : .isStaticText)
+        .padding(.horizontal, LubaAlertTokens.horizontalPadding)
+        .padding(.vertical, LubaAlertTokens.verticalPadding)
+
+        if useGlass {
+            content
+                .lubaGlass(.regular, tint: style.color, cornerRadius: LubaRadius.md)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityAddTraits(isDismissible ? .isButton : .isStaticText)
+        } else {
+            content
+                .background(style.backgroundColor)
+                .clipShape(RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous)
+                        .strokeBorder(style.color.opacity(0.2), lineWidth: 1)
+                )
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityAddTraits(isDismissible ? .isButton : .isStaticText)
+        }
     }
 
     private func dismiss() {

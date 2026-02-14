@@ -267,7 +267,7 @@ struct LongPressableScreen: View {
                         Text("    ) { action() }")
                             .foregroundStyle(LubaColors.accent)
                     }
-                    .font(.system(size: 13, design: .monospaced))
+                    .font(LubaTypography.code)
                 }
             }
         }

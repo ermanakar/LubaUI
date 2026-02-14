@@ -119,7 +119,50 @@ public extension LubaPrimitives {
     static let durationQuick: Double = 0.15
     static let durationStandard: Double = 0.25
     static let durationGentle: Double = 0.4
-    
+
     static let springResponse: Double = 0.35
     static let springDamping: Double = 0.7
+}
+
+// MARK: - Glass Primitives (Tier 1)
+
+public extension LubaPrimitives {
+    /// Blur radius for subtle glass — toolbar overlays, small floating elements
+    static let glassBlurSubtle: CGFloat = 8
+
+    /// Blur radius for regular glass — cards, tab bars, sheets
+    static let glassBlurRegular: CGFloat = 16
+
+    /// Blur radius for prominent glass — large panels, modal backgrounds
+    static let glassBlurProminent: CGFloat = 24
+
+    /// Tint overlay opacity in light mode — barely visible color wash
+    static let glassTintOpacityLight: CGFloat = 0.08
+
+    /// Tint overlay opacity in dark mode — slightly stronger for visibility
+    static let glassTintOpacityDark: CGFloat = 0.12
+
+    /// Border luminance (white edge highlight) in light mode
+    static let glassBorderLuminanceLight: CGFloat = 0.5
+
+    /// Border luminance in dark mode — dimmer to avoid glare
+    static let glassBorderLuminanceDark: CGFloat = 0.2
+
+    /// Hairline border width for the luminous edge
+    static let glassBorderWidth: CGFloat = 0.5
+
+    /// Solid fallback background opacity for accessibility (reduceTransparency)
+    static let glassSolidFallbackOpacity: CGFloat = 0.95
+
+    /// Shadow opacity in light mode
+    static let glassShadowOpacityLight: CGFloat = 0.08
+
+    /// Shadow opacity in dark mode — 2x stronger to maintain depth perception
+    static let glassShadowOpacityDark: CGFloat = 0.16
+
+    /// Shadow blur radius
+    static let glassShadowRadius: CGFloat = 8
+
+    /// Shadow Y offset
+    static let glassShadowY: CGFloat = 2
 }

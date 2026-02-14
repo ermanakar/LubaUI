@@ -24,7 +24,7 @@ struct IconsScreen: View {
                             VStack(spacing: LubaSpacing.sm) {
                                 LubaIcon("heart.fill", size: iconSize, color: LubaColors.accent)
                                 Text("\(Int(iconSize.dimension))pt")
-                                    .font(.system(size: 11, design: .monospaced))
+                                    .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                     .foregroundStyle(LubaColors.textTertiary)
                             }
                         }
@@ -219,7 +219,7 @@ struct IconsScreen: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .font(LubaTypography.custom(size: 12, weight: .semibold))
                 .foregroundStyle(LubaColors.textTertiary)
         }
         .padding(.vertical, LubaSpacing.sm)

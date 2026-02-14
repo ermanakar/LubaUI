@@ -267,9 +267,6 @@ final class TokenTests: XCTestCase {
         XCTAssertNotNil(LubaMotion.colorAnimation)
         XCTAssertNotNil(LubaMotion.stateAnimation)
         XCTAssertNotNil(LubaMotion.micro)
-        XCTAssertNotNil(LubaMotion.standard)
-        XCTAssertNotNil(LubaMotion.gentle)
-        XCTAssertNotNil(LubaMotion.bouncy)
     }
 
     func testMotionStagger() {
@@ -323,5 +320,38 @@ final class TokenTests: XCTestCase {
         XCTAssertEqual(LubaRadius.lg, LubaPrimitives.radius16)
         XCTAssertEqual(LubaRadius.xl, LubaPrimitives.radius24)
         XCTAssertEqual(LubaRadius.full, LubaPrimitives.radiusFull)
+    }
+
+    // MARK: - Glass Primitives
+
+    func testGlassPrimitiveValues() {
+        XCTAssertEqual(LubaPrimitives.glassBlurSubtle, 8)
+        XCTAssertEqual(LubaPrimitives.glassBlurRegular, 16)
+        XCTAssertEqual(LubaPrimitives.glassBlurProminent, 24)
+        XCTAssertEqual(LubaPrimitives.glassBorderWidth, 0.5)
+        XCTAssertEqual(LubaPrimitives.glassSolidFallbackOpacity, 0.95)
+        XCTAssertEqual(LubaPrimitives.glassShadowRadius, 8)
+        XCTAssertEqual(LubaPrimitives.glassShadowY, 2)
+    }
+
+    func testGlassBlurMonotonicProgression() {
+        XCTAssertLessThan(LubaPrimitives.glassBlurSubtle, LubaPrimitives.glassBlurRegular)
+        XCTAssertLessThan(LubaPrimitives.glassBlurRegular, LubaPrimitives.glassBlurProminent)
+    }
+
+    func testGlassDarkModeOpacitiesStronger() {
+        XCTAssertGreaterThan(LubaPrimitives.glassTintOpacityDark, LubaPrimitives.glassTintOpacityLight)
+        XCTAssertGreaterThan(LubaPrimitives.glassShadowOpacityDark, LubaPrimitives.glassShadowOpacityLight)
+    }
+
+    func testGlassBorderLuminanceLightBrighter() {
+        XCTAssertGreaterThan(LubaPrimitives.glassBorderLuminanceLight, LubaPrimitives.glassBorderLuminanceDark)
+    }
+
+    func testGlassColorTokensExist() {
+        XCTAssertNotNil(LubaColors.glassBorder)
+        XCTAssertNotNil(LubaColors.glassShadow)
+        XCTAssertNotNil(LubaColors.Programmatic.glassBorder)
+        XCTAssertNotNil(LubaColors.Programmatic.glassShadow)
     }
 }

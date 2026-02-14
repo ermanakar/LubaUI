@@ -84,7 +84,7 @@ public struct LubaExpandable<Header: View, Content: View>: View {
 
                     if showChevron {
                         Image(systemName: LubaExpandTokens.chevronIcon)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(LubaTypography.custom(size: 14, weight: .semibold))
                             .foregroundStyle(LubaColors.textTertiary)
                             .rotationEffect(.degrees(isExpanded ? 180 : 0))
                             .animation(LubaExpandTokens.chevronAnimation, value: isExpanded)

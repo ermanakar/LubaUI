@@ -58,7 +58,7 @@ struct GettingStartedScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             CopyableCode(code: ".lubaPressable { action() }")
                             CopyableCode(code: ".lubaLongPressable { action() }")
-                            CopyableCode(code: ".lubaShimmerable(active: isLoading)")
+                            CopyableCode(code: ".lubaShimmerable(isLoading: isLoading)")
                             CopyableCode(code: ".lubaSwipeable(actions: [.delete])")
                         }
                     }

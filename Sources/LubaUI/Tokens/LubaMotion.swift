@@ -82,16 +82,8 @@ public enum LubaMotion {
     // MARK: - Semantic Presets
 
     /// Quick micro-interaction (toggles, checkboxes)
+    /// Response 0.2s = ultra-quick, 0.7 damping = crisp stop
     public static let micro: Animation = .spring(response: 0.2, dampingFraction: 0.7)
-
-    /// Standard interaction (buttons, cards)
-    public static let standard: Animation = pressAnimation
-
-    /// Gentle movement (modals, sheets)
-    public static let gentle: Animation = .spring(response: 0.4, dampingFraction: 0.8)
-
-    /// Celebratory bounce (success states)
-    public static let bouncy: Animation = .spring(response: 0.35, dampingFraction: 0.5)
 }
 
 // MARK: - Animation Helpers
@@ -99,6 +91,6 @@ public enum LubaMotion {
 public extension LubaMotion {
     /// Creates a staggered delay for list animations
     static func stagger(index: Int, base: Double = 0.04) -> Animation {
-        standard.delay(Double(index) * base)
+        pressAnimation.delay(Double(index) * base)
     }
 }

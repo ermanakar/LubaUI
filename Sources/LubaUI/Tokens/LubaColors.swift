@@ -218,6 +218,20 @@ public enum LubaColors {
     /// Focused border — uses accent
     public static let borderFocused = accent
     
+    // MARK: - Glass
+
+    /// Glass border color — luminous white edge at varying opacity
+    public static let glassBorder = adaptive(
+        light: Color.white.opacity(LubaPrimitives.glassBorderLuminanceLight),
+        dark: Color.white.opacity(LubaPrimitives.glassBorderLuminanceDark)
+    )
+
+    /// Glass shadow color
+    public static let glassShadow = adaptive(
+        light: Color.black.opacity(LubaPrimitives.glassShadowOpacityLight),
+        dark: Color.black.opacity(LubaPrimitives.glassShadowOpacityDark)
+    )
+
     // MARK: - Legacy Aliases (For Compatibility)
     
     public static let navy900 = gray900
@@ -280,6 +294,10 @@ public extension LubaColors {
         public static let errorSubtle = LubaColors.errorSubtle
         public static let border = LubaColors.border
         
+        // Glass
+        public static let glassBorder = LubaColors.glassBorder
+        public static let glassShadow = LubaColors.glassShadow
+
         // Legacy
         public static let navy900 = LubaColors.gray900
         public static let navy700 = LubaColors.gray800

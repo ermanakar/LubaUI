@@ -34,7 +34,7 @@ struct MotionScreen: View {
                             .animation(LubaMotion.pressAnimation, value: isPressed)
 
                         Text("0.97")
-                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                            .font(LubaTypography.custom(size: 13, weight: .medium, design: .monospaced))
                             .foregroundStyle(LubaColors.textSecondary)
                         Text("Standard")
                             .font(LubaTypography.caption)
@@ -49,7 +49,7 @@ struct MotionScreen: View {
                             .animation(LubaMotion.pressAnimation, value: isPressed)
 
                         Text("0.98")
-                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                            .font(LubaTypography.custom(size: 13, weight: .medium, design: .monospaced))
                             .foregroundStyle(LubaColors.textSecondary)
                         Text("Prominent")
                             .font(LubaTypography.caption)
@@ -82,8 +82,6 @@ struct MotionScreen: View {
                         animationRow("colorAnimation", "easeOut(0.12)", "Color transitions")
                         LubaDivider()
                         animationRow("micro", "spring(0.2, 0.7)", "Ultra-quick")
-                        LubaDivider()
-                        animationRow("gentle", "spring(0.4, 0.8)", "Soft transitions")
                     }
                 }
             }
@@ -124,6 +122,26 @@ struct MotionScreen: View {
                     .background(LubaColors.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+            }
+
+            // Applied Animations (LubaAnimations)
+            DemoSection(title: "Applied Animations") {
+                LubaCard(elevation: .flat, style: .outlined) {
+                    VStack(spacing: 0) {
+                        animationRow("LubaAnimations.quick", "spring(0.3, 0.7)", "Snappy interactions")
+                        LubaDivider()
+                        animationRow("LubaAnimations.standard", "spring(0.4, 0.75)", "Default motion")
+                        LubaDivider()
+                        animationRow("LubaAnimations.gentle", "spring(0.6, 0.8)", "Soft, slow reveals")
+                        LubaDivider()
+                        animationRow("LubaAnimations.bouncy", "spring(0.4, 0.6)", "Playful bounce")
+                    }
+                }
+
+                Text("Use LubaMotion for raw values, LubaAnimations for Animation objects.")
+                    .font(LubaTypography.caption)
+                    .foregroundStyle(LubaColors.textTertiary)
+                    .frame(maxWidth: .infinity)
             }
 
             // The Invisible Craft
@@ -168,7 +186,7 @@ struct MotionScreen: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .font(LubaTypography.custom(size: 13, weight: .medium, design: .monospaced))
                     .foregroundStyle(LubaColors.accent)
                 Text(purpose)
                     .font(LubaTypography.caption)
@@ -176,7 +194,7 @@ struct MotionScreen: View {
             }
             Spacer()
             Text(value)
-                .font(.system(size: 11, design: .monospaced))
+                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                 .foregroundStyle(LubaColors.textSecondary)
         }
         .padding(.vertical, LubaSpacing.sm)
@@ -185,7 +203,7 @@ struct MotionScreen: View {
     private func craftItem(_ token: String, _ rationale: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(token)
-                .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                .font(LubaTypography.custom(size: 13, weight: .semibold, design: .monospaced))
                 .foregroundStyle(LubaColors.textPrimary)
             Text(rationale)
                 .font(LubaTypography.caption)

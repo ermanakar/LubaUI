@@ -179,7 +179,7 @@ struct ToastScreen: View {
                         Text(")")
                             .foregroundStyle(LubaColors.textPrimary)
                     }
-                    .font(.system(size: 13, design: .monospaced))
+                    .font(LubaTypography.code)
                 }
             }
         }

@@ -21,14 +21,14 @@ struct ColorsScreen: View {
             DemoSection(title: "Greyscale") {
                 LubaCard(elevation: .flat, style: .outlined, padding: 0) {
                     VStack(spacing: 0) {
-                        greyscaleRow(name: "900", color: LubaColors.gray900)
-                        greyscaleRow(name: "800", color: LubaColors.gray800)
-                        greyscaleRow(name: "600", color: LubaColors.gray600)
-                        greyscaleRow(name: "500", color: LubaColors.gray500)
-                        greyscaleRow(name: "400", color: LubaColors.gray400)
-                        greyscaleRow(name: "200", color: LubaColors.gray200)
-                        greyscaleRow(name: "100", color: LubaColors.gray100)
-                        greyscaleRow(name: "50", color: LubaColors.gray50)
+                        greyscaleRow(name: "900", color: LubaColors.gray900, lightHex: "#1A1A1A", darkHex: "#F5F5F5")
+                        greyscaleRow(name: "800", color: LubaColors.gray800, lightHex: "#2E2E2E", darkHex: "#E5E5E5")
+                        greyscaleRow(name: "600", color: LubaColors.gray600, lightHex: "#525252", darkHex: "#B3B3B3")
+                        greyscaleRow(name: "500", color: LubaColors.gray500, lightHex: "#737373", darkHex: "#8A8A8A")
+                        greyscaleRow(name: "400", color: LubaColors.gray400, lightHex: "#A3A3A3", darkHex: "#5C5C5C")
+                        greyscaleRow(name: "200", color: LubaColors.gray200, lightHex: "#E5E5E5", darkHex: "#333333")
+                        greyscaleRow(name: "100", color: LubaColors.gray100, lightHex: "#F5F5F5", darkHex: "#1C1C1C")
+                        greyscaleRow(name: "50", color: LubaColors.gray50, lightHex: "#FAFAFA", darkHex: "#161616")
                     }
                 }
             }
@@ -37,9 +37,9 @@ struct ColorsScreen: View {
             DemoSection(title: "Accent — Sage Green") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     HStack(spacing: LubaSpacing.md) {
-                        colorChip(color: LubaColors.accent, name: "Accent")
-                        colorChip(color: LubaColors.accentHover, name: "Hover")
-                        colorChip(color: LubaColors.accentSubtle, name: "Subtle")
+                        colorChip(color: LubaColors.accent, name: "Accent", hex: "#5F7360")
+                        colorChip(color: LubaColors.accentHover, name: "Hover", hex: "#506350")
+                        colorChip(color: LubaColors.accentSubtle, name: "Subtle", hex: "#EDF2EC")
                     }
                 }
             }
@@ -48,9 +48,9 @@ struct ColorsScreen: View {
             DemoSection(title: "Semantic") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     HStack(spacing: LubaSpacing.md) {
-                        colorChip(color: LubaColors.success, name: "Success")
-                        colorChip(color: LubaColors.warning, name: "Warning")
-                        colorChip(color: LubaColors.error, name: "Error")
+                        colorChip(color: LubaColors.success, name: "Success", hex: "#4A7C59")
+                        colorChip(color: LubaColors.warning, name: "Warning", hex: "#B8860B")
+                        colorChip(color: LubaColors.error, name: "Error", hex: "#B54A4A")
                     }
                 }
             }
@@ -171,7 +171,9 @@ struct ColorsScreen: View {
 
     // MARK: - Components
 
-    private func greyscaleRow(name: String, color: Color) -> some View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private func greyscaleRow(name: String, color: Color, lightHex: String, darkHex: String) -> some View {
         HStack(spacing: 0) {
             Rectangle()
                 .fill(color)
@@ -182,7 +184,7 @@ struct ColorsScreen: View {
                     .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textPrimary)
                 Spacer()
-                Text("gray\(name)")
+                Text(colorScheme == .dark ? darkHex : lightHex)
                     .font(LubaTypography.code)
                     .foregroundStyle(LubaColors.textTertiary)
             }
@@ -193,15 +195,22 @@ struct ColorsScreen: View {
         .background(LubaColors.surface)
     }
 
-    private func colorChip(color: Color, name: String) -> some View {
+    private func colorChip(color: Color, name: String, hex: String? = nil) -> some View {
         VStack(spacing: LubaSpacing.sm) {
             RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous)
                 .fill(color)
                 .frame(height: 80)
 
-            Text(name)
-                .font(LubaTypography.caption)
-                .foregroundStyle(LubaColors.textSecondary)
+            VStack(spacing: 2) {
+                Text(name)
+                    .font(LubaTypography.caption)
+                    .foregroundStyle(LubaColors.textSecondary)
+                if let hex {
+                    Text(hex)
+                        .font(LubaTypography.code)
+                        .foregroundStyle(LubaColors.textTertiary)
+                }
+            }
         }
         .frame(maxWidth: .infinity)
     }

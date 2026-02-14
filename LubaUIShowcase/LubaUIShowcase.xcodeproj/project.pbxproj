@@ -54,6 +54,12 @@
 		8A3C2B7B2B0F5B4700E1F2D3 /* RatingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B7C2B0F5B4700E1F2D3 /* RatingScreen.swift */; };
 		8A3C2B7D2B0F5B4700E1F2D3 /* TextAreaScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B7E2B0F5B4700E1F2D3 /* TextAreaScreen.swift */; };
 		8A3C2B7F2B0F5B4700E1F2D3 /* LinkScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B802B0F5B4700E1F2D3 /* LinkScreen.swift */; };
+		8A3C2B812B0F5B4200E1F2D3 /* GlassScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B822B0F5B4200E1F2D3 /* GlassScreen.swift */; };
+		8A3C2B832B0F5B4700E1F2D3 /* ToggleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B842B0F5B4700E1F2D3 /* ToggleScreen.swift */; };
+		8A3C2B852B0F5B4700E1F2D3 /* CheckboxScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B862B0F5B4700E1F2D3 /* CheckboxScreen.swift */; };
+		8A3C2B872B0F5B4700E1F2D3 /* RadioScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B882B0F5B4700E1F2D3 /* RadioScreen.swift */; };
+		8A3C2B892B0F5B4700E1F2D3 /* SliderScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B8A2B0F5B4700E1F2D3 /* SliderScreen.swift */; };
+		8A3C2B8B2B0F5B4700E1F2D3 /* ComposabilityScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B8C2B0F5B4700E1F2D3 /* ComposabilityScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,6 +110,12 @@
 		8A3C2B7C2B0F5B4700E1F2D3 /* RatingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingScreen.swift; sourceTree = "<group>"; };
 		8A3C2B7E2B0F5B4700E1F2D3 /* TextAreaScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAreaScreen.swift; sourceTree = "<group>"; };
 		8A3C2B802B0F5B4700E1F2D3 /* LinkScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkScreen.swift; sourceTree = "<group>"; };
+		8A3C2B822B0F5B4200E1F2D3 /* GlassScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassScreen.swift; sourceTree = "<group>"; };
+		8A3C2B842B0F5B4700E1F2D3 /* ToggleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleScreen.swift; sourceTree = "<group>"; };
+		8A3C2B862B0F5B4700E1F2D3 /* CheckboxScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckboxScreen.swift; sourceTree = "<group>"; };
+		8A3C2B882B0F5B4700E1F2D3 /* RadioScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioScreen.swift; sourceTree = "<group>"; };
+		8A3C2B8A2B0F5B4700E1F2D3 /* SliderScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderScreen.swift; sourceTree = "<group>"; };
+		8A3C2B8C2B0F5B4700E1F2D3 /* ComposabilityScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposabilityScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +203,12 @@
 				8A3C2B7C2B0F5B4700E1F2D3 /* RatingScreen.swift */,
 				8A3C2B7E2B0F5B4700E1F2D3 /* TextAreaScreen.swift */,
 				8A3C2B802B0F5B4700E1F2D3 /* LinkScreen.swift */,
+				8A3C2B822B0F5B4200E1F2D3 /* GlassScreen.swift */,
+				8A3C2B842B0F5B4700E1F2D3 /* ToggleScreen.swift */,
+				8A3C2B862B0F5B4700E1F2D3 /* CheckboxScreen.swift */,
+				8A3C2B882B0F5B4700E1F2D3 /* RadioScreen.swift */,
+				8A3C2B8A2B0F5B4700E1F2D3 /* SliderScreen.swift */,
+				8A3C2B8C2B0F5B4700E1F2D3 /* ComposabilityScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -315,6 +333,12 @@
 				8A3C2B7B2B0F5B4700E1F2D3 /* RatingScreen.swift in Sources */,
 				8A3C2B7D2B0F5B4700E1F2D3 /* TextAreaScreen.swift in Sources */,
 				8A3C2B7F2B0F5B4700E1F2D3 /* LinkScreen.swift in Sources */,
+				8A3C2B812B0F5B4200E1F2D3 /* GlassScreen.swift in Sources */,
+				8A3C2B832B0F5B4700E1F2D3 /* ToggleScreen.swift in Sources */,
+				8A3C2B852B0F5B4700E1F2D3 /* CheckboxScreen.swift in Sources */,
+				8A3C2B872B0F5B4700E1F2D3 /* RadioScreen.swift in Sources */,
+				8A3C2B892B0F5B4700E1F2D3 /* SliderScreen.swift in Sources */,
+				8A3C2B8B2B0F5B4700E1F2D3 /* ComposabilityScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

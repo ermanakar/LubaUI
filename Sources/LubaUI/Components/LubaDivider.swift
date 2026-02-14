@@ -51,7 +51,7 @@ public struct LubaDivider: View {
                 line
                 
                 Text(label)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(LubaTypography.custom(size: 12, weight: .medium))
                     .foregroundStyle(LubaColors.textTertiary)
                 
                 line

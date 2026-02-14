@@ -268,7 +268,7 @@ struct SheetScreen: View {
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(LubaTypography.custom(size: 12, weight: .semibold))
                     .foregroundStyle(LubaColors.textTertiary)
             }
         }
@@ -304,7 +304,7 @@ struct SheetScreen: View {
 
             if isSelected {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(LubaTypography.custom(size: 14, weight: .semibold))
                     .foregroundStyle(LubaColors.accent)
             }
         }
@@ -335,7 +335,7 @@ struct SheetScreen: View {
     private func codeRow(_ code: String, _ description: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(code)
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
                 .foregroundStyle(LubaColors.accent)
             Text(description)
                 .font(LubaTypography.caption)

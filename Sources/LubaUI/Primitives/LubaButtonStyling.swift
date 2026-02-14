@@ -144,6 +144,26 @@ public struct LubaSubtleStyle: LubaButtonStyling {
     public var haptic: LubaHapticStyle { .soft }
 }
 
+/// Glass button: translucent glass background for overlay contexts
+public struct LubaGlassButtonStyle: LubaButtonStyling {
+    public init() {}
+
+    public func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
+        colorScheme == .dark ? LubaColors.white : LubaColors.textPrimary
+    }
+
+    public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
+        // Glass modifier handles the visual background; use clear here
+        .clear
+    }
+
+    public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
+        nil
+    }
+
+    public var haptic: LubaHapticStyle { .light }
+}
+
 // MARK: - Style Enum (Convenience)
 
 /// Convenience enum wrapping the built-in styles.
@@ -154,6 +174,7 @@ public enum LubaButtonStyleType {
     case ghost
     case destructive
     case subtle
+    case glass
 
     public var styling: any LubaButtonStyling {
         switch self {
@@ -162,6 +183,7 @@ public enum LubaButtonStyleType {
         case .ghost: return LubaGhostStyle()
         case .destructive: return LubaDestructiveStyle()
         case .subtle: return LubaSubtleStyle()
+        case .glass: return LubaGlassButtonStyle()
         }
     }
 }

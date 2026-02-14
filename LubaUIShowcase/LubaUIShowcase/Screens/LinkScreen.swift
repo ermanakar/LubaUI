@@ -50,6 +50,25 @@ struct LinkScreen: View {
                 }
             }
 
+            // Footer Pattern
+            DemoSection(title: "Footer Pattern") {
+                LubaCard(elevation: .flat, style: .outlined) {
+                    VStack(spacing: LubaSpacing.md) {
+                        HStack(spacing: LubaSpacing.lg) {
+                            LubaLink("Terms", style: .subtle) { }
+                            LubaLink("Privacy", style: .subtle) { }
+                            LubaLink("Help", style: .subtle) { }
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        Text("2025 LubaUI. All rights reserved.")
+                            .font(LubaTypography.caption)
+                            .foregroundStyle(LubaColors.textTertiary)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+            }
+
             // Usage
             DemoSection(title: "Usage") {
                 VStack(spacing: LubaSpacing.sm) {

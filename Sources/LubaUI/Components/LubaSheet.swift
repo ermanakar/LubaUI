@@ -68,6 +68,7 @@ public extension View {
 public struct LubaSheetHeader: View {
     private let title: String
     private let subtitle: String?
+    private let useGlass: Bool
     private let onClose: () -> Void
 
     @Environment(\.lubaConfig) private var config
@@ -75,23 +76,25 @@ public struct LubaSheetHeader: View {
     public init(
         _ title: String,
         subtitle: String? = nil,
+        useGlass: Bool = false,
         onClose: @escaping () -> Void
     ) {
         self.title = title
         self.subtitle = subtitle
+        self.useGlass = useGlass
         self.onClose = onClose
     }
 
     public var body: some View {
-        HStack(alignment: .top) {
+        let header = HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: LubaSheetTokens.titleSpacing) {
                 Text(title)
-                    .font(.system(size: LubaSheetTokens.titleFontSize, weight: .semibold, design: .rounded))
+                    .font(LubaTypography.custom(size: LubaSheetTokens.titleFontSize, weight: .semibold))
                     .foregroundStyle(LubaColors.textPrimary)
 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(.system(size: LubaSheetTokens.subtitleFontSize, design: .rounded))
+                        .font(LubaTypography.footnote)
                         .foregroundStyle(LubaColors.textSecondary)
                 }
             }
@@ -116,7 +119,12 @@ public struct LubaSheetHeader: View {
             .accessibilityAddTraits(.isButton)
         }
         .padding(LubaSheetTokens.headerPadding)
-        .background(LubaColors.surface)
+
+        if useGlass {
+            header.lubaGlass(.subtle)
+        } else {
+            header.background(LubaColors.surface)
+        }
     }
 }
 

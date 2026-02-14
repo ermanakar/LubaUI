@@ -12,6 +12,7 @@ struct TextAreaScreen: View {
     @State private var bio = ""
     @State private var notes = ""
     @State private var tweet = ""
+    @State private var feedback = ""
 
     var body: some View {
         ShowcaseScreen("Text Area") {
@@ -33,6 +34,32 @@ struct TextAreaScreen: View {
             // Custom Height
             DemoSection(title: "Custom Height") {
                 LubaTextArea("Notes", text: $notes, placeholder: "Add your notes here...", minHeight: 160)
+            }
+
+            // Feedback Form
+            DemoSection(title: "Feedback Form") {
+                LubaCard(elevation: .low) {
+                    VStack(spacing: LubaSpacing.lg) {
+                        LubaTextField(
+                            "Subject",
+                            text: .constant(""),
+                            placeholder: "Brief summary"
+                        )
+
+                        LubaTextArea(
+                            "Details",
+                            text: $feedback,
+                            placeholder: "Describe the issue or suggestion in detail...",
+                            characterLimit: 500,
+                            minHeight: 120
+                        )
+
+                        LubaButton(
+                            "Submit Feedback",
+                            isDisabled: feedback.isEmpty
+                        ) { }
+                    }
+                }
             }
 
             // Usage

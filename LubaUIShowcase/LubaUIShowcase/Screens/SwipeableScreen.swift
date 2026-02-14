@@ -196,7 +196,7 @@ struct SwipeableScreen: View {
                     .frame(width: 40, height: 40)
 
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(LubaTypography.custom(size: 16, weight: .medium))
                     .foregroundStyle(.white)
             }
 
@@ -207,7 +207,7 @@ struct SwipeableScreen: View {
             Spacer()
 
             Text(code)
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
                 .foregroundStyle(LubaColors.accent)
         }
         .padding(LubaSpacing.md)
@@ -227,14 +227,14 @@ struct SwipeableScreen: View {
                 .foregroundStyle(LubaColors.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .font(LubaTypography.custom(size: 14, weight: .medium, design: .monospaced))
                 .foregroundStyle(LubaColors.accent)
         }
     }
 
     private func codeSnippet(_ code: String) -> some View {
         Text(code)
-            .font(.system(size: 12, weight: .medium, design: .monospaced))
+            .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
             .foregroundStyle(LubaColors.accent)
     }
 }

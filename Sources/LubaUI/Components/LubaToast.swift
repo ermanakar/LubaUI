@@ -44,6 +44,7 @@ public enum LubaToastStyle {
 public struct LubaToast: View {
     private let message: String
     private let style: LubaToastStyle
+    private let useGlass: Bool
     private let action: (() -> Void)?
     private let actionLabel: String?
 
@@ -53,17 +54,19 @@ public struct LubaToast: View {
     public init(
         _ message: String,
         style: LubaToastStyle = .info,
+        useGlass: Bool = false,
         action: (() -> Void)? = nil,
         actionLabel: String? = nil
     ) {
         self.message = message
         self.style = style
+        self.useGlass = useGlass
         self.action = action
         self.actionLabel = actionLabel
     }
 
     public var body: some View {
-        HStack(spacing: LubaToastTokens.iconSpacing) {
+        let content = HStack(spacing: LubaToastTokens.iconSpacing) {
             // Icon
             Image(systemName: style.icon)
                 .font(.system(size: LubaToastTokens.iconSize, weight: .medium))
@@ -71,7 +74,7 @@ public struct LubaToast: View {
 
             // Message
             Text(message)
-                .font(.system(size: LubaToastTokens.messageFontSize, weight: .medium, design: .rounded))
+                .font(LubaTypography.subheadline)
                 .foregroundStyle(LubaColors.textPrimary)
 
             Spacer(minLength: 4)
@@ -85,27 +88,37 @@ public struct LubaToast: View {
                     action()
                 } label: {
                     Text(label)
-                        .font(.system(size: LubaToastTokens.actionFontSize, weight: .semibold, design: .rounded))
+                        .font(LubaTypography.buttonSmall)
                         .foregroundStyle(style.color)
                 }
             }
         }
         .padding(.horizontal, LubaToastTokens.horizontalPadding)
         .padding(.vertical, LubaToastTokens.verticalPadding)
-        .background(LubaColors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: LubaToastTokens.cornerRadius, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: LubaToastTokens.cornerRadius, style: .continuous)
-                .strokeBorder(LubaColors.border.opacity(colorScheme == .dark ? 0.5 : 1), lineWidth: 1)
-        )
-        .shadow(
-            color: Color.black.opacity(LubaToastTokens.shadowOpacity),
-            radius: LubaToastTokens.shadowBlur,
-            y: LubaToastTokens.shadowY
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
-        .accessibilityAddTraits(.isStaticText)
+
+        if useGlass {
+            content
+                .lubaGlass(.regular, tint: style.color, cornerRadius: LubaToastTokens.cornerRadius)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityAddTraits(.isStaticText)
+        } else {
+            content
+                .background(LubaColors.surface)
+                .clipShape(RoundedRectangle(cornerRadius: LubaToastTokens.cornerRadius, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: LubaToastTokens.cornerRadius, style: .continuous)
+                        .strokeBorder(LubaColors.border.opacity(colorScheme == .dark ? 0.5 : 1), lineWidth: 1)
+                )
+                .shadow(
+                    color: Color.black.opacity(LubaToastTokens.shadowOpacity),
+                    radius: LubaToastTokens.shadowBlur,
+                    y: LubaToastTokens.shadowY
+                )
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityAddTraits(.isStaticText)
+        }
     }
 }
 

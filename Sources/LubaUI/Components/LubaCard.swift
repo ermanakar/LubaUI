@@ -71,30 +71,31 @@ public enum LubaCardStyle {
     case filled     // Solid surface background
     case outlined   // Border only, transparent background
     case ghost      // No border, no background (content only)
+    case glass      // Translucent glass background
 
     var hasBackground: Bool {
         switch self {
         case .filled: return true
-        case .outlined: return false
-        case .ghost: return false
+        case .outlined, .ghost, .glass: return false
         }
     }
 
     var hasBorder: Bool {
         switch self {
-        case .filled: return false
         case .outlined: return true
-        case .ghost: return false
+        case .filled, .ghost, .glass: return false
         }
     }
+
+    var isGlass: Bool { self == .glass }
 }
 
 // MARK: - Card Constants
 
 /// Layout constants for cards
 public enum LubaCardTokens {
-    /// Default corner radius
-    public static let cornerRadius: CGFloat = 14
+    /// Default corner radius (on the LubaRadius grid)
+    public static let cornerRadius: CGFloat = LubaRadius.lg
 
     /// Default content padding
     public static let padding: CGFloat = LubaSpacing.lg
@@ -174,17 +175,23 @@ public struct LubaCard<Content: View>: View {
     }
 
     public var body: some View {
-        content
-            .padding(padding)
-            .background(backgroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .overlay(borderOverlay)
-            .shadow(
-                color: shadowColor,
-                radius: elevation.shadowRadius,
-                x: 0,
-                y: elevation.shadowY
-            )
+        if style.isGlass {
+            content
+                .padding(padding)
+                .lubaGlass(.regular, cornerRadius: cornerRadius)
+        } else {
+            content
+                .padding(padding)
+                .background(backgroundColor)
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .overlay(borderOverlay)
+                .shadow(
+                    color: shadowColor,
+                    radius: elevation.shadowRadius,
+                    x: 0,
+                    y: elevation.shadowY
+                )
+        }
     }
 
     // MARK: - Computed Properties

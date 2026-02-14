@@ -97,44 +97,62 @@ public struct LubaThemeSpacing {
     public let md: CGFloat
     public let lg: CGFloat
     public let xl: CGFloat
-    
+    public let xxl: CGFloat
+    public let xxxl: CGFloat
+    public let huge: CGFloat
+
     public init(
         xs: CGFloat = LubaSpacing.xs,
         sm: CGFloat = LubaSpacing.sm,
         md: CGFloat = LubaSpacing.md,
         lg: CGFloat = LubaSpacing.lg,
-        xl: CGFloat = LubaSpacing.xl
+        xl: CGFloat = LubaSpacing.xl,
+        xxl: CGFloat = LubaSpacing.xxl,
+        xxxl: CGFloat = LubaSpacing.xxxl,
+        huge: CGFloat = LubaSpacing.huge
     ) {
         self.xs = xs
         self.sm = sm
         self.md = md
         self.lg = lg
         self.xl = xl
+        self.xxl = xxl
+        self.xxxl = xxxl
+        self.huge = huge
     }
-    
+
     public static let `default` = LubaThemeSpacing()
 }
 
 // MARK: - Theme Radius
 
 public struct LubaThemeRadius {
+    public let none: CGFloat
+    public let xs: CGFloat
     public let sm: CGFloat
     public let md: CGFloat
     public let lg: CGFloat
+    public let xl: CGFloat
     public let full: CGFloat
-    
+
     public init(
+        none: CGFloat = LubaRadius.none,
+        xs: CGFloat = LubaRadius.xs,
         sm: CGFloat = LubaRadius.sm,
         md: CGFloat = LubaRadius.md,
         lg: CGFloat = LubaRadius.lg,
+        xl: CGFloat = LubaRadius.xl,
         full: CGFloat = LubaRadius.full
     ) {
+        self.none = none
+        self.xs = xs
         self.sm = sm
         self.md = md
         self.lg = lg
+        self.xl = xl
         self.full = full
     }
-    
+
     public static let `default` = LubaThemeRadius()
 }
 

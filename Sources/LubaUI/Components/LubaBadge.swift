@@ -85,7 +85,7 @@ public struct LubaBadge: View {
             }
             
             Text(text)
-                .font(.system(size: size.fontSize, weight: .semibold, design: .rounded))
+                .font(LubaTypography.custom(size: size.fontSize, weight: .semibold))
         }
         .padding(.horizontal, size.horizontalPadding)
         .padding(.vertical, size.verticalPadding)

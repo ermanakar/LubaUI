@@ -14,14 +14,14 @@ final class ComponentTokenTests: XCTestCase {
     // MARK: - Button Style Tests
 
     func testButtonStyleEnum() {
-        let styles: [LubaButtonStyle] = [.primary, .secondary, .ghost, .destructive, .subtle]
+        let styles: [LubaButtonStyle] = [.primary, .secondary, .ghost, .destructive, .subtle, .glass]
         for style in styles {
             XCTAssertNotNil(style.styling, "Style \(style) should produce a styling instance")
         }
     }
 
     func testButtonStyleType() {
-        let types: [LubaButtonStyleType] = [.primary, .secondary, .ghost, .destructive, .subtle]
+        let types: [LubaButtonStyleType] = [.primary, .secondary, .ghost, .destructive, .subtle, .glass]
         for type in types {
             XCTAssertNotNil(type.styling, "Type \(type) should produce a styling instance")
         }
@@ -98,7 +98,7 @@ final class ComponentTokenTests: XCTestCase {
 
     func testFieldTokens() {
         XCTAssertEqual(LubaFieldTokens.minHeight, 48)
-        XCTAssertEqual(LubaFieldTokens.cornerRadius, 10)
+        XCTAssertEqual(LubaFieldTokens.cornerRadius, 12)
         XCTAssertGreaterThan(LubaFieldTokens.borderWidthFocused, LubaFieldTokens.borderWidth,
                              "Focused border should be thicker than normal")
     }
@@ -115,7 +115,7 @@ final class ComponentTokenTests: XCTestCase {
     // MARK: - Card Token Tests
 
     func testCardTokens() {
-        XCTAssertEqual(LubaCardTokens.cornerRadius, 14)
+        XCTAssertEqual(LubaCardTokens.cornerRadius, 16)
         XCTAssertEqual(LubaCardTokens.padding, LubaSpacing.lg)
         XCTAssertEqual(LubaCardTokens.paddingCompact, LubaSpacing.md)
         XCTAssertEqual(LubaCardTokens.paddingLarge, LubaSpacing.xl)
@@ -141,8 +141,8 @@ final class ComponentTokenTests: XCTestCase {
     }
 
     func testCardStylesCoverage() {
-        let styles: [LubaCardStyle] = [.filled, .outlined]
-        XCTAssertEqual(styles.count, 2)
+        let styles: [LubaCardStyle] = [.filled, .outlined, .ghost, .glass]
+        XCTAssertEqual(styles.count, 4)
     }
 
     func testCardElevationsCoverage() {
@@ -156,9 +156,9 @@ final class ComponentTokenTests: XCTestCase {
         XCTAssertEqual(LubaSelectionTokens.controlSize, 20)
         XCTAssertEqual(LubaSelectionTokens.indicatorSize, 10)
         XCTAssertEqual(LubaSelectionTokens.borderWidth, 1.5)
-        XCTAssertEqual(LubaSelectionTokens.checkboxRadius, 5)
+        XCTAssertEqual(LubaSelectionTokens.checkboxRadius, 4)
         XCTAssertEqual(LubaSelectionTokens.checkmarkSize, 11)
-        XCTAssertEqual(LubaSelectionTokens.labelSpacing, 10)
+        XCTAssertEqual(LubaSelectionTokens.labelSpacing, 8)
         XCTAssertEqual(LubaSelectionTokens.minTouchTarget, 44)
     }
 
@@ -315,6 +315,38 @@ final class ComponentTokenTests: XCTestCase {
     func testBadgeStylesCoverage() {
         let styles: [LubaBadgeStyle] = [.accent, .subtle, .neutral, .success, .warning, .error]
         XCTAssertEqual(styles.count, 6, "Should have 6 badge styles")
+    }
+
+    // MARK: - Touch Target Consistency
+
+    // MARK: - Glass Token Tests
+
+    func testGlassTokens() {
+        XCTAssertEqual(LubaGlassTokens.cornerRadius, LubaRadius.md)
+        XCTAssertEqual(LubaGlassTokens.borderWidth, LubaPrimitives.glassBorderWidth)
+        XCTAssertEqual(LubaGlassTokens.shadowRadius, LubaPrimitives.glassShadowRadius)
+        XCTAssertEqual(LubaGlassTokens.shadowY, LubaPrimitives.glassShadowY)
+        XCTAssertEqual(LubaGlassTokens.solidFallbackOpacity, LubaPrimitives.glassSolidFallbackOpacity)
+    }
+
+    func testGlassStyleCount() {
+        let styles: [LubaGlassStyle] = [.subtle, .regular, .prominent]
+        XCTAssertEqual(styles.count, 3)
+    }
+
+    func testGlassButtonStyleCreation() {
+        let style = LubaGlassButtonStyle()
+        XCTAssertEqual(style.haptic, .light)
+        XCTAssertFalse(style.defaultsToFullWidth)
+        let bg = style.backgroundColor(isPressed: false, colorScheme: .light)
+        XCTAssertEqual(bg, .clear)
+    }
+
+    func testCardGlassStyle() {
+        let style = LubaCardStyle.glass
+        XCTAssertTrue(style.isGlass)
+        XCTAssertFalse(style.hasBackground)
+        XCTAssertFalse(style.hasBorder)
     }
 
     // MARK: - Touch Target Consistency

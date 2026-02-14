@@ -19,7 +19,7 @@ final class ComponentTests: XCTestCase {
     }
 
     func testButtonWithAllStyles() {
-        let styles: [LubaButtonStyle] = [.primary, .secondary, .ghost, .destructive, .subtle]
+        let styles: [LubaButtonStyle] = [.primary, .secondary, .ghost, .destructive, .subtle, .glass]
         for style in styles {
             let button = LubaButton("Test", style: style) { }
             XCTAssertNotNil(button)
@@ -54,6 +54,28 @@ final class ComponentTests: XCTestCase {
             Text("Content")
         }
         XCTAssertNotNil(card)
+    }
+
+    func testGlassCardCreation() {
+        let card = LubaCard(style: .glass) {
+            Text("Glass Content")
+        }
+        XCTAssertNotNil(card)
+    }
+
+    func testGlassButtonCreation() {
+        let button = LubaButton("Glass", style: .glass) { }
+        XCTAssertNotNil(button)
+    }
+
+    func testGlassToastCreation() {
+        let toast = LubaToast("Saved", style: .success, useGlass: true)
+        XCTAssertNotNil(toast)
+    }
+
+    func testGlassAlertCreation() {
+        let alert = LubaAlert("Info", style: .info, useGlass: true)
+        XCTAssertNotNil(alert)
     }
 
     // MARK: - TextField

@@ -20,14 +20,14 @@ public enum LubaFieldTokens {
     /// Minimum touch target height
     public static let minHeight: CGFloat = 48
 
-    /// Corner radius (matches buttons)
-    public static let cornerRadius: CGFloat = 10
+    /// Corner radius (matches buttons, on the LubaRadius grid)
+    public static let cornerRadius: CGFloat = LubaRadius.md
 
     /// Horizontal padding inside field
-    public static let horizontalPadding: CGFloat = 14
+    public static let horizontalPadding: CGFloat = LubaSpacing.lg
 
     /// Spacing between icon and text
-    public static let iconSpacing: CGFloat = 10
+    public static let iconSpacing: CGFloat = LubaSpacing.sm
 
     /// Icon size
     public static let iconSize: CGFloat = 18
@@ -173,7 +173,7 @@ public struct LubaTextField: View {
 
     private var labelView: some View {
         Text(label)
-            .font(.system(size: LubaFieldTokens.labelFontSize, weight: .medium, design: .rounded))
+            .font(LubaTypography.custom(size: LubaFieldTokens.labelFontSize, weight: .medium))
             .foregroundStyle(currentState.labelColor())
             .animation(LubaMotion.colorAnimation, value: currentState)
     }
@@ -241,15 +241,15 @@ public struct LubaTextField: View {
         if let error = error {
             HStack(spacing: 4) {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .font(.system(size: LubaFieldTokens.helperFontSize))
+                    .font(LubaTypography.custom(size: LubaFieldTokens.helperFontSize, weight: .regular))
                 Text(error)
-                    .font(.system(size: LubaFieldTokens.helperFontSize, design: .rounded))
+                    .font(LubaTypography.custom(size: LubaFieldTokens.helperFontSize, weight: .regular))
             }
             .foregroundStyle(LubaColors.error)
             .transition(.opacity.combined(with: .move(edge: .top)))
         } else if let helperText = helperText {
             Text(helperText)
-                .font(.system(size: LubaFieldTokens.helperFontSize, design: .rounded))
+                .font(LubaTypography.custom(size: LubaFieldTokens.helperFontSize, weight: .regular))
                 .foregroundStyle(LubaColors.textTertiary)
         }
     }

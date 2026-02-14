@@ -196,14 +196,14 @@ struct ExpandableScreen: View {
                 .foregroundStyle(LubaColors.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .font(LubaTypography.custom(size: 14, weight: .medium, design: .monospaced))
                 .foregroundStyle(LubaColors.accent)
         }
     }
 
     private func codeSnippet(_ code: String) -> some View {
         Text(code)
-            .font(.system(size: 12, weight: .medium, design: .monospaced))
+            .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
             .foregroundStyle(LubaColors.accent)
     }
 }

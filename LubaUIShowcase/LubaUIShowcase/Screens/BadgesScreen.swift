@@ -59,14 +59,14 @@ struct BadgesScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             LubaBadge("Small", style: .accent, size: .small)
                             Text("11pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
 
                         VStack(spacing: LubaSpacing.sm) {
                             LubaBadge("Medium", style: .accent, size: .medium)
                             Text("12pt")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                     }
@@ -224,7 +224,7 @@ struct BadgesScreen: View {
             }
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .font(LubaTypography.custom(size: 12, weight: .semibold))
                 .foregroundStyle(LubaColors.textTertiary)
         }
         .padding(.vertical, LubaSpacing.sm)

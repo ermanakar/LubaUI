@@ -97,6 +97,13 @@ public struct LubaConfig {
         accentColorDark = dark
     }
     
+    /// Apply animation speed multiplier to any animation.
+    /// Returns nil when animations are disabled.
+    public func animation(_ base: Animation = LubaAnimations.standard) -> Animation? {
+        guard animationsEnabled else { return nil }
+        return animationSpeed == 1.0 ? base : base.speed(1.0 / animationSpeed)
+    }
+
     /// Disable all animations
     public mutating func disableAnimations() {
         animationsEnabled = false
