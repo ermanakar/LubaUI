@@ -1,6 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import {
   lookupToken,
   lookupComponent,
@@ -16,9 +19,15 @@ import { validateSpacing, validateRadius } from "./tools/validate.js";
 import { suggestTokens } from "./tools/suggest.js";
 import { planMigration } from "./tools/migrate.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const pkg = JSON.parse(
+  readFileSync(resolve(__dirname, "..", "package.json"), "utf-8")
+);
+
 const server = new McpServer({
   name: "lubaui",
-  version: "1.0.0",
+  version: pkg.version,
 });
 
 // --- Tools ---
@@ -27,7 +36,7 @@ server.tool(
   "lookup_token",
   "Look up a single LubaUI design token by name or description. For multiple tokens, use lookup_tokens (batch) instead. For the full system, read the lubaui://reference/full resource.",
   {
-    query: z.string().describe("Token name, API path, or description (e.g. 'spacing large', 'lg', 'card padding')"),
+    query: z.string().min(1).max(200).describe("Token name, API path, or description (e.g. 'spacing large', 'lg', 'card padding')"),
     category: z
       .enum(["spacing", "radius", "color", "typography", "motion", "glass"])
       .optional()
@@ -43,7 +52,7 @@ server.tool(
   "lookup_component",
   "Look up a single LubaUI component by name. For multiple components, use lookup_components (batch) instead. For the full system, read the lubaui://reference/full resource.",
   {
-    query: z.string().describe("Component name (e.g. 'Button', 'LubaTextField', 'toast')"),
+    query: z.string().min(1).max(200).describe("Component name (e.g. 'Button', 'LubaTextField', 'toast')"),
   },
   async ({ query }) => {
     const result = lookupComponent(query);
@@ -55,7 +64,7 @@ server.tool(
   "lookup_primitive",
   "Look up a LubaUI interaction primitive by name. Returns modifier signature, parameters, presets, and code example.",
   {
-    query: z.string().describe("Primitive name (e.g. 'pressable', 'swipeable', 'glass', 'expandable')"),
+    query: z.string().min(1).max(200).describe("Primitive name (e.g. 'pressable', 'swipeable', 'glass', 'expandable')"),
   },
   async ({ query }) => {
     const result = lookupPrimitive(query);
@@ -67,7 +76,7 @@ server.tool(
   "validate_spacing",
   "Check if a spacing value is on the LubaUI 4pt grid and maps to a named token. Suggests nearest tokens if not.",
   {
-    value: z.number().describe("Spacing value in points to validate"),
+    value: z.number().finite().describe("Spacing value in points to validate"),
   },
   async ({ value }) => {
     const result = validateSpacing(value);
@@ -79,7 +88,7 @@ server.tool(
   "validate_radius",
   "Check if a corner radius value is on the LubaUI radius scale. Suggests nearest token if not.",
   {
-    value: z.number().describe("Radius value in points to validate"),
+    value: z.number().finite().describe("Radius value in points to validate"),
   },
   async ({ value }) => {
     const result = validateRadius(value);
@@ -91,7 +100,7 @@ server.tool(
   "get_color_palette",
   "Get LubaUI colors by category or search. Returns light/dark hex values and usage context.",
   {
-    query: z.string().describe("Color category (greyscale, surfaces, accent, text, semantic, border, glass) or search term (e.g. 'error', 'background')"),
+    query: z.string().min(1).max(200).describe("Color category (greyscale, surfaces, accent, text, semantic, border, glass) or search term (e.g. 'error', 'background')"),
   },
   async ({ query }) => {
     const result = getColorPalette(query);
@@ -103,7 +112,7 @@ server.tool(
   "suggest_tokens",
   "Suggest LubaUI tokens, components, and primitives for a UI you're building. Returns full component/primitive specs with parameters and code examples. For complete system knowledge, read the lubaui://reference/full resource instead.",
   {
-    description: z.string().describe("Description of what you're building (e.g. 'notification banner', 'settings page', 'profile card')"),
+    description: z.string().min(1).max(500).describe("Description of what you're building (e.g. 'notification banner', 'settings page', 'profile card')"),
   },
   async ({ description }) => {
     const result = suggestTokens(description);
@@ -117,7 +126,7 @@ server.tool(
   "lookup_components",
   "Look up multiple LubaUI components in a single call. Returns full specs (parameters, code examples, tokens, notes) for each match. Use this instead of calling lookup_component repeatedly.",
   {
-    queries: z.array(z.string()).describe("Array of component names (e.g. ['Button', 'Card', 'TextField', 'Tabs'])"),
+    queries: z.array(z.string().min(1).max(200)).min(1).max(25).describe("Array of component names (e.g. ['Button', 'Card', 'TextField', 'Tabs'])"),
   },
   async ({ queries }) => {
     const result = lookupComponents(queries);
@@ -129,7 +138,7 @@ server.tool(
   "lookup_tokens",
   "Look up multiple LubaUI design tokens in a single call. Returns token name, API, value, tier, and usage guidance for each match. Use this instead of calling lookup_token repeatedly.",
   {
-    queries: z.array(z.string()).describe("Array of token queries (e.g. ['spacing large', 'radius medium', 'press scale'])"),
+    queries: z.array(z.string().min(1).max(200)).min(1).max(50).describe("Array of token queries (e.g. ['spacing large', 'radius medium', 'press scale'])"),
     category: z
       .enum(["spacing", "radius", "color", "typography", "motion", "glass"])
       .optional()
@@ -149,54 +158,63 @@ server.tool(
   {
     source_system: z
       .string()
+      .min(1)
+      .max(500)
       .describe("Name or description of the source design system (e.g. 'Custom DS with violet accent and dark-only theme')"),
     colors: z
       .array(
         z.object({
-          name: z.string().describe("Source color token name (e.g. 'DS.Colors.accent')"),
-          value: z.string().describe("Hex color value (e.g. '#A78BFA')"),
-          usage: z.string().optional().describe("How this color is used (e.g. 'primary accent')"),
+          name: z.string().min(1).max(200).describe("Source color token name (e.g. 'DS.Colors.accent')"),
+          value: z.string().min(1).max(50).describe("Hex color value (e.g. '#A78BFA')"),
+          usage: z.string().max(200).optional().describe("How this color is used (e.g. 'primary accent')"),
         })
       )
+      .max(100)
       .optional()
       .describe("Source color tokens to map"),
     spacing: z
       .array(
         z.object({
-          name: z.string().describe("Source spacing token name"),
-          value: z.number().describe("Value in points"),
+          name: z.string().min(1).max(200).describe("Source spacing token name"),
+          value: z.number().finite().describe("Value in points"),
         })
       )
+      .max(100)
       .optional()
       .describe("Source spacing tokens to map"),
     radii: z
       .array(
         z.object({
-          name: z.string().describe("Source radius token name"),
-          value: z.number().describe("Value in points"),
+          name: z.string().min(1).max(200).describe("Source radius token name"),
+          value: z.number().finite().describe("Value in points"),
         })
       )
+      .max(100)
       .optional()
       .describe("Source radius tokens to map"),
     typography: z
       .array(
         z.object({
-          name: z.string().describe("Source typography token name"),
-          size: z.number().describe("Font size in points"),
-          weight: z.string().optional().describe("Font weight (e.g. 'bold', 'semibold')"),
+          name: z.string().min(1).max(200).describe("Source typography token name"),
+          size: z.number().finite().describe("Font size in points"),
+          weight: z.string().max(50).optional().describe("Font weight (e.g. 'bold', 'semibold')"),
         })
       )
+      .max(100)
       .optional()
       .describe("Source typography tokens to map"),
     components: z
       .array(
         z.object({
-          name: z.string().describe("Source component name (e.g. 'HeroCard')"),
+          name: z.string().min(1).max(200).describe("Source component name (e.g. 'HeroCard')"),
           description: z
             .string()
+            .min(1)
+            .max(500)
             .describe("What the component does (e.g. 'large card with shadow for featured content')"),
         })
       )
+      .max(100)
       .optional()
       .describe("Source components to find LubaUI equivalents for"),
   },
@@ -226,7 +244,7 @@ server.resource(
   async () => {
     const fullReference = {
       system: "LubaUI Design System",
-      version: "1.0.0",
+      version: pkg.version,
       philosophy:
         "Composability over inheritance. Behaviors are extracted into primitives (modifiers) so any view can gain interactive powers without subclassing. Every magic number has a name, a token, and documented rationale.",
       platforms: "iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, visionOS 1.0+",
@@ -450,4 +468,7 @@ async function main() {
   await server.connect(transport);
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  console.error("Failed to start LubaUI MCP server:", error);
+  process.exit(1);
+});
