@@ -11,10 +11,27 @@ An MCP (Model Context Protocol) server that makes the LubaUI design system activ
 One command — works from any project directory:
 
 ```bash
-claude mcp add lubaui -- npx lubaui-mcp
+claude mcp add lubaui -- npx lubaui-mcp@latest
 ```
 
+Using `@latest` ensures you always get the newest version. Without it, `npx` caches the first version it downloads.
+
 That's it. Next time you start Claude Code, the LubaUI tools are available. Ask "What spacing should I use for card padding?" and Claude will query the server.
+
+### Updating
+
+If you installed without `@latest`, you can update manually:
+
+```bash
+npx lubaui-mcp@latest
+```
+
+Or re-add with auto-updates:
+
+```bash
+claude mcp remove lubaui
+claude mcp add lubaui -- npx lubaui-mcp@latest
+```
 
 ### Contributing to LubaUI
 
@@ -30,51 +47,79 @@ The server starts on demand when Claude Code opens the project.
 
 ## Tools
 
-The server provides 7 tools that solve real problems during development.
+The server provides 10 tools organized by use case.
 
-### `lookup_token`
+### Lookup Tools
 
-Find any design token by name or description.
+#### `lookup_token`
+
+Find a single design token by name or description.
 
 ```
 "What spacing should I use for card padding?"
 → LubaSpacing.lg — 16pt — "Large — card padding, section spacing, standard gap"
-
-"What's the accent color hex?"
-→ LubaColors.accent — light: #5F7360, dark: #9AB897
 ```
 
 **Parameters:**
 - `query` (required) — Token name, API path, or description
 - `category` (optional) — Filter: `spacing`, `radius`, `color`, `typography`, `motion`, `glass`
 
-### `lookup_component`
+#### `lookup_component`
 
-Get the full API for any of the 25 components.
+Get the full API for a single component.
 
 ```
 "How do I use LubaButton?"
-→ Parameters, styles (.primary/.secondary/.ghost/.destructive/.subtle/.glass),
-  sizes, code example, related tokens
+→ Parameters, styles, sizes, code example, related tokens
 ```
 
 **Parameters:**
 - `query` (required) — Component name (fuzzy: "Button", "LubaTextField", "toast")
 
-### `lookup_primitive`
+#### `lookup_primitive`
 
-Look up any of the 7 interaction primitives.
+Look up a single interaction primitive.
 
 ```
 "How do I add swipe-to-delete?"
-→ .lubaSwipeable() modifier, parameters, 6 presets (.delete, .archive, .pin, etc.),
-  code example, composability notes
+→ .lubaSwipeable() modifier, parameters, 6 presets, code example
 ```
 
 **Parameters:**
 - `query` (required) — Primitive name (fuzzy: "pressable", "swipeable", "glass")
 
-### `validate_spacing`
+### Batch Tools
+
+For looking up multiple items at once — use these instead of calling the single-lookup tools repeatedly.
+
+#### `lookup_components`
+
+Look up multiple components in a single call. Returns full specs for each match.
+
+```
+queries: ["Button", "Card", "TextField", "Tabs", "Badge"]
+→ 5 components with parameters, code examples, tokens, and notes
+```
+
+**Parameters:**
+- `queries` (required) — Array of component names
+
+#### `lookup_tokens`
+
+Look up multiple tokens in a single call.
+
+```
+queries: ["spacing large", "radius medium", "press scale", "accent"]
+→ All matching tokens with values, tiers, and descriptions
+```
+
+**Parameters:**
+- `queries` (required) — Array of token queries
+- `category` (optional) — Filter all queries by category
+
+### Validation Tools
+
+#### `validate_spacing`
 
 Check if a spacing value is on the 4pt grid and maps to a named token.
 
@@ -82,55 +127,33 @@ Check if a spacing value is on the 4pt grid and maps to a named token.
 "Is 14pt valid?"
 → No — 14pt is NOT on the 4pt grid.
   Nearest: LubaSpacing.md (12pt) and LubaSpacing.lg (16pt)
-
-"Is 16pt valid?"
-→ Yes — 16pt is LubaSpacing.lg
 ```
 
 **Parameters:**
 - `value` (required) — Spacing value in points
 
-### `validate_radius`
+#### `validate_radius`
 
 Check if a corner radius is on the LubaRadius scale.
 
 ```
 "Is 10pt a valid radius?"
 → No — nearest: LubaRadius.sm (8pt) and LubaRadius.md (12pt)
-  Valid radii: none(0), xs(4), sm(8), md(12), lg(16), xl(24), full(9999)
 ```
 
 **Parameters:**
 - `value` (required) — Radius value in points
 
-### `get_color_palette`
+### Recommendation Tools
 
-Browse colors by category or search across the palette.
+#### `suggest_tokens`
 
-```
-"Show me the surface colors"
-→ background (#FAFAFA/#0D0D0D), surface (#FFFFFF/#171717),
-  surfaceSecondary (#F5F5F5/#212121), surfaceTertiary (#EFEFEF/#2A2A2A)
-
-"What colors are available for errors?"
-→ error (#B54A4A/#E07A7A), errorSubtle (#FAEFEF/#251A1A)
-```
-
-**Parameters:**
-- `query` (required) — Category name (`greyscale`, `surfaces`, `accent`, `text`, `semantic`, `border`, `glass`) or search term
-
-### `suggest_tokens`
-
-Describe what you're building and get token, component, and primitive recommendations.
+Describe what you're building and get token, component, and primitive recommendations — with full specs including parameters and code examples.
 
 ```
 "I'm building a notification banner"
-→ Spacing: LubaSpacing.md (12pt) internal, LubaSpacing.lg (16pt) horizontal
-  Colors: LubaColors.success/warning/error for status
-  Radius: LubaRadius.md (12pt)
-  Typography: LubaTypography.subheadline for message
-  Components: LubaToast, LubaAlert
-  Primitives: lubaGlass for frosted effect
+→ Spacing, colors, radius, typography recommendations
+  + full specs for LubaToast, LubaAlert, lubaGlass
 ```
 
 **Parameters:**
@@ -138,17 +161,58 @@ Describe what you're building and get token, component, and primitive recommenda
 
 Recognizes these patterns: `form`, `notification`, `banner`, `card`, `list`, `loading`, `navigation`, `profile`, `modal`, `settings`.
 
+#### `get_color_palette`
+
+Browse colors by category or search across the palette.
+
+```
+"Show me the surface colors"
+→ background (#FAFAFA/#0D0D0D), surface (#FFFFFF/#171717),
+  surfaceSecondary (#F5F5F5/#212121), surfaceTertiary (#EFEFEF/#2A2A2A)
+```
+
+**Parameters:**
+- `query` (required) — Category name (`greyscale`, `surfaces`, `accent`, `text`, `semantic`, `border`, `glass`) or search term
+
+### Migration Tool
+
+#### `plan_migration`
+
+Generate a mapping from an existing design system to LubaUI. Provide your source tokens and get a complete migration table.
+
+```
+source_system: "Custom DS with violet accent"
+colors: [{ name: "DS.Colors.accent", value: "#A78BFA" }]
+spacing: [{ name: "DS.Spacing.md", value: 16 }]
+components: [{ name: "HeroCard", description: "large card with shadow" }]
+
+→ Color mappings (exact/nearest with hex values)
+  Spacing mappings (exact/nearest with delta)
+  Component mappings (LubaCard, with full specs and code examples)
+```
+
+**Parameters:**
+- `source_system` (required) — Name or description of your current design system
+- `colors` (optional) — Array of `{ name, value (hex), usage? }`
+- `spacing` (optional) — Array of `{ name, value (pt) }`
+- `radii` (optional) — Array of `{ name, value (pt) }`
+- `typography` (optional) — Array of `{ name, size (pt), weight? }`
+- `components` (optional) — Array of `{ name, description }`
+
 ---
 
 ## Resources
 
-Three read-only resources provide full reference data.
+Four read-only resources provide reference data at different levels of detail.
 
-| URI | Description |
-|-----|-------------|
-| `lubaui://tokens/all` | Complete token catalog — spacing, radius, colors, typography, motion, glass |
-| `lubaui://architecture` | Three-tier system rules, design philosophy, naming conventions |
-| `lubaui://components` | Component and primitive directory with descriptions |
+| URI | Size | Description |
+|-----|------|-------------|
+| `lubaui://reference/full` | ~52KB | Complete system — architecture, all tokens, all components with full specs, all primitives. **Read this once for full system adoption.** |
+| `lubaui://components` | ~32KB | All components and primitives with full specs (parameters, examples, tokens, notes) |
+| `lubaui://tokens/all` | ~18KB | Complete token catalog — spacing, radius, colors, typography, motion, glass |
+| `lubaui://architecture` | ~2KB | Three-tier system rules, design philosophy, naming conventions |
+
+**Recommended usage:** For design system adoption or migration, read `lubaui://reference/full` once — it has everything. Use the smaller resources when you only need a specific section.
 
 ---
 
@@ -162,13 +226,16 @@ mcp-server/
     ├── index.ts              # Server entry, tool/resource registration
     ├── data/
     │   ├── tokens.json       # Spacing, radius, colors, typography, motion, glass
-    │   ├── components.json   # 25 component APIs with parameters and examples
+    │   ├── components.json   # 26 component APIs with parameters and examples
     │   └── primitives.json   # 7 primitives with modifiers and patterns
     ├── tools/
     │   ├── lookup.ts         # lookup_token, lookup_component, lookup_primitive, get_color_palette
+    │   │                     # + batch: lookup_components, lookup_tokens
     │   ├── validate.ts       # validate_spacing, validate_radius
-    │   └── suggest.ts        # suggest_tokens
+    │   ├── suggest.ts        # suggest_tokens (returns full component specs)
+    │   └── migrate.ts        # plan_migration (token + component mapping)
     └── utils/
+        ├── paths.ts          # Data directory resolution (source + dist)
         └── search.ts         # Scored fuzzy search (camelCase-aware)
 ```
 
@@ -204,4 +271,10 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 # List tools
 echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}
 {"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | npx tsx src/index.ts
+
+# Type check
+npx tsc --noEmit
+
+# Build for publishing
+npx tsc
 ```

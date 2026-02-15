@@ -383,16 +383,19 @@ LubaUI includes an MCP (Model Context Protocol) server that makes the entire des
 **One command to set up, works from any project:**
 
 ```bash
-claude mcp add lubaui -- npx lubaui-mcp
+claude mcp add lubaui -- npx lubaui-mcp@latest
 ```
 
-**What your AI can do:**
-- "What spacing should I use for card padding?" -- returns `LubaSpacing.lg (16pt)`
-- "Is 14pt on the grid?" -- returns no, suggests `md (12pt)` or `lg (16pt)`
-- "Show me the LubaButton API" -- returns all parameters, styles, and a code example
-- "I'm building a settings page" -- recommends tokens, components, and primitives
+Using `@latest` ensures you always get the newest version of the server.
 
-See [mcp-server/README.md](mcp-server/README.md) for all 7 tools and 3 resources.
+**What your AI can do:**
+- Read the full design system reference in one call (`lubaui://reference/full`)
+- Look up multiple components at once (`lookup_components`)
+- Generate migration mappings from your existing design system (`plan_migration`)
+- Validate spacing and radius values against the token scales
+- Get contextual recommendations for what you're building (`suggest_tokens`)
+
+See [mcp-server/README.md](mcp-server/README.md) for all 10 tools and 4 resources.
 
 ---
 
