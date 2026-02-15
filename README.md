@@ -10,6 +10,18 @@ That's LubaUI.
 ![Platforms](https://img.shields.io/badge/Platforms-iOS%2016%2B%20%7C%20macOS%2013%2B%20%7C%20watchOS%209%2B%20%7C%20visionOS%201%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
+<p align="center">
+  <img src="assets/showcase-forms.jpg" width="180" alt="Form patterns — signup, settings, payment flows" />
+  &nbsp;
+  <img src="assets/showcase-theming.jpg" width="180" alt="Theming — live theme switching with color and spacing overrides" />
+  &nbsp;
+  <img src="assets/showcase-typography.jpg" width="180" alt="Typography — SF Rounded with message thread and pricing card" />
+  &nbsp;
+  <img src="assets/showcase-composability.jpg" width="180" alt="Composability — mix and match primitives on any view" />
+  &nbsp;
+  <img src="assets/showcase-loading.jpg" width="180" alt="Loading patterns — skeletons, spinners, and progress" />
+</p>
+
 ---
 
 ## 30-Second Demo
@@ -334,6 +346,53 @@ Components automatically respect these settings via `@Environment(\.lubaConfig)`
 | `defaultCornerRadius` | `12` | Default corner radius |
 | `showDebugOutlines` | `false` | Show component outlines for debugging |
 | `logA11yWarnings` | `false` | Log accessibility warnings |
+
+---
+
+## Glass Effects
+
+LubaUI includes a glass/frosted primitive that works across iOS versions:
+
+```swift
+// Apply glass to any view
+VStack {
+    Text("Frosted Content")
+}
+.padding(LubaSpacing.lg)
+.lubaGlass(.regular, tint: LubaColors.accent)
+
+// Three intensity levels
+.lubaGlass(.subtle)      // Light frosting — toolbars, FABs
+.lubaGlass(.regular)     // Standard — cards, tab bars
+.lubaGlass(.prominent)   // Heavy — panels, modals
+
+// Built into components
+LubaButton("Action", style: .glass) { }
+LubaCard(style: .glass) { content }
+LubaToast("Saved", style: .success, useGlass: true)
+```
+
+Uses SwiftUI materials on iOS 16-25, ready for native Liquid Glass on iOS 26+. Automatically falls back to a solid surface when Reduce Transparency or High Contrast Mode is active.
+
+---
+
+## MCP Server — AI-Native Design System
+
+LubaUI includes an MCP (Model Context Protocol) server that makes the entire design system queryable by AI assistants like Claude. Instead of reading source files, your AI can look up tokens, validate values, and get component APIs instantly.
+
+**One command to set up, works from any project:**
+
+```bash
+claude mcp add lubaui -- npx lubaui-mcp
+```
+
+**What your AI can do:**
+- "What spacing should I use for card padding?" -- returns `LubaSpacing.lg (16pt)`
+- "Is 14pt on the grid?" -- returns no, suggests `md (12pt)` or `lg (16pt)`
+- "Show me the LubaButton API" -- returns all parameters, styles, and a code example
+- "I'm building a settings page" -- recommends tokens, components, and primitives
+
+See [mcp-server/README.md](mcp-server/README.md) for all 7 tools and 3 resources.
 
 ---
 

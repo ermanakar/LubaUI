@@ -1,0 +1,134 @@
+[
+  {
+    "name": "lubaPressable",
+    "modifier": ".lubaPressable(scale:animation:haptic:action:)",
+    "description": "Makes any view tappable with scale animation, haptic feedback, and press state tracking. The foundational interaction primitive.",
+    "parameters": [
+      { "name": "scale", "type": "CGFloat", "default": "LubaMotion.pressScale (0.97)", "description": "Scale factor when pressed" },
+      { "name": "animation", "type": "Animation", "default": "LubaMotion.pressAnimation", "description": "Press/release animation" },
+      { "name": "haptic", "type": "LubaHapticStyle?", "default": ".light", "description": "Haptic feedback style (nil to disable)" },
+      { "name": "action", "type": "() -> Void", "required": true, "description": "Tap action closure" }
+    ],
+    "example": "Text(\"Tap me\")\n    .padding()\n    .background(LubaColors.surface)\n    .lubaCornerRadius(.md)\n    .lubaPressable { doSomething() }",
+    "relatedStyles": ["LubaPressableButtonStyle", "LubaInteractiveButtonStyle"],
+    "hapticStyles": [".light", ".medium", ".heavy", ".soft", ".selection", ".success", ".warning", ".error"],
+    "tokens": ["LubaMotion.pressScale", "LubaMotion.pressAnimation"],
+    "composability": "Used internally by LubaButton, LubaChip, LubaTooltip, and other interactive components."
+  },
+  {
+    "name": "lubaExpandable",
+    "modifier": ".lubaExpandable(isExpanded:content:)",
+    "description": "Adds expand/collapse behavior to any view. Also available as standalone LubaExpandable, LubaExpandableCard, and LubaAccordion components.",
+    "parameters": [
+      { "name": "isExpanded", "type": "Binding<Bool>", "required": true, "description": "Expansion state binding" },
+      { "name": "content", "type": "ViewBuilder", "required": true, "description": "Expandable content" }
+    ],
+    "example": "// As modifier\nText(\"Header\")\n    .lubaExpandable(isExpanded: $expanded) {\n        Text(\"Expanded content here\")\n    }\n\n// As standalone\nLubaExpandable(isExpanded: $expanded, showChevron: true) {\n    Text(\"Header\")\n} content: {\n    Text(\"Details\")\n}\n\n// As accordion\nLubaAccordion(items: items, allowMultiple: false)",
+    "variants": [
+      { "name": "LubaExpandable", "description": "Standalone with header and content ViewBuilders, optional chevron" },
+      { "name": "LubaExpandableCard", "description": "Expandable wrapped in a LubaCard with elevation" },
+      { "name": "LubaAccordion", "description": "Multiple expandable items, optional multi-expand" }
+    ],
+    "tokens": ["LubaExpandTokens"],
+    "composability": "LubaExpandableCard composes with LubaCard. LubaAccordion manages multiple expand states."
+  },
+  {
+    "name": "lubaSwipeable",
+    "modifier": ".lubaSwipeable(leading:trailing:allowsFullSwipe:)",
+    "description": "Adds horizontal swipe actions to any view, like swipe-to-delete in Mail.",
+    "parameters": [
+      { "name": "leading", "type": "[LubaSwipeAction]", "default": "[]", "description": "Actions revealed on right swipe" },
+      { "name": "trailing", "type": "[LubaSwipeAction]", "default": "[]", "description": "Actions revealed on left swipe" },
+      { "name": "allowsFullSwipe", "type": "Bool", "default": "true", "description": "Full swipe triggers first action" }
+    ],
+    "presets": [
+      { "name": ".delete(action:)", "description": "Red trash icon, heavy haptic" },
+      { "name": ".archive(action:)", "description": "Accent archive icon, medium haptic" },
+      { "name": ".pin(action:)", "description": "Warning pin icon, light haptic" },
+      { "name": ".unread(action:)", "description": "Accent envelope badge icon, light haptic" },
+      { "name": ".flag(action:)", "description": "Warning flag icon, light haptic" },
+      { "name": ".share(action:)", "description": "Accent share icon, light haptic" }
+    ],
+    "example": "ForEach(items) { item in\n    ItemRow(item)\n        .lubaSwipeable(\n            trailing: [\n                .delete { deleteItem(item) },\n                .archive { archiveItem(item) }\n            ]\n        )\n}",
+    "tokens": ["LubaSwipeTokens"],
+    "composability": "Works on any view. Reveal threshold 60pt, full swipe at 60% width. Max 3 actions per side."
+  },
+  {
+    "name": "lubaShimmerable",
+    "modifier": ".lubaShimmerable(isLoading:intensity:)",
+    "description": "Applies a shimmer loading effect over any view content.",
+    "parameters": [
+      { "name": "isLoading", "type": "Bool", "required": true, "description": "Whether shimmer is active" },
+      { "name": "intensity", "type": "CGFloat", "default": "0.6", "description": "Shimmer opacity/intensity" }
+    ],
+    "example": "// Shimmer overlay\nText(\"Loading content\")\n    .lubaShimmerable(isLoading: isLoading)\n\n// Redacted + shimmer (hides content)\nProfileView()\n    .lubaRedactedShimmer(isLoading: isLoading)",
+    "variants": [
+      { "name": ".lubaShimmerable()", "description": "Shimmer gradient overlay on visible content" },
+      { "name": ".lubaRedactedShimmer()", "description": "Combines SwiftUI .redacted(reason: .placeholder) with shimmer" }
+    ],
+    "tokens": ["LubaShimmerTokens"],
+    "composability": "Pairs well with LubaSkeleton for loading states. Respects config.animationsEnabled."
+  },
+  {
+    "name": "lubaLongPressable",
+    "modifier": ".lubaLongPressable(duration:showProgress:progressSize:hapticOnStart:hapticOnComplete:action:)",
+    "description": "Adds long-press interaction with optional circular progress indicator and dual haptic feedback.",
+    "parameters": [
+      { "name": "duration", "type": "Double", "default": "0.8", "description": "Required press duration in seconds" },
+      { "name": "showProgress", "type": "Bool", "default": "false", "description": "Shows circular progress ring" },
+      { "name": "progressSize", "type": "CGFloat", "default": "48", "description": "Progress ring size" },
+      { "name": "hapticOnStart", "type": "LubaHapticStyle?", "default": ".light", "description": "Haptic when press begins" },
+      { "name": "hapticOnComplete", "type": "LubaHapticStyle", "default": ".success", "description": "Haptic when action fires" },
+      { "name": "action", "type": "() -> Void", "required": true, "description": "Completion action" }
+    ],
+    "example": "// On any view\nImage(systemName: \"trash\")\n    .lubaLongPressable(showProgress: true) {\n        deleteAllItems()\n    }\n\n// Standalone button\nLubaLongPressButton(icon: \"power\", label: \"Shut Down\") {\n    shutdown()\n}",
+    "variants": [
+      { "name": ".lubaLongPressable()", "description": "Modifier for any view" },
+      { "name": "LubaLongPressButton", "description": "Standalone circular button with icon, label, and built-in progress" }
+    ],
+    "tokens": ["LubaLongPressTokens"],
+    "composability": "Timer-based progress (20ms intervals). Minimum duration 0.3s. Press scale 0.95 while held."
+  },
+  {
+    "name": "lubaGlass",
+    "modifier": ".lubaGlass(_:tint:cornerRadius:isInteractive:)",
+    "description": "Applies a glass/frosted effect to any view. Uses SwiftUI materials (iOS 16-25) with native Liquid Glass ready for iOS 26+.",
+    "parameters": [
+      { "name": "style", "type": "LubaGlassStyle", "default": ".regular", "options": [".subtle", ".regular", ".prominent"], "description": "Glass intensity level" },
+      { "name": "tint", "type": "Color?", "default": "nil", "description": "Optional color tint over glass" },
+      { "name": "cornerRadius", "type": "CGFloat", "default": "12", "description": "Corner radius" },
+      { "name": "isInteractive", "type": "Bool", "default": "false", "description": "Touch response (iOS 26+ only)" }
+    ],
+    "example": "VStack {\n    Text(\"Glass Card\")\n    Text(\"Frosted content\")\n}\n.padding(LubaSpacing.lg)\n.lubaGlass(.regular, tint: LubaColors.accent)\n\n// Glass container for compositing\nZStack {\n    GlassCard1()\n    GlassCard2()\n}\n.lubaGlassContainer()",
+    "variants": [
+      { "name": ".lubaGlass()", "description": "Apply glass effect to a single view" },
+      { "name": ".lubaGlassContainer()", "description": "Group glass elements for shared compositing (iOS 26+)" }
+    ],
+    "tokens": ["LubaGlassTokens", "LubaGlassStyle"],
+    "composability": "Used by LubaButton(.glass), LubaCard(.glass), LubaToast(useGlass:), LubaAlert(useGlass:), LubaSheetHeader(useGlass:), LubaTabs(useGlass:). Solid fallback for reduceTransparency/highContrastMode."
+  },
+  {
+    "name": "LubaButtonStyling",
+    "modifier": "Protocol — not a view modifier",
+    "description": "Protocol for defining custom button styles. Implement to create brand-specific buttons beyond the built-in 6 styles.",
+    "parameters": [
+      { "name": "foregroundColor(isPressed:colorScheme:)", "type": "-> Color", "required": true, "description": "Text/icon color based on press state and color scheme" },
+      { "name": "backgroundColor(isPressed:colorScheme:)", "type": "-> Color", "required": true, "description": "Background color" },
+      { "name": "borderColor(isPressed:colorScheme:)", "type": "-> Color?", "required": true, "description": "Border color (nil for no border)" },
+      { "name": "borderWidth", "type": "CGFloat", "default": "1", "description": "Border width" },
+      { "name": "defaultsToFullWidth", "type": "Bool", "default": "false", "description": "Whether button defaults to full width" },
+      { "name": "haptic", "type": "LubaHapticStyle", "default": ".light", "description": "Haptic feedback style" }
+    ],
+    "example": "struct BrandStyle: LubaButtonStyling {\n    func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {\n        .white\n    }\n    func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {\n        isPressed ? Color.blue.opacity(0.8) : Color.blue\n    }\n    func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {\n        nil\n    }\n}\n\nLubaButton(\"Action\", styling: BrandStyle()) { }",
+    "builtInStyles": [
+      { "name": ".primary", "struct": "LubaPrimaryStyle", "description": "Filled accent background, full-width, medium haptic" },
+      { "name": ".secondary", "struct": "LubaSecondaryStyle", "description": "Surface background with border, light haptic" },
+      { "name": ".ghost", "struct": "LubaGhostStyle", "description": "Text only, accent color, soft haptic" },
+      { "name": ".destructive", "struct": "LubaDestructiveStyle", "description": "Error background, full-width, warning haptic" },
+      { "name": ".subtle", "struct": "LubaSubtleStyle", "description": "Minimal presence, secondary text color, soft haptic" },
+      { "name": ".glass", "struct": "LubaGlassButtonStyle", "description": "Clear background (glass modifier handles visual), light haptic" }
+    ],
+    "tokens": ["LubaButtonStyleType"],
+    "composability": "Any struct conforming to LubaButtonStyling works with LubaButton via the `styling:` parameter."
+  }
+]

@@ -1,0 +1,345 @@
+[
+  {
+    "name": "LubaButton",
+    "description": "Versatile button with multiple styles, sizes, loading states, and icon support. Supports both built-in enum styles and custom LubaButtonStyling protocol conformances.",
+    "parameters": [
+      { "name": "title", "type": "String", "required": true, "description": "Button label text" },
+      { "name": "style", "type": "LubaButtonStyleType", "default": ".primary", "options": [".primary", ".secondary", ".ghost", ".destructive", ".subtle", ".glass"], "description": "Built-in style enum" },
+      { "name": "size", "type": "LubaButtonSize", "default": ".medium", "options": [".small", ".medium", ".large"], "description": "Button size" },
+      { "name": "isLoading", "type": "Bool", "default": "false", "description": "Shows spinner and disables interaction" },
+      { "name": "isDisabled", "type": "Bool", "default": "false", "description": "Disables button with reduced opacity" },
+      { "name": "icon", "type": "Image?", "default": "nil", "description": "Optional SF Symbol icon" },
+      { "name": "iconPosition", "type": "LubaIconPosition", "default": ".leading", "options": [".leading", ".trailing"], "description": "Icon placement relative to title" },
+      { "name": "fullWidth", "type": "Bool?", "default": "nil", "description": "Override full-width behavior (primary/destructive default to full-width)" },
+      { "name": "action", "type": "() -> Void", "required": true, "description": "Tap action closure" }
+    ],
+    "example": "LubaButton(\"Save\", style: .primary, icon: Image(systemName: \"checkmark\")) {\n    save()\n}",
+    "tokens": ["LubaButtonSize", "LubaButtonStyleType", "LubaMotion.pressScale"],
+    "notes": "Also supports custom styles via `LubaButton(\"Save\", styling: MyCustomStyle()) { }` using the LubaButtonStyling protocol."
+  },
+  {
+    "name": "LubaCard",
+    "description": "Container component with elevation shadows, multiple visual styles, and configurable corners/padding.",
+    "parameters": [
+      { "name": "elevation", "type": "LubaCardElevation", "default": ".low", "options": [".flat", ".low", ".medium", ".high"], "description": "Shadow depth level" },
+      { "name": "style", "type": "LubaCardStyle", "default": ".filled", "options": [".filled", ".outlined", ".ghost", ".glass"], "description": "Visual style variant" },
+      { "name": "cornerRadius", "type": "CGFloat", "default": "LubaCardTokens.cornerRadius (12)", "description": "Corner radius" },
+      { "name": "padding", "type": "CGFloat", "default": "LubaCardTokens.padding (16)", "description": "Internal padding" },
+      { "name": "content", "type": "ViewBuilder", "required": true, "description": "Card content" }
+    ],
+    "example": "LubaCard(elevation: .medium, style: .filled) {\n    VStack(alignment: .leading, spacing: LubaSpacing.sm) {\n        Text(\"Title\").font(LubaTypography.headline)\n        Text(\"Description\").font(LubaTypography.body)\n    }\n}",
+    "tokens": ["LubaCardTokens.cornerRadius", "LubaCardTokens.padding"],
+    "notes": "Shadow strengthens 1.5x in dark mode. Glass style applies .lubaGlass() modifier."
+  },
+  {
+    "name": "LubaTextField",
+    "description": "Text input with floating label, validation states, helper text, icons, clear button, and secure entry support.",
+    "parameters": [
+      { "name": "label", "type": "String", "required": true, "description": "Field label text" },
+      { "name": "text", "type": "Binding<String>", "required": true, "description": "Text binding" },
+      { "name": "placeholder", "type": "String", "default": "\"\"", "description": "Placeholder text" },
+      { "name": "helperText", "type": "String?", "default": "nil", "description": "Helper text below field" },
+      { "name": "error", "type": "String?", "default": "nil", "description": "Error message (activates error state)" },
+      { "name": "leadingIcon", "type": "Image?", "default": "nil", "description": "Leading icon" },
+      { "name": "trailingIcon", "type": "Image?", "default": "nil", "description": "Trailing icon" },
+      { "name": "isSecure", "type": "Bool", "default": "false", "description": "Secure text entry (password)" },
+      { "name": "isDisabled", "type": "Bool", "default": "false", "description": "Disables field" },
+      { "name": "showClearButton", "type": "Bool", "default": "true", "description": "Shows clear button when text present" }
+    ],
+    "example": "LubaTextField(\"Email\", text: $email, placeholder: \"you@example.com\",\n    leadingIcon: Image(systemName: \"envelope\"))",
+    "tokens": ["LubaFieldTokens", "LubaFieldState", "LubaRadius.md"],
+    "notes": "Convenience inits: .secure() for passwords, .email() for email fields. Min height 48pt."
+  },
+  {
+    "name": "LubaTextArea",
+    "description": "Multi-line text input with floating label, character counter, and auto-growing height.",
+    "parameters": [
+      { "name": "label", "type": "String", "required": true, "description": "Field label text" },
+      { "name": "text", "type": "Binding<String>", "required": true, "description": "Text binding" },
+      { "name": "placeholder", "type": "String", "default": "\"\"", "description": "Placeholder text" },
+      { "name": "characterLimit", "type": "Int?", "default": "nil", "description": "Max character count (shows counter)" },
+      { "name": "minHeight", "type": "CGFloat", "default": "100", "description": "Minimum height" }
+    ],
+    "example": "LubaTextArea(\"Notes\", text: $notes, placeholder: \"Write something...\",\n    characterLimit: 500)",
+    "tokens": ["LubaRadius.md", "LubaSpacing.sm"],
+    "notes": "Uses TextEditor internally. Shares field state pattern with LubaTextField."
+  },
+  {
+    "name": "LubaSearchBar",
+    "description": "Search input with search icon, cancel button, and clear functionality.",
+    "parameters": [
+      { "name": "text", "type": "Binding<String>", "required": true, "description": "Search text binding" },
+      { "name": "placeholder", "type": "String", "default": "\"Search\"", "description": "Placeholder text" },
+      { "name": "showCancelButton", "type": "Bool", "default": "true", "description": "Shows cancel button when focused" },
+      { "name": "onSubmit", "type": "(() -> Void)?", "default": "nil", "description": "Submit action" },
+      { "name": "onCancel", "type": "(() -> Void)?", "default": "nil", "description": "Cancel action" }
+    ],
+    "example": "LubaSearchBar(text: $searchText, placeholder: \"Search components...\")",
+    "tokens": ["LubaSearchBarTokens"],
+    "notes": "Height 40pt (compact, distinct from TextField's 48pt). Capsule shape with surfaceSecondary background."
+  },
+  {
+    "name": "LubaCheckbox",
+    "description": "Checkbox with optional label and haptic feedback.",
+    "parameters": [
+      { "name": "isChecked", "type": "Binding<Bool>", "required": true, "description": "Checked state binding" },
+      { "name": "label", "type": "String?", "default": "nil", "description": "Label text" },
+      { "name": "isDisabled", "type": "Bool", "default": "false", "description": "Disables checkbox" }
+    ],
+    "example": "LubaCheckbox(isChecked: $agreed, label: \"I agree to the terms\")",
+    "tokens": ["LubaSelectionTokens"],
+    "notes": "20pt control size, 4pt corner radius, checkmark animates on toggle."
+  },
+  {
+    "name": "LubaRadio",
+    "description": "Radio button group for single selection among options.",
+    "parameters": [
+      { "name": "selection", "type": "Binding<T>", "required": true, "description": "Selected value binding" },
+      { "name": "options", "type": "[(value: T, label: String)]", "required": true, "description": "Array of value-label pairs" },
+      { "name": "isDisabled", "type": "Bool", "default": "false", "description": "Disables all options" }
+    ],
+    "example": "LubaRadioGroup(selection: $plan, options: [\n    (value: \"free\", label: \"Free\"),\n    (value: \"pro\", label: \"Pro\"),\n    (value: \"team\", label: \"Team\")\n])",
+    "tokens": ["LubaSelectionTokens"],
+    "notes": "Use LubaRadioGroup for the full group. LubaRadioButton / LubaRadio for individual items."
+  },
+  {
+    "name": "LubaToggle",
+    "description": "Toggle switch with optional label and haptic feedback.",
+    "parameters": [
+      { "name": "isOn", "type": "Binding<Bool>", "required": true, "description": "Toggle state binding" },
+      { "name": "label", "type": "String?", "default": "nil", "description": "Label text" },
+      { "name": "isDisabled", "type": "Bool", "default": "false", "description": "Disables toggle" }
+    ],
+    "example": "LubaToggle(isOn: $darkMode, label: \"Dark Mode\")",
+    "tokens": ["LubaToggleTokens"],
+    "notes": "Track: 48x28pt, thumb: 24pt. Uses accent color when on, gray200 when off."
+  },
+  {
+    "name": "LubaSlider",
+    "description": "Slider with optional label, value display, and step increments.",
+    "parameters": [
+      { "name": "value", "type": "Binding<Double>", "required": true, "description": "Current value binding" },
+      { "name": "range", "type": "ClosedRange<Double>", "default": "0...1", "description": "Value range" },
+      { "name": "step", "type": "Double?", "default": "nil", "description": "Step increment" },
+      { "name": "label", "type": "String?", "default": "nil", "description": "Label text" },
+      { "name": "showValue", "type": "Bool", "default": "false", "description": "Shows current value" },
+      { "name": "isDisabled", "type": "Bool", "default": "false", "description": "Disables slider" }
+    ],
+    "example": "LubaSlider(value: $volume, in: 0...100, step: 1,\n    label: \"Volume\", showValue: true)",
+    "tokens": ["LubaSliderTokens"],
+    "notes": "Track height 4pt, thumb 22pt with border and shadow. Thumb scales to 1.1x while dragging."
+  },
+  {
+    "name": "LubaStepper",
+    "description": "Stepper with minus/plus buttons and value display.",
+    "parameters": [
+      { "name": "value", "type": "Binding<Int>", "required": true, "description": "Current value binding" },
+      { "name": "range", "type": "ClosedRange<Int>", "default": "0...99", "description": "Value range" },
+      { "name": "step", "type": "Int", "default": "1", "description": "Step increment" },
+      { "name": "label", "type": "String?", "default": "nil", "description": "Label text" }
+    ],
+    "example": "LubaStepper(value: $quantity, in: 1...10, label: \"Quantity\")",
+    "tokens": ["LubaSpacing", "LubaMotion"],
+    "notes": "44pt touch targets. Capsule shape. Haptic feedback on increment/decrement."
+  },
+  {
+    "name": "LubaRating",
+    "description": "Star rating input with configurable max stars.",
+    "parameters": [
+      { "name": "value", "type": "Binding<Int>", "required": true, "description": "Rating value binding" },
+      { "name": "maxStars", "type": "Int", "default": "5", "description": "Maximum star count" },
+      { "name": "isReadOnly", "type": "Bool", "default": "false", "description": "Read-only display" },
+      { "name": "label", "type": "String?", "default": "nil", "description": "Label text" }
+    ],
+    "example": "LubaRating(value: $rating, maxStars: 5, label: \"Rate this\")",
+    "tokens": ["LubaMotion", "LubaColors.accent"],
+    "notes": "Star size 28pt, touch target 36pt. Filled stars use accent color."
+  },
+  {
+    "name": "LubaTabs",
+    "description": "Segmented tab control with optional icons and glass style.",
+    "parameters": [
+      { "name": "selection", "type": "Binding<T>", "required": true, "description": "Selected tab binding" },
+      { "name": "tabs", "type": "[(value: T, label: String, icon: String?)]", "required": true, "description": "Tab items with optional SF Symbol icons" },
+      { "name": "useGlass", "type": "Bool", "default": "false", "description": "Glass effect for selected tab indicator" }
+    ],
+    "example": "LubaTabs(selection: $selectedTab, tabs: [\n    (value: 0, label: \"All\", icon: nil),\n    (value: 1, label: \"Active\", icon: \"circle.fill\"),\n    (value: 2, label: \"Done\", icon: \"checkmark\")\n])",
+    "tokens": ["LubaTabsTokens"],
+    "notes": "Also available: LubaUnderlineTabs for underline-style tabs (no glass, no icons). Tab height 32pt (segmented), 44pt (underline)."
+  },
+  {
+    "name": "LubaToast",
+    "description": "Non-intrusive notification bar with icon, message, optional action button, and glass variant.",
+    "parameters": [
+      { "name": "message", "type": "String", "required": true, "description": "Toast message" },
+      { "name": "style", "type": "LubaToastStyle", "default": ".info", "options": [".info", ".success", ".warning", ".error"], "description": "Visual style with icon and color" },
+      { "name": "useGlass", "type": "Bool", "default": "false", "description": "Glass effect background" },
+      { "name": "action", "type": "(() -> Void)?", "default": "nil", "description": "Action button tap handler" },
+      { "name": "actionLabel", "type": "String?", "default": "nil", "description": "Action button label" }
+    ],
+    "example": "// As a modifier\nView()\n    .lubaToast(isPresented: $showToast, message: \"Saved!\", style: .success)",
+    "tokens": ["LubaToastTokens"],
+    "notes": "Use .lubaToast() modifier for auto-presenting/dismissing (default 3s). Direct LubaToast view for inline display."
+  },
+  {
+    "name": "LubaAlert",
+    "description": "Inline alert banner with icon, title, message, and optional dismiss button.",
+    "parameters": [
+      { "name": "message", "type": "String", "required": true, "description": "Alert message" },
+      { "name": "style", "type": "LubaAlertStyle", "default": ".info", "options": [".info", ".success", ".warning", ".error"], "description": "Visual style" },
+      { "name": "title", "type": "String?", "default": "nil", "description": "Optional title" },
+      { "name": "useGlass", "type": "Bool", "default": "false", "description": "Glass effect background" },
+      { "name": "isDismissible", "type": "Bool", "default": "false", "description": "Shows dismiss button" },
+      { "name": "onDismiss", "type": "(() -> Void)?", "default": "nil", "description": "Dismiss action" }
+    ],
+    "example": "LubaAlert(\"Please check your input\", style: .warning, title: \"Validation Error\",\n    isDismissible: true) { hideAlert() }",
+    "tokens": ["LubaAlertTokens"],
+    "notes": "Rounded rectangle with semantic icon and color. Each style has icon, color, and backgroundColor."
+  },
+  {
+    "name": "LubaProgress",
+    "description": "Progress indicators: linear bar and circular ring with optional labels.",
+    "parameters": [
+      { "name": "value", "type": "Double", "required": true, "description": "Progress value 0-1" },
+      { "name": "showLabel", "type": "Bool", "default": "false (bar), true (circular)", "description": "Shows percentage label" }
+    ],
+    "example": "// Linear bar\nLubaProgressBar(value: 0.65, showLabel: true)\n\n// Circular ring\nLubaCircularProgress(value: 0.65, size: 64)",
+    "tokens": ["LubaProgressTokens"],
+    "notes": "LubaProgressBar for linear, LubaCircularProgress for circular. Bar height 6pt. Circular default size 64pt."
+  },
+  {
+    "name": "LubaSpinner",
+    "description": "Loading spinner with multiple animation styles.",
+    "parameters": [
+      { "name": "size", "type": "CGFloat", "default": "20", "description": "Spinner size" },
+      { "name": "style", "type": "LubaSpinnerStyle", "default": ".arc", "options": [".arc", ".pulse", ".dots", ".breathe"], "description": "Animation style" }
+    ],
+    "example": "LubaSpinner(size: 32, style: .dots)",
+    "tokens": ["LubaSpinnerTokens"],
+    "notes": "Arc: rotating arc trim. Pulse: scaling circle. Dots: bouncing dots. Breathe: breathing scale+opacity."
+  },
+  {
+    "name": "LubaSkeleton",
+    "description": "Skeleton loading placeholders with shimmer animation.",
+    "parameters": [
+      { "name": "width", "type": "CGFloat?", "default": "nil", "description": "Fixed width (nil for full width)" },
+      { "name": "height", "type": "CGFloat", "default": "14", "description": "Skeleton height" },
+      { "name": "cornerRadius", "type": "CGFloat", "default": "4", "description": "Corner radius" }
+    ],
+    "example": "// Basic rectangle\nLubaSkeleton(height: 20)\n\n// Circle\nLubaSkeletonCircle(size: 40)\n\n// Text block\nLubaSkeletonText(lines: 3)\n\n// Card layout\nLubaSkeletonCard()",
+    "tokens": ["LubaSkeletonTokens"],
+    "notes": "Variants: LubaSkeleton, LubaSkeletonCircle, LubaSkeletonText, LubaSkeletonCard, LubaSkeletonRow. Shimmer duration 1.5s."
+  },
+  {
+    "name": "LubaSheet",
+    "description": "Bottom sheet with drag indicator, header, and size presets.",
+    "parameters": [
+      { "name": "isPresented", "type": "Binding<Bool>", "required": true, "description": "Sheet visibility binding" },
+      { "name": "size", "type": "LubaSheetSize", "default": ".medium", "options": [".small", ".medium", ".large", ".full"], "description": "Sheet height preset" },
+      { "name": "showDragIndicator", "type": "Bool", "default": "true", "description": "Shows drag indicator handle" },
+      { "name": "content", "type": "ViewBuilder", "required": true, "description": "Sheet content" }
+    ],
+    "example": "View()\n    .lubaSheet(isPresented: $showSheet, size: .medium) {\n        LubaSheetHeader(\"Settings\", onClose: { showSheet = false })\n        // content\n    }",
+    "tokens": ["LubaSheetTokens"],
+    "notes": "Use .lubaSheet() modifier. Sizes: small 25%, medium 50%, large 75%, full. LubaSheetHeader supports useGlass parameter."
+  },
+  {
+    "name": "LubaAvatar",
+    "description": "User avatar with image, initials, or name-generated initials.",
+    "parameters": [
+      { "name": "image/initials/name", "type": "Image/String", "required": true, "description": "Avatar content (three init variants)" },
+      { "name": "size", "type": "LubaAvatarSize", "default": ".medium", "options": [".small (32pt)", ".medium (40pt)", ".large (56pt)", ".xlarge (80pt)"], "description": "Avatar size" },
+      { "name": "showBorder", "type": "Bool", "default": "false", "description": "Shows border ring" }
+    ],
+    "example": "LubaAvatar(name: \"Jane Doe\", size: .large, showBorder: true)",
+    "tokens": ["LubaAvatarSize"],
+    "notes": "Three init variants: image, initials string, or full name (auto-extracts initials). Circular shape with surfaceSecondary background for placeholder."
+  },
+  {
+    "name": "LubaBadge",
+    "description": "Inline label/badge with icon, color styles, and size variants.",
+    "parameters": [
+      { "name": "text", "type": "String", "required": true, "description": "Badge text" },
+      { "name": "style", "type": "LubaBadgeStyle", "default": ".accent", "options": [".accent", ".subtle", ".neutral", ".success", ".warning", ".error"], "description": "Color style" },
+      { "name": "size", "type": "LubaBadgeSize", "default": ".medium", "options": [".small", ".medium"], "description": "Size variant" },
+      { "name": "icon", "type": "Image?", "default": "nil", "description": "Optional leading icon" }
+    ],
+    "example": "LubaBadge(\"New\", style: .accent, icon: Image(systemName: \"sparkles\"))",
+    "tokens": ["LubaBadgeStyle", "LubaBadgeSize"],
+    "notes": "Capsule shape. Each style has foregroundColor and backgroundColor."
+  },
+  {
+    "name": "LubaDivider",
+    "description": "Horizontal or vertical divider with optional center label.",
+    "parameters": [
+      { "name": "label", "type": "String?", "default": "nil", "description": "Center label text" },
+      { "name": "orientation", "type": "Orientation", "default": ".horizontal", "options": [".horizontal", ".vertical"], "description": "Divider direction" }
+    ],
+    "example": "LubaDivider(label: \"or\")",
+    "tokens": ["LubaColors.border"],
+    "notes": "1px line with border color. Label appears centered with spacing."
+  },
+  {
+    "name": "LubaIcon",
+    "description": "SF Symbol icon with size tokens and optional color override.",
+    "parameters": [
+      { "name": "name", "type": "String", "required": true, "description": "SF Symbol name" },
+      { "name": "size", "type": "LubaIconSize", "default": ".md", "options": [".xs (14pt)", ".sm (18pt)", ".md (22pt)", ".lg (26pt)", ".xl (32pt)"], "description": "Icon size" },
+      { "name": "color", "type": "Color?", "default": "nil", "description": "Color override (defaults to textPrimary)" }
+    ],
+    "example": "LubaIcon(\"heart.fill\", size: .lg, color: LubaColors.error)",
+    "tokens": ["LubaIconTokens", "LubaIconSize"],
+    "notes": "Also: LubaIconButton (tappable icon with 44pt touch target, press scale), LubaCircledIcon (icon in circle background with .filled/.subtle/.neutral styles)."
+  },
+  {
+    "name": "LubaChip",
+    "description": "Compact interactive chip with optional icon, selection state, and dismiss.",
+    "parameters": [
+      { "name": "label", "type": "String", "required": true, "description": "Chip label" },
+      { "name": "style", "type": "LubaChipStyle", "default": ".filled", "options": [".filled", ".outlined"], "description": "Visual style" },
+      { "name": "icon", "type": "Image?", "default": "nil", "description": "Leading icon" },
+      { "name": "isSelected", "type": "Bool", "default": "false", "description": "Selected state" },
+      { "name": "isDismissible", "type": "Bool", "default": "false", "description": "Shows dismiss X" },
+      { "name": "onDismiss", "type": "(() -> Void)?", "default": "nil", "description": "Dismiss action" },
+      { "name": "onTap", "type": "(() -> Void)?", "default": "nil", "description": "Tap action" }
+    ],
+    "example": "LubaChip(\"Swift\", style: .filled, icon: Image(systemName: \"swift\"),\n    isSelected: true, onTap: { toggle() })",
+    "tokens": ["LubaSpacing", "LubaMotion"],
+    "notes": "Height 32pt, capsule shape. Selected state uses accent color."
+  },
+  {
+    "name": "LubaMenu",
+    "description": "Dropdown menu with action items, icons, and destructive roles.",
+    "parameters": [
+      { "name": "items", "type": "[LubaMenuItem]", "required": true, "description": "Menu items array" },
+      { "name": "label", "type": "ViewBuilder", "required": true, "description": "Menu trigger view" }
+    ],
+    "example": "LubaMenu(items: [\n    LubaMenuItem(\"Edit\", icon: Image(systemName: \"pencil\")) { edit() },\n    LubaMenuItem(\"Delete\", icon: Image(systemName: \"trash\"), role: .destructive) { delete() }\n]) {\n    LubaIconButton(icon: \"ellipsis\") {}\n}",
+    "tokens": ["LubaMenuTokens"],
+    "notes": "LubaMenuItem roles: .normal, .destructive. Menu width min 200pt, item height 44pt. Uses SwiftUI Menu under the hood."
+  },
+  {
+    "name": "LubaTooltip",
+    "description": "Contextual help popup that appears on tap with auto-dismiss.",
+    "parameters": [
+      { "name": "message", "type": "String", "required": true, "description": "Tooltip text" },
+      { "name": "position", "type": "LubaTooltipPosition", "default": ".top", "options": [".top", ".bottom"], "description": "Position relative to anchor" },
+      { "name": "content", "type": "ViewBuilder", "required": true, "description": "Anchor view" }
+    ],
+    "example": "// As wrapper\nLubaTooltip(\"This field is required\") {\n    Image(systemName: \"info.circle\")\n}\n\n// As modifier\nText(\"Label\").lubaTooltip(\"Helpful explanation\")",
+    "tokens": ["LubaTooltipTokens"],
+    "notes": "Max width 240pt, auto-dismiss after 3s. Scale+fade entrance animation. Available as component or .lubaTooltip() modifier."
+  },
+  {
+    "name": "LubaLink",
+    "description": "Tappable text link with underline styles.",
+    "parameters": [
+      { "name": "label", "type": "String", "required": true, "description": "Link text" },
+      { "name": "style", "type": "LubaLinkStyle", "default": ".default", "options": [".default", ".subtle", ".external"], "description": "Visual style" },
+      { "name": "action", "type": "() -> Void", "required": true, "description": "Tap action" }
+    ],
+    "example": "LubaLink(\"Learn more\", style: .external) { openDocs() }",
+    "tokens": ["LubaColors.accent"],
+    "notes": "Default uses accent color with underline. External appends arrow icon."
+  }
+]

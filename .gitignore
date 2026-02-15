@@ -62,8 +62,13 @@ Thumbs.db
 *.swo
 *~
 
+# Node.js (MCP server)
+node_modules/
+dist/
+
 # Claude Code
 CLAUDE.md
+.mcp.json
 
 # Archives
 *.ipa

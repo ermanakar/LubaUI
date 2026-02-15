@@ -1,0 +1,44 @@
+{
+  "name": "lubaui-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for the LubaUI design system — makes tokens, components, and primitives queryable by AI assistants",
+  "type": "module",
+  "bin": {
+    "lubaui-mcp": "bin/lubaui-mcp.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "src/data/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "lubaui",
+    "design-system",
+    "swiftui",
+    "design-tokens",
+    "ai",
+    "claude"
+  ],
+  "author": "Erman Akar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ermanakar/LubaUI",
+    "directory": "mcp-server"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  }
+}
