@@ -395,18 +395,33 @@ server.resource(
 server.resource(
   "components",
   "lubaui://components",
-  { description: "LubaUI component directory — all 25 components with descriptions" },
+  { description: "All LubaUI components and primitives with full specs — parameters, code examples, tokens, and notes. Use this when you only need component/primitive details without tokens." },
   async () => {
-    const summary = componentsData.map((c: { name: string; description: string }) => ({
+    const components = componentsData.map((c: { name: string; description: string; parameters: unknown; example: string; tokens: string[]; notes: string }) => ({
       name: c.name,
       description: c.description,
+      parameters: c.parameters,
+      example: c.example,
+      tokens: c.tokens,
+      notes: c.notes,
     }));
 
-    const primitivesSummary = primitivesData.map((p: { name: string; modifier: string; description: string }) => ({
-      name: p.name,
-      modifier: p.modifier,
-      description: p.description,
-    }));
+    const primitives = primitivesData.map((p: { name: string; modifier: string; description: string; parameters: unknown; example: string; tokens: string[]; composability: string; [key: string]: unknown }) => {
+      const entry: Record<string, unknown> = {
+        name: p.name,
+        modifier: p.modifier,
+        description: p.description,
+        parameters: p.parameters,
+        example: p.example,
+        tokens: p.tokens,
+        composability: p.composability,
+      };
+      if ("presets" in p) entry.presets = p.presets;
+      if ("variants" in p) entry.variants = p.variants;
+      if ("builtInStyles" in p) entry.builtInStyles = p.builtInStyles;
+      if ("hapticStyles" in p) entry.hapticStyles = p.hapticStyles;
+      return entry;
+    });
 
     return {
       contents: [
@@ -415,9 +430,9 @@ server.resource(
           mimeType: "application/json",
           text: JSON.stringify(
             {
-              components: summary,
-              primitives: primitivesSummary,
-              total: { components: summary.length, primitives: primitivesSummary.length },
+              components,
+              primitives,
+              total: { components: components.length, primitives: primitives.length },
             },
             null,
             2
