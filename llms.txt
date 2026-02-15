@@ -2,7 +2,10 @@
 
 > For human documentation, see README.md
 > For Claude Code guidance, see the project's CLAUDE.md (not included in repo)
-> Last updated: 2026-02-11
+> MCP server: `claude mcp add lubaui -- npx lubaui-mcp` (npm: lubaui-mcp)
+> Website: https://shopofluba.de/lubaui
+> Repository: https://github.com/ermanakar/LubaUI
+> Last updated: 2026-02-15
 
 ---
 
@@ -47,7 +50,8 @@ Sources/LubaUI/
 │   ├── LubaExpandable.swift      # .lubaExpandable() — expand/collapse + accordion
 │   ├── LubaLongPressable.swift   # .lubaLongPressable() — long press + progress ring
 │   ├── LubaShimmerable.swift     # .lubaShimmerable() — loading shimmer effect
-│   └── LubaSwipeable.swift       # .lubaSwipeable() — swipe actions (delete, archive, pin)
+│   ├── LubaSwipeable.swift       # .lubaSwipeable() — swipe actions (delete, archive, pin)
+│   └── LubaGlass.swift           # .lubaGlass() — frosted glass effect (iOS 26 Liquid Glass ready)
 ├── Components/                   # UI components (25 files)
 │   ├── LubaAlert.swift           # Inline notification banner
 │   ├── LubaAvatar.swift          # Profile image/initials + AvatarGroup
@@ -200,6 +204,20 @@ LubaButton(
 
 // Custom styling via protocol
 LubaButton("Save", styling: MyCustomStyle()) { }
+
+// Glass style
+LubaButton("Action", style: .glass) { }
+```
+
+### LubaCard
+```swift
+LubaCard(
+    elevation: LubaCardElevation = .low,  // .flat | .low | .medium | .high
+    style: LubaCardStyle = .filled,       // .filled | .outlined | .ghost | .glass
+    cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
+    padding: CGFloat = LubaCardTokens.padding,
+    content: () -> Content
+)
 ```
 
 ### LubaTextField
@@ -509,6 +527,42 @@ When generating LubaUI code:
 9. Use LubaButton for buttons — never custom Button styling
 10. Check LubaConfig for haptics/animations in custom components
 11. Prefer composition (`.lubaPressable()`, `.lubaToast()`) over inheritance
+
+---
+
+## Glass Primitive
+
+```swift
+// Apply glass to any view — three intensity levels
+.lubaGlass(.subtle)              // Toolbars, FABs (ultraThinMaterial)
+.lubaGlass(.regular)             // Cards, tab bars (thinMaterial)
+.lubaGlass(.prominent)           // Panels, modals (regularMaterial)
+.lubaGlass(.regular, tint: LubaColors.accent)  // With color tint
+
+// Components with glass support
+LubaButton("Action", style: .glass) { }
+LubaCard(style: .glass) { content }
+LubaToast("Saved", useGlass: true)
+LubaAlert("Info", useGlass: true)
+LubaSheetHeader("Title", useGlass: true) { dismiss() }
+LubaTabs(selection: $tab, tabs: tabs, useGlass: true)
+```
+
+iOS 16-25: SwiftUI materials. iOS 26+: native Liquid Glass (ready, commented). Solid fallback for reduceTransparency/highContrastMode.
+
+---
+
+## MCP Server
+
+LubaUI has an MCP server (`lubaui-mcp` on npm) that makes the design system queryable:
+
+```bash
+claude mcp add lubaui -- npx lubaui-mcp
+```
+
+**7 tools:** lookup_token, lookup_component, lookup_primitive, validate_spacing, validate_radius, get_color_palette, suggest_tokens
+
+**3 resources:** lubaui://tokens/all, lubaui://architecture, lubaui://components
 
 ---
 
