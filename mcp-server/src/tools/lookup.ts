@@ -285,5 +285,89 @@ export function getColorPalette(query: string) {
   };
 }
 
+// --- Batch lookups ---
+
+export function lookupComponents(queries: string[]) {
+  const searchable: (ComponentEntry & SearchableItem)[] = componentsData.map(
+    (c) => ({
+      ...c,
+      aliases: [c.name.replace("Luba", "")],
+    })
+  );
+
+  const seen = new Set<string>();
+  const allResults: ComponentEntry[] = [];
+
+  for (const query of queries) {
+    const results = search(searchable, query, { maxResults: 3 });
+    for (const c of results) {
+      if (!seen.has(c.name)) {
+        seen.add(c.name);
+        allResults.push(c);
+      }
+    }
+  }
+
+  if (allResults.length === 0) {
+    return {
+      found: false,
+      message: `No components matching any of: ${queries.join(", ")}. Available: ${componentsData.map((c) => c.name).join(", ")}`,
+    };
+  }
+
+  return {
+    found: true,
+    count: allResults.length,
+    components: allResults.map((c) => ({
+      name: c.name,
+      description: c.description,
+      parameters: c.parameters,
+      example: c.example,
+      tokens: c.tokens,
+      notes: c.notes,
+    })),
+  };
+}
+
+export function lookupTokens(queries: string[], category?: string) {
+  const seen = new Set<string>();
+  const allResults: FlatToken[] = [];
+
+  for (const query of queries) {
+    const results = search(flatTokens, query, { category, maxResults: 8 });
+    for (const t of results) {
+      if (!seen.has(t.api)) {
+        seen.add(t.api);
+        allResults.push(t);
+      }
+    }
+  }
+
+  if (allResults.length === 0) {
+    return {
+      found: false,
+      message: `No tokens matching any of: ${queries.join(", ")}${category ? ` in category "${category}"` : ""}`,
+    };
+  }
+
+  return {
+    found: true,
+    count: allResults.length,
+    tokens: allResults.map((t) => ({
+      name: t.name,
+      api: t.api,
+      value: t.value,
+      tier: t.tier,
+      category: t.category,
+      subcategory: t.subcategory,
+      description: t.description,
+      ...(t.light && { light: t.light }),
+      ...(t.dark && { dark: t.dark }),
+      ...(t.primitive && { primitive: t.primitive }),
+      ...(t.aliasOf && { aliasOf: t.aliasOf }),
+    })),
+  };
+}
+
 // Export data for resources
 export { tokensData, componentsData, primitivesData };

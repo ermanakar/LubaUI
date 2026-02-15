@@ -134,6 +134,60 @@ export function suggestTokens(description: string) {
     maxResults: 3,
   });
 
+  // Helper: resolve component names to full specs
+  function resolveComponents(names: Iterable<string>) {
+    const results: typeof componentsData = [];
+    const seen = new Set<string>();
+    for (const name of names) {
+      const match = componentsData.find(
+        (c) => c.name === name || c.name === `Luba${name}` || c.name.toLowerCase() === name.toLowerCase()
+      );
+      if (match && !seen.has(match.name)) {
+        seen.add(match.name);
+        results.push(match);
+      }
+    }
+    return results.map((c) => ({
+      name: c.name,
+      description: c.description,
+      parameters: c.parameters,
+      example: c.example,
+      tokens: c.tokens,
+      notes: c.notes,
+    }));
+  }
+
+  // Helper: resolve primitive names to full specs
+  function resolvePrimitives(names: Iterable<string>) {
+    const results: typeof primitivesData = [];
+    const seen = new Set<string>();
+    for (const name of names) {
+      // Match against name, stripped prefix, or partial match (e.g. "lubaGlass for frosted effect" → "lubaGlass")
+      const normalizedName = name.split(" ")[0].toLowerCase();
+      const match = primitivesData.find(
+        (p) =>
+          p.name.toLowerCase() === normalizedName ||
+          p.name.toLowerCase() === `luba${normalizedName}` ||
+          p.name.replace("luba", "").toLowerCase() === normalizedName
+      );
+      if (match && !seen.has(match.name)) {
+        seen.add(match.name);
+        results.push(match);
+      }
+    }
+    return results.map((p) => ({
+      name: p.name,
+      modifier: p.modifier,
+      description: p.description,
+      parameters: p.parameters,
+      example: p.example,
+      tokens: p.tokens,
+      composability: p.composability,
+      ...("presets" in p ? { presets: p.presets } : {}),
+      ...("variants" in p ? { variants: p.variants } : {}),
+    }));
+  }
+
   if (matchedPatterns.length > 0) {
     // Merge suggestions from all matched patterns
     const merged = {
@@ -163,22 +217,31 @@ export function suggestTokens(description: string) {
         radius: [...merged.radius],
         typography: [...merged.typography],
       },
-      recommendedComponents: [...merged.components],
-      recommendedPrimitives: [...merged.primitives],
+      recommendedComponents: resolveComponents(merged.components),
+      recommendedPrimitives: resolvePrimitives(merged.primitives),
     };
   }
 
-  // Fallback: return search-based suggestions
+  // Fallback: return search-based suggestions with full specs
   return {
     matchedPatterns: [],
     note: "No exact pattern match. Showing relevant components and primitives based on your description.",
     recommendedComponents: relevantComponents.map((c) => ({
       name: c.name,
-      description: c.description,
+      description: (c as Record<string, unknown>).description as string,
+      parameters: (c as Record<string, unknown>).parameters,
+      example: (c as Record<string, unknown>).example,
+      tokens: (c as Record<string, unknown>).tokens,
+      notes: (c as Record<string, unknown>).notes,
     })),
     recommendedPrimitives: relevantPrimitives.map((p) => ({
       name: p.name,
-      description: p.description,
+      modifier: (p as Record<string, unknown>).modifier,
+      description: (p as Record<string, unknown>).description as string,
+      parameters: (p as Record<string, unknown>).parameters,
+      example: (p as Record<string, unknown>).example,
+      tokens: (p as Record<string, unknown>).tokens,
+      composability: (p as Record<string, unknown>).composability,
     })),
     generalGuidance: {
       spacing: "Use LubaSpacing tokens (xs=4, sm=8, md=12, lg=16, xl=24, xxl=32, xxxl=48, huge=64). All on the 4pt grid.",

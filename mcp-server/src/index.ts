@@ -5,6 +5,8 @@ import {
   lookupToken,
   lookupComponent,
   lookupPrimitive,
+  lookupComponents,
+  lookupTokens,
   getColorPalette,
   tokensData,
   componentsData,
@@ -22,7 +24,7 @@ const server = new McpServer({
 
 server.tool(
   "lookup_token",
-  "Look up a LubaUI design token by name or description. Returns token name, API, value, tier, and usage guidance.",
+  "Look up a single LubaUI design token by name or description. For multiple tokens, use lookup_tokens (batch) instead. For the full system, read the lubaui://reference/full resource.",
   {
     query: z.string().describe("Token name, API path, or description (e.g. 'spacing large', 'lg', 'card padding')"),
     category: z
@@ -38,7 +40,7 @@ server.tool(
 
 server.tool(
   "lookup_component",
-  "Look up a LubaUI component by name. Returns init parameters, styles, code example, and related tokens.",
+  "Look up a single LubaUI component by name. For multiple components, use lookup_components (batch) instead. For the full system, read the lubaui://reference/full resource.",
   {
     query: z.string().describe("Component name (e.g. 'Button', 'LubaTextField', 'toast')"),
   },
@@ -98,7 +100,7 @@ server.tool(
 
 server.tool(
   "suggest_tokens",
-  "Suggest LubaUI tokens, components, and primitives for a UI you're building. Describe what you're building and get recommendations.",
+  "Suggest LubaUI tokens, components, and primitives for a UI you're building. Returns full component/primitive specs with parameters and code examples. For complete system knowledge, read the lubaui://reference/full resource instead.",
   {
     description: z.string().describe("Description of what you're building (e.g. 'notification banner', 'settings page', 'profile card')"),
   },
@@ -108,7 +110,139 @@ server.tool(
   }
 );
 
+// --- Batch Tools ---
+
+server.tool(
+  "lookup_components",
+  "Look up multiple LubaUI components in a single call. Returns full specs (parameters, code examples, tokens, notes) for each match. Use this instead of calling lookup_component repeatedly.",
+  {
+    queries: z.array(z.string()).describe("Array of component names (e.g. ['Button', 'Card', 'TextField', 'Tabs'])"),
+  },
+  async ({ queries }) => {
+    const result = lookupComponents(queries);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  "lookup_tokens",
+  "Look up multiple LubaUI design tokens in a single call. Returns token name, API, value, tier, and usage guidance for each match. Use this instead of calling lookup_token repeatedly.",
+  {
+    queries: z.array(z.string()).describe("Array of token queries (e.g. ['spacing large', 'radius medium', 'press scale'])"),
+    category: z
+      .enum(["spacing", "radius", "color", "typography", "motion", "glass"])
+      .optional()
+      .describe("Filter all queries by token category"),
+  },
+  async ({ queries, category }) => {
+    const result = lookupTokens(queries, category);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
 // --- Resources ---
+
+server.resource(
+  "reference-full",
+  "lubaui://reference/full",
+  {
+    description:
+      "Complete LubaUI design system reference — architecture, all tokens, all 25 components with full specs, and all 7 primitives. Read this once to understand the entire system without making individual lookup calls.",
+  },
+  async () => {
+    const fullReference = {
+      system: "LubaUI Design System",
+      version: "1.0.0",
+      philosophy:
+        "Composability over inheritance. Behaviors are extracted into primitives (modifiers) so any view can gain interactive powers without subclassing. Every magic number has a name, a token, and documented rationale.",
+      platforms: "iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, visionOS 1.0+",
+
+      architecture: {
+        tokenSystem: {
+          tier1: {
+            name: "Primitives (LubaPrimitives)",
+            rule: "Raw hex values and numbers. NEVER reference directly in component code.",
+          },
+          tier2: {
+            name: "Semantic Tokens",
+            rule: "Human-readable, context-aware names. USE THESE in components.",
+            modules: [
+              "LubaColors",
+              "LubaSpacing",
+              "LubaRadius",
+              "LubaTypography",
+              "LubaMotion",
+              "LubaAnimations",
+            ],
+          },
+          tier3: {
+            name: "Component Tokens",
+            rule: "Per-component configuration enums. Reference tier 2 tokens internally.",
+          },
+        },
+        colorSystem: {
+          approach: "Greyscale-first with organic sage green accent",
+          adaptive: "All colors use LubaColors.adaptive(light:dark:) for automatic light/dark mode",
+          surfaceHierarchy: "background → surface → surfaceSecondary → surfaceTertiary",
+          accentColor: "Sage green (#5F7360 light / #9AB897 dark) — WCAG AA compliant",
+        },
+        motionSystems: {
+          LubaMotion: "Raw constants (scale values, animation parameters) — use with .scaleEffect(), .opacity()",
+          LubaAnimations: "Applied Animation objects — use with withAnimation(), .animation(), .transition()",
+        },
+        configuration: {
+          environment: "@Environment(\\.lubaConfig) for runtime settings, @Environment(\\.lubaTheme) for theming",
+          presets: [".minimal", ".accessible", ".debug"],
+        },
+      },
+
+      tokens: tokensData,
+
+      components: componentsData.map((c: { name: string; description: string; parameters: unknown; example: string; tokens: string[]; notes: string }) => ({
+        name: c.name,
+        description: c.description,
+        parameters: c.parameters,
+        example: c.example,
+        tokens: c.tokens,
+        notes: c.notes,
+      })),
+
+      primitives: primitivesData.map((p: { name: string; modifier: string; description: string; parameters: unknown; example: string; tokens: string[]; composability: string; [key: string]: unknown }) => {
+        const entry: Record<string, unknown> = {
+          name: p.name,
+          modifier: p.modifier,
+          description: p.description,
+          parameters: p.parameters,
+          example: p.example,
+          tokens: p.tokens,
+          composability: p.composability,
+        };
+        if ("presets" in p) entry.presets = p.presets;
+        if ("variants" in p) entry.variants = p.variants;
+        if ("builtInStyles" in p) entry.builtInStyles = p.builtInStyles;
+        if ("hapticStyles" in p) entry.hapticStyles = p.hapticStyles;
+        return entry;
+      }),
+
+      summary: {
+        totalComponents: componentsData.length,
+        totalPrimitives: primitivesData.length,
+        componentNames: componentsData.map((c: { name: string }) => c.name),
+        primitiveNames: primitivesData.map((p: { name: string }) => p.name),
+      },
+    };
+
+    return {
+      contents: [
+        {
+          uri: "lubaui://reference/full",
+          mimeType: "application/json",
+          text: JSON.stringify(fullReference, null, 2),
+        },
+      ],
+    };
+  }
+);
 
 server.resource(
   "tokens-all",
