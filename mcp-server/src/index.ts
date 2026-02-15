@@ -14,6 +14,7 @@ import {
 } from "./tools/lookup.js";
 import { validateSpacing, validateRadius } from "./tools/validate.js";
 import { suggestTokens } from "./tools/suggest.js";
+import { planMigration } from "./tools/migrate.js";
 
 const server = new McpServer({
   name: "lubaui",
@@ -137,6 +138,79 @@ server.tool(
   async ({ queries, category }) => {
     const result = lookupTokens(queries, category);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+// --- Migration Tool ---
+
+server.tool(
+  "plan_migration",
+  "Generate a mapping from an existing design system to LubaUI. Provide source tokens (colors with hex values, spacing/radius with pt values, typography with sizes, components with descriptions) and get a complete migration table showing exact/nearest LubaUI equivalents with code examples.",
+  {
+    source_system: z
+      .string()
+      .describe("Name or description of the source design system (e.g. 'Custom DS with violet accent and dark-only theme')"),
+    colors: z
+      .array(
+        z.object({
+          name: z.string().describe("Source color token name (e.g. 'DS.Colors.accent')"),
+          value: z.string().describe("Hex color value (e.g. '#A78BFA')"),
+          usage: z.string().optional().describe("How this color is used (e.g. 'primary accent')"),
+        })
+      )
+      .optional()
+      .describe("Source color tokens to map"),
+    spacing: z
+      .array(
+        z.object({
+          name: z.string().describe("Source spacing token name"),
+          value: z.number().describe("Value in points"),
+        })
+      )
+      .optional()
+      .describe("Source spacing tokens to map"),
+    radii: z
+      .array(
+        z.object({
+          name: z.string().describe("Source radius token name"),
+          value: z.number().describe("Value in points"),
+        })
+      )
+      .optional()
+      .describe("Source radius tokens to map"),
+    typography: z
+      .array(
+        z.object({
+          name: z.string().describe("Source typography token name"),
+          size: z.number().describe("Font size in points"),
+          weight: z.string().optional().describe("Font weight (e.g. 'bold', 'semibold')"),
+        })
+      )
+      .optional()
+      .describe("Source typography tokens to map"),
+    components: z
+      .array(
+        z.object({
+          name: z.string().describe("Source component name (e.g. 'HeroCard')"),
+          description: z
+            .string()
+            .describe("What the component does (e.g. 'large card with shadow for featured content')"),
+        })
+      )
+      .optional()
+      .describe("Source components to find LubaUI equivalents for"),
+  },
+  async ({ source_system, colors, spacing, radii, typography, components }) => {
+    const result = planMigration(source_system, {
+      colors,
+      spacing,
+      radii,
+      typography,
+      components,
+    });
+    return {
+      content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+    };
   }
 );
 
