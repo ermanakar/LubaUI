@@ -14,10 +14,21 @@ import SwiftUI
 
 // MARK: - Toast Style
 
+/// Visual style for a toast notification.
+///
+/// Each style provides a semantic icon and color:
+/// - ``info``: Accent-colored info circle
+/// - ``success``: Green checkmark
+/// - ``warning``: Amber triangle
+/// - ``error``: Red X
 public enum LubaToastStyle {
+    /// Informational message.
     case info
+    /// Positive outcome or confirmation.
     case success
+    /// Caution or validation issue.
     case warning
+    /// Error or failure.
     case error
 
     var icon: String {
@@ -41,6 +52,16 @@ public enum LubaToastStyle {
 
 // MARK: - Toast View
 
+/// A toast notification banner with icon, message, and optional action button.
+///
+/// Toasts overlay the screen briefly to communicate status. Use the `.lubaToast()`
+/// modifier for auto-dismissing overlay behavior, or place `LubaToast` inline.
+///
+/// ```swift
+/// LubaToast("File saved", style: .success)
+///
+/// LubaToast("Connection lost", style: .error, action: { retry() }, actionLabel: "Retry")
+/// ```
 public struct LubaToast: View {
     private let message: String
     private let style: LubaToastStyle
@@ -51,6 +72,14 @@ public struct LubaToast: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a toast notification.
+    ///
+    /// - Parameters:
+    ///   - message: The message to display.
+    ///   - style: The visual style (info, success, warning, error).
+    ///   - useGlass: Whether to use a glass background.
+    ///   - action: Optional action triggered by the action button.
+    ///   - actionLabel: Label for the action button. Required when `action` is provided.
     public init(
         _ message: String,
         style: LubaToastStyle = .info,
@@ -135,6 +164,10 @@ private extension LubaToastStyle {
 
 // MARK: - Toast Modifier
 
+/// A view modifier that presents a toast notification at the top of the screen.
+///
+/// The toast slides in from the top and auto-dismisses after the specified duration.
+/// Use the convenience method `.lubaToast()` instead of applying this modifier directly.
 public struct LubaToastModifier: ViewModifier {
     @Binding var isPresented: Bool
     let message: String
@@ -170,6 +203,18 @@ public struct LubaToastModifier: ViewModifier {
 }
 
 public extension View {
+    /// Present an auto-dismissing toast notification overlaid on this view.
+    ///
+    /// ```swift
+    /// ContentView()
+    ///     .lubaToast(isPresented: $showToast, message: "Saved", style: .success)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - isPresented: Binding that controls toast visibility.
+    ///   - message: The message to display.
+    ///   - style: The visual style.
+    ///   - duration: Seconds before auto-dismiss.
     func lubaToast(
         isPresented: Binding<Bool>,
         message: String,

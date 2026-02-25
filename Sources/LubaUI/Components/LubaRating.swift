@@ -30,6 +30,13 @@ public struct LubaRating: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a rating control.
+    ///
+    /// - Parameters:
+    ///   - value: Binding to the current rating (0 means no selection).
+    ///   - maxStars: Number of stars to display.
+    ///   - isReadOnly: When `true`, taps are ignored.
+    ///   - label: Optional text displayed to the left of the stars.
     public init(
         value: Binding<Int>,
         maxStars: Int = 5,

@@ -265,6 +265,11 @@ public enum LubaColors {
 // MARK: - Programmatic Namespace
 
 public extension LubaColors {
+    /// A scoped namespace that mirrors all ``LubaColors`` properties.
+    ///
+    /// Use `LubaColors.Programmatic` when you need the nested enum scope
+    /// for disambiguation in generic contexts or test assertions. In normal
+    /// component code, prefer the top-level properties (e.g. `LubaColors.accent`).
     enum Programmatic {
         public static let gray900 = LubaColors.gray900
         public static let gray800 = LubaColors.gray800

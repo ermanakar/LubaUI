@@ -15,15 +15,23 @@ import SwiftUI
 
 // MARK: - Badge Style
 
+/// Visual style for a badge.
 public enum LubaBadgeStyle {
-    case accent    // Filled accent
-    case subtle    // Light background, accent text
-    case neutral   // Gray background
-    case success   // Green
-    case warning   // Amber
-    case error     // Red
+    /// Filled accent background with contrasting text.
+    case accent
+    /// Light accent background with accent text.
+    case subtle
+    /// Gray background with secondary text.
+    case neutral
+    /// Green background for positive status.
+    case success
+    /// Amber background for warning status.
+    case warning
+    /// Red background for error status.
+    case error
 }
 
+/// Size variant for a badge.
 public enum LubaBadgeSize {
     case small
     case medium
@@ -59,12 +67,28 @@ public enum LubaBadgeSize {
 
 // MARK: - LubaBadge
 
+/// A small status indicator or count label.
+///
+/// Badges are pill-shaped labels used for status indicators, counts, and categories.
+///
+/// ```swift
+/// LubaBadge("New", style: .accent)
+/// LubaBadge("3", style: .error, size: .small)
+/// LubaBadge("Pro", style: .subtle, icon: Image(systemName: "crown"))
+/// ```
 public struct LubaBadge: View {
     private let text: String
     private let style: LubaBadgeStyle
     private let size: LubaBadgeSize
     private let icon: Image?
     
+    /// Creates a badge.
+    ///
+    /// - Parameters:
+    ///   - text: The text to display.
+    ///   - style: The visual style.
+    ///   - size: The size variant.
+    ///   - icon: Optional leading icon.
     public init(
         _ text: String,
         style: LubaBadgeStyle = .accent,

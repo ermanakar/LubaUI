@@ -15,6 +15,7 @@ import SwiftUI
 
 // MARK: - Chip Style
 
+/// Visual style for a ``LubaChip``.
 public enum LubaChipStyle {
     case filled
     case outlined
@@ -39,6 +40,16 @@ public struct LubaChip: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a chip.
+    ///
+    /// - Parameters:
+    ///   - label: The chip label text.
+    ///   - style: Visual style (filled or outlined).
+    ///   - icon: Optional leading icon.
+    ///   - isSelected: Whether the chip is selected.
+    ///   - isDismissible: Whether to show a dismiss button.
+    ///   - onDismiss: Action called when the dismiss button is tapped.
+    ///   - onTap: Action called when the chip itself is tapped.
     public init(
         _ label: String,
         style: LubaChipStyle = .filled,

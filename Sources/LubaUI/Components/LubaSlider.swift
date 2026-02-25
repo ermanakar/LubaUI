@@ -33,6 +33,15 @@ public struct LubaSlider: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a slider.
+    ///
+    /// - Parameters:
+    ///   - value: Binding to the current value.
+    ///   - range: The allowable range of values.
+    ///   - step: Optional step increment; `nil` allows continuous values.
+    ///   - label: Optional text displayed above the track.
+    ///   - showValue: When `true`, the current value is shown as text.
+    ///   - isDisabled: When `true`, the slider is non-interactive.
     public init(
         value: Binding<Double>,
         in range: ClosedRange<Double> = 0...1,

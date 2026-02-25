@@ -134,6 +134,11 @@ public struct LubaSpinner: View {
     @Environment(\.lubaConfig) private var config
     @State private var isAnimating = false
 
+    /// Creates a loading spinner.
+    ///
+    /// - Parameters:
+    ///   - size: Diameter of the spinner.
+    ///   - style: Animation style (arc, pulse, dots, or breathe).
     public init(size: CGFloat = LubaSpinnerTokens.defaultSize, style: LubaSpinnerStyle = .arc) {
         self.size = size
         self.style = style

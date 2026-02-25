@@ -48,6 +48,14 @@ public enum LubaExpandTokens {
 // MARK: - Expandable View
 
 /// A view that can expand and collapse to reveal content.
+///
+/// ```swift
+/// LubaExpandable(isExpanded: $isOpen) {
+///     Text("Header")
+/// } content: {
+///     Text("Expandable content here")
+/// }
+/// ```
 public struct LubaExpandable<Header: View, Content: View>: View {
     @Binding var isExpanded: Bool
     let showChevron: Bool
@@ -57,6 +65,14 @@ public struct LubaExpandable<Header: View, Content: View>: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates an expandable view.
+    ///
+    /// - Parameters:
+    ///   - isExpanded: Binding controlling the expanded state.
+    ///   - showChevron: Whether to display a rotation chevron indicator.
+    ///   - haptic: Haptic feedback on toggle, or `nil` for none.
+    ///   - header: The always-visible header content.
+    ///   - content: The content revealed when expanded.
     public init(
         isExpanded: Binding<Bool>,
         showChevron: Bool = true,

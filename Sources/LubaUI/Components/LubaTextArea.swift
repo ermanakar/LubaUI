@@ -31,6 +31,14 @@ public struct LubaTextArea: View {
     @FocusState private var isFocused: Bool
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a multi-line text area.
+    ///
+    /// - Parameters:
+    ///   - label: The field label displayed above the editor.
+    ///   - text: A binding to the edited text.
+    ///   - placeholder: Placeholder text shown when empty.
+    ///   - characterLimit: Optional maximum character count.
+    ///   - minHeight: Minimum editor height in points.
     public init(
         _ label: String,
         text: Binding<String>,

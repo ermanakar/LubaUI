@@ -29,6 +29,13 @@ public struct LubaStepper: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a stepper.
+    ///
+    /// - Parameters:
+    ///   - value: Binding to the current integer value.
+    ///   - range: The allowable range of values.
+    ///   - step: The increment/decrement amount per tap.
+    ///   - label: Optional text displayed to the left of the controls.
     public init(
         value: Binding<Int>,
         in range: ClosedRange<Int> = 0...99,

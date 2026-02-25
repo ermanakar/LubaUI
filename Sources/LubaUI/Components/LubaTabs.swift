@@ -14,6 +14,19 @@ import SwiftUI
 
 // MARK: - LubaTabs (Segmented)
 
+/// A segmented tab bar with animated selection indicator.
+///
+/// Use `LubaTabs` for pill-style segmented controls. For underline-style tabs,
+/// see ``LubaUnderlineTabs``.
+///
+/// ```swift
+/// LubaTabs(selection: $tab, tabs: [
+///     (value: Tab.home, label: "Home", icon: "house"),
+///     (value: Tab.search, label: "Search", icon: "magnifyingglass"),
+/// ])
+/// ```
+///
+/// Pass `useGlass: true` for a frosted glass background.
 public struct LubaTabs<T: Hashable>: View {
     @Binding private var selection: T
     private let tabs: [(value: T, label: String, icon: String?)]
@@ -129,6 +142,14 @@ public struct LubaTabs<T: Hashable>: View {
 
 // MARK: - LubaUnderlineTabs
 
+/// An underline-style tab bar with animated selection indicator.
+///
+/// ```swift
+/// LubaUnderlineTabs(selection: $section, tabs: [
+///     (value: Section.overview, label: "Overview"),
+///     (value: Section.details, label: "Details"),
+/// ])
+/// ```
 public struct LubaUnderlineTabs<T: Hashable>: View {
     @Binding private var selection: T
     private let tabs: [(value: T, label: String)]

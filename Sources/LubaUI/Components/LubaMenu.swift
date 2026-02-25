@@ -16,12 +16,24 @@ import SwiftUI
 
 // MARK: - Menu Item
 
+/// A single item in a ``LubaMenu``.
+///
+/// ```swift
+/// LubaMenuItem("Edit", icon: Image(systemName: "pencil")) { }
+/// ```
 public struct LubaMenuItem {
     public let label: String
     public let icon: Image?
     public let role: LubaMenuItemRole
     public let action: () -> Void
 
+    /// Creates a menu item.
+    ///
+    /// - Parameters:
+    ///   - label: The item title.
+    ///   - icon: Optional leading icon.
+    ///   - role: Semantic role (normal or destructive).
+    ///   - action: Action performed when selected.
     public init(
         _ label: String,
         icon: Image? = nil,
@@ -35,6 +47,7 @@ public struct LubaMenuItem {
     }
 }
 
+/// Semantic role for a ``LubaMenuItem``.
 public enum LubaMenuItemRole {
     case normal
     case destructive
@@ -57,6 +70,11 @@ public struct LubaMenu<Label: View>: View {
     private let items: [LubaMenuItem]
     private let label: Label
 
+    /// Creates a menu with a custom trigger label.
+    ///
+    /// - Parameters:
+    ///   - items: The menu items to display.
+    ///   - label: A view builder for the trigger label.
     public init(
         items: [LubaMenuItem],
         @ViewBuilder label: () -> Label

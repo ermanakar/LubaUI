@@ -15,6 +15,7 @@ import SwiftUI
 
 // MARK: - Link Style
 
+/// Visual style for a ``LubaLink``.
 public enum LubaLinkStyle {
     case `default`
     case subtle
@@ -36,6 +37,12 @@ public struct LubaLink: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates an inline link.
+    ///
+    /// - Parameters:
+    ///   - label: The link text.
+    ///   - style: Visual style (default, subtle, or external).
+    ///   - action: Action performed when tapped.
     public init(
         _ label: String,
         style: LubaLinkStyle = .default,

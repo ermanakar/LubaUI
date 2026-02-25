@@ -16,6 +16,12 @@ import SwiftUI
 
 // MARK: - Alert Style
 
+/// Semantic style for a ``LubaAlert``.
+///
+/// - ``info``: Neutral informational message.
+/// - ``success``: Positive confirmation.
+/// - ``warning``: Caution or upcoming expiration.
+/// - ``error``: Failure or validation error.
 public enum LubaAlertStyle {
     case info
     case success
@@ -68,6 +74,15 @@ public struct LubaAlert: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates an inline alert banner.
+    ///
+    /// - Parameters:
+    ///   - message: The alert body text.
+    ///   - style: Semantic style controlling color and icon.
+    ///   - title: Optional bold title above the message.
+    ///   - useGlass: Whether to use a glass material background.
+    ///   - isDismissible: Whether to show a dismiss button.
+    ///   - onDismiss: Action called when dismissed.
     public init(
         _ message: String,
         style: LubaAlertStyle = .info,

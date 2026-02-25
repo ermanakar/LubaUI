@@ -27,6 +27,12 @@ public struct LubaToggle: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a toggle switch.
+    ///
+    /// - Parameters:
+    ///   - isOn: Binding to the on/off state.
+    ///   - label: Optional text displayed to the left of the switch.
+    ///   - isDisabled: When `true`, the toggle is non-interactive.
     public init(
         isOn: Binding<Bool>,
         label: String? = nil,

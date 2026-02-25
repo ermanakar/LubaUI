@@ -78,22 +78,23 @@ public enum LubaReducedMotion {
 
 // MARK: - Accessibility Announcements
 
+/// Helpers for posting VoiceOver accessibility notifications.
 public struct LubaAnnounce {
-    /// Announce a message to VoiceOver
+    /// Announce a message to VoiceOver users.
     public static func message(_ text: String) {
         #if os(iOS)
         UIAccessibility.post(notification: .announcement, argument: text)
         #endif
     }
     
-    /// Announce a screen change
+    /// Notify VoiceOver of a screen change, optionally announcing text.
     public static func screenChanged(_ text: String? = nil) {
         #if os(iOS)
         UIAccessibility.post(notification: .screenChanged, argument: text)
         #endif
     }
     
-    /// Announce a layout change
+    /// Notify VoiceOver of a layout change, optionally focusing an element.
     public static func layoutChanged(_ element: Any? = nil) {
         #if os(iOS)
         UIAccessibility.post(notification: .layoutChanged, argument: element)

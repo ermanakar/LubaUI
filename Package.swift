@@ -19,6 +19,9 @@ let package = Package(
             targets: ["LubaUI"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
+    ],
     targets: [
         .target(
             name: "LubaUI",

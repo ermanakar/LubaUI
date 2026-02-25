@@ -15,15 +15,32 @@ import SwiftUI
 
 // MARK: - LubaDivider
 
+/// A visual separator line, optionally with a centered label.
+///
+/// Use dividers to separate sections of content. The default orientation is horizontal.
+///
+/// ```swift
+/// LubaDivider()
+/// LubaDivider(label: "or continue with")
+/// LubaDivider(orientation: .vertical)
+/// ```
 public struct LubaDivider: View {
     private let label: String?
     private let orientation: Orientation
-    
+
+    /// The direction of the divider line.
     public enum Orientation {
+        /// A horizontal line spanning the available width.
         case horizontal
+        /// A vertical line spanning the available height.
         case vertical
     }
-    
+
+    /// Creates a divider.
+    ///
+    /// - Parameters:
+    ///   - label: Optional text centered on the divider line (horizontal only).
+    ///   - orientation: The direction of the line.
     public init(
         label: String? = nil,
         orientation: Orientation = .horizontal

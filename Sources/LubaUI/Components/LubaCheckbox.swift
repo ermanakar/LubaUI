@@ -27,6 +27,12 @@ public struct LubaCheckbox: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a checkbox.
+    ///
+    /// - Parameters:
+    ///   - isChecked: Binding to the checked state.
+    ///   - label: Optional text displayed next to the checkbox.
+    ///   - isDisabled: When `true`, the checkbox is non-interactive.
     public init(
         isChecked: Binding<Bool>,
         label: String? = nil,

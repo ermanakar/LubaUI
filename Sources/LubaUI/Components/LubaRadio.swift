@@ -39,6 +39,12 @@ public struct LubaRadioGroup<T: Hashable>: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a radio group.
+    ///
+    /// - Parameters:
+    ///   - selection: Binding to the currently selected value.
+    ///   - options: The available choices, each with a value and display label.
+    ///   - isDisabled: When `true`, all options are non-interactive.
     public init(
         selection: Binding<T>,
         options: [(value: T, label: String)],
@@ -75,6 +81,13 @@ public struct LubaRadioButton: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a radio button.
+    ///
+    /// - Parameters:
+    ///   - label: The text displayed next to the radio indicator.
+    ///   - isSelected: Whether this option is currently selected.
+    ///   - isDisabled: When `true`, the button is non-interactive.
+    ///   - action: Closure invoked when the button is tapped.
     public init(
         label: String,
         isSelected: Bool,

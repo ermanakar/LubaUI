@@ -15,6 +15,7 @@ import SwiftUI
 
 // MARK: - Avatar Size
 
+/// Predefined sizes for ``LubaAvatar``.
 public enum LubaAvatarSize {
     case small   // 32pt
     case medium  // 40pt
@@ -41,6 +42,13 @@ public enum LubaAvatarSize {
 
 // MARK: - LubaAvatar
 
+/// A circular avatar displaying an image, initials, or a placeholder icon.
+///
+/// ```swift
+/// LubaAvatar(image: Image("profile"), size: .large)
+/// LubaAvatar(name: "Erman Akar", size: .medium)
+/// LubaAvatar(initials: "LU", showBorder: true)
+/// ```
 public struct LubaAvatar: View {
     private let image: Image?
     private let initials: String?
@@ -121,11 +129,22 @@ public struct LubaAvatar: View {
 
 // MARK: - Avatar Group
 
+/// A horizontally stacked, overlapping row of avatars with an overflow indicator.
+///
+/// ```swift
+/// LubaAvatarGroup(avatars: avatars, maxVisible: 3, size: .small)
+/// ```
 public struct LubaAvatarGroup: View {
     private let avatars: [LubaAvatar]
     private let maxVisible: Int
     private let size: LubaAvatarSize
     
+    /// Creates an avatar group.
+    ///
+    /// - Parameters:
+    ///   - avatars: The avatars to display.
+    ///   - maxVisible: Maximum number of avatars shown before the overflow badge.
+    ///   - size: Size applied to overflow badge layout.
     public init(
         avatars: [LubaAvatar],
         maxVisible: Int = 4,

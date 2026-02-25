@@ -9,7 +9,18 @@ import SwiftUI
 
 // MARK: - Theme Configuration
 
-/// LubaUI theme configuration
+/// Full theme override for colors, typography, spacing, and radii.
+///
+/// Apply a theme to a view subtree using the `.lubaTheme()` modifier:
+///
+/// ```swift
+/// let custom = LubaThemeConfiguration(
+///     colors: LubaThemeColors(accent: .blue)
+/// )
+/// ContentView().lubaTheme(custom)
+/// ```
+///
+/// Properties not specified fall back to LubaUI defaults.
 public struct LubaThemeConfiguration {
     public let colors: LubaThemeColors
     public let typography: LubaThemeTypography
@@ -33,6 +44,9 @@ public struct LubaThemeConfiguration {
 
 // MARK: - Theme Colors
 
+/// Color overrides for a ``LubaThemeConfiguration``.
+///
+/// Each property defaults to the corresponding ``LubaColors`` token.
 public struct LubaThemeColors {
     public let primary: Color
     public let secondary: Color
@@ -65,6 +79,9 @@ public struct LubaThemeColors {
 
 // MARK: - Theme Typography
 
+/// Font overrides for a ``LubaThemeConfiguration``.
+///
+/// Each property defaults to the corresponding ``LubaTypography`` token.
 public struct LubaThemeTypography {
     public let title: Font
     public let headline: Font
@@ -91,6 +108,9 @@ public struct LubaThemeTypography {
 
 // MARK: - Theme Spacing
 
+/// Spacing overrides for a ``LubaThemeConfiguration``.
+///
+/// Each property defaults to the corresponding ``LubaSpacing`` token.
 public struct LubaThemeSpacing {
     public let xs: CGFloat
     public let sm: CGFloat
@@ -126,6 +146,9 @@ public struct LubaThemeSpacing {
 
 // MARK: - Theme Radius
 
+/// Corner radius overrides for a ``LubaThemeConfiguration``.
+///
+/// Each property defaults to the corresponding ``LubaRadius`` token.
 public struct LubaThemeRadius {
     public let none: CGFloat
     public let xs: CGFloat
@@ -163,6 +186,7 @@ private struct LubaThemeKey: EnvironmentKey {
 }
 
 public extension EnvironmentValues {
+    /// The current LubaUI theme configuration.
     var lubaTheme: LubaThemeConfiguration {
         get { self[LubaThemeKey.self] }
         set { self[LubaThemeKey.self] = newValue }

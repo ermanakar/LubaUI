@@ -31,6 +31,14 @@ public struct LubaSearchBar: View {
     @FocusState private var isFocused: Bool
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a search bar.
+    ///
+    /// - Parameters:
+    ///   - text: Binding to the search text.
+    ///   - placeholder: Placeholder shown when the field is empty.
+    ///   - showCancelButton: When `true`, a cancel button appears on focus.
+    ///   - onSubmit: Optional closure invoked when the user submits.
+    ///   - onCancel: Optional closure invoked when the user cancels.
     public init(
         text: Binding<String>,
         placeholder: String = "Search",

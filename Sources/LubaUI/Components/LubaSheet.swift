@@ -13,11 +13,22 @@ import SwiftUI
 
 // MARK: - Sheet Size
 
+/// Presentation height for a bottom sheet.
+///
+/// Each size maps to a SwiftUI `PresentationDetent`:
+/// - ``small``: ~25% of the screen
+/// - ``medium``: ~50% of the screen
+/// - ``large``: ~75% of the screen
+/// - ``full``: Full screen
 public enum LubaSheetSize {
-    case small      // ~25% of screen
-    case medium     // ~50% of screen
-    case large      // ~75% of screen
-    case full       // Full screen
+    /// Approximately 25% of the screen height.
+    case small
+    /// Approximately 50% of the screen height.
+    case medium
+    /// Approximately 75% of the screen height.
+    case large
+    /// Full screen height.
+    case full
     
     var detent: PresentationDetent {
         switch self {
@@ -31,6 +42,16 @@ public enum LubaSheetSize {
 
 // MARK: - Sheet Modifier
 
+/// A view modifier that presents content in a bottom sheet.
+///
+/// Use the convenience method `.lubaSheet()` instead of applying this modifier directly:
+///
+/// ```swift
+/// Button("Show Sheet") { showSheet = true }
+///     .lubaSheet(isPresented: $showSheet, size: .medium) {
+///         SettingsView()
+///     }
+/// ```
 public struct LubaSheetModifier<SheetContent: View>: ViewModifier {
     @Binding var isPresented: Bool
     let size: LubaSheetSize
@@ -48,6 +69,13 @@ public struct LubaSheetModifier<SheetContent: View>: ViewModifier {
 }
 
 public extension View {
+    /// Present a bottom sheet with configurable size and drag indicator.
+    ///
+    /// - Parameters:
+    ///   - isPresented: Binding that controls sheet visibility.
+    ///   - size: The sheet's presentation height.
+    ///   - showDragIndicator: Whether to show the drag handle at the top.
+    ///   - content: The sheet's content.
     func lubaSheet<Content: View>(
         isPresented: Binding<Bool>,
         size: LubaSheetSize = .medium,
@@ -65,6 +93,15 @@ public extension View {
 
 // MARK: - Sheet Header
 
+/// A standard header bar for sheets with title, optional subtitle, and close button.
+///
+/// ```swift
+/// LubaSheetHeader("Settings", subtitle: "Customize your experience") {
+///     dismiss()
+/// }
+/// ```
+///
+/// Set `useGlass: true` for a frosted glass background on the header.
 public struct LubaSheetHeader: View {
     private let title: String
     private let subtitle: String?
@@ -73,6 +110,13 @@ public struct LubaSheetHeader: View {
 
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a sheet header.
+    ///
+    /// - Parameters:
+    ///   - title: The header title.
+    ///   - subtitle: Optional secondary text below the title.
+    ///   - useGlass: Whether to use a glass background instead of a solid surface.
+    ///   - onClose: Action invoked when the close button is tapped.
     public init(
         _ title: String,
         subtitle: String? = nil,

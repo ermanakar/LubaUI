@@ -16,6 +16,7 @@ import SwiftUI
 
 // MARK: - Tooltip Position
 
+/// Anchor position for a ``LubaTooltip``.
 public enum LubaTooltipPosition {
     case top
     case bottom
@@ -45,6 +46,12 @@ public struct LubaTooltip<Content: View>: View {
     @State private var isPresented = false
     @Environment(\.lubaConfig) private var config
 
+    /// Creates a tooltip wrapping the given content.
+    ///
+    /// - Parameters:
+    ///   - message: The tooltip text.
+    ///   - position: Whether the tooltip appears above or below.
+    ///   - content: The view that triggers the tooltip on tap.
     public init(
         _ message: String,
         position: LubaTooltipPosition = .top,

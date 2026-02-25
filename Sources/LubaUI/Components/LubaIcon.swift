@@ -14,6 +14,7 @@ import SwiftUI
 
 // MARK: - Icon Size
 
+/// Predefined sizes for ``LubaIcon`` and related icon components.
 public enum LubaIconSize: CaseIterable {
     case xs     // 14pt
     case sm     // 18pt
@@ -48,6 +49,12 @@ public struct LubaIcon: View {
     private let size: LubaIconSize
     private let color: Color?
     
+    /// Creates an icon from an SF Symbol name.
+    ///
+    /// - Parameters:
+    ///   - name: The SF Symbol name (e.g. `"heart.fill"`).
+    ///   - size: The icon size preset.
+    ///   - color: Optional override color; defaults to `LubaColors.textSecondary`.
     public init(
         _ name: String,
         size: LubaIconSize = .md,
@@ -77,6 +84,13 @@ public struct LubaIconButton: View {
     @Environment(\.lubaConfig) private var config
     @State private var isPressed = false
 
+    /// Creates an icon button.
+    ///
+    /// - Parameters:
+    ///   - icon: The SF Symbol name.
+    ///   - size: The icon size preset.
+    ///   - color: Optional override color.
+    ///   - action: Closure invoked on tap.
     public init(
         _ icon: String,
         size: LubaIconSize = .md,
@@ -146,12 +160,19 @@ public struct LubaCircledIcon: View {
     private let size: LubaIconSize
     private let style: Style
 
+    /// Visual style for the circular background.
     public enum Style {
         case filled     // Accent bg, contrasting icon
         case subtle     // Accent subtle bg, accent icon
         case neutral    // Gray bg, gray icon
     }
 
+    /// Creates a circled icon.
+    ///
+    /// - Parameters:
+    ///   - icon: The SF Symbol name.
+    ///   - size: The icon size preset.
+    ///   - style: The visual style of the circular background.
     public init(
         _ icon: String,
         size: LubaIconSize = .md,

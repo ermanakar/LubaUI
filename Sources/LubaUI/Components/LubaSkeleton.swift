@@ -22,6 +22,12 @@ public struct LubaSkeleton: View {
     @Environment(\.lubaConfig) private var config
     @State private var shimmerOffset: CGFloat = LubaSkeletonTokens.shimmerStart
 
+    /// Creates a skeleton placeholder.
+    ///
+    /// - Parameters:
+    ///   - width: Optional fixed width; fills available space when `nil`.
+    ///   - height: Height of the skeleton shape.
+    ///   - cornerRadius: Corner radius of the rounded rectangle.
     public init(
         width: CGFloat? = nil,
         height: CGFloat = LubaSkeletonTokens.defaultHeight,
@@ -75,6 +81,10 @@ public struct LubaSkeletonCircle: View {
     @Environment(\.lubaConfig) private var config
     @State private var shimmerOffset: CGFloat = LubaSkeletonTokens.shimmerStart
 
+    /// Creates a circular skeleton placeholder.
+    ///
+    /// - Parameters:
+    ///   - size: Diameter of the circle.
     public init(size: CGFloat = LubaSkeletonTokens.defaultCircleSize) {
         self.size = size
     }
@@ -116,6 +126,13 @@ public struct LubaSkeletonText: View {
     private let lineHeight: CGFloat
     private let spacing: CGFloat
 
+    /// Creates a multi-line skeleton text block.
+    ///
+    /// - Parameters:
+    ///   - lines: Number of skeleton lines to display.
+    ///   - lastLineRatio: Width ratio of the last line (0 to 1).
+    ///   - lineHeight: Height of each skeleton line.
+    ///   - spacing: Vertical spacing between lines.
     public init(
         lines: Int = LubaSkeletonTokens.defaultLineCount,
         lastLineRatio: CGFloat = LubaSkeletonTokens.lastLineRatio,
@@ -152,6 +169,11 @@ public struct LubaSkeletonCard: View {
     private let avatarSize: CGFloat
     private let showBody: Bool
 
+    /// Creates a card skeleton with an avatar and text lines.
+    ///
+    /// - Parameters:
+    ///   - avatarSize: Diameter of the avatar circle.
+    ///   - showBody: Whether to show body text lines below the header.
     public init(avatarSize: CGFloat = LubaSkeletonTokens.cardAvatarSize, showBody: Bool = true) {
         self.avatarSize = avatarSize
         self.showBody = showBody

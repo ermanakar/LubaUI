@@ -16,7 +16,23 @@ import SwiftUI
 // MARK: - Button Styling Protocol
 
 /// Defines the visual appearance of a button.
-/// Implement this to create custom button styles.
+///
+/// Implement this protocol to create custom button styles. Use the `styling:` parameter
+/// on ``LubaButton`` to apply your custom style.
+///
+/// ```swift
+/// struct BrandStyle: LubaButtonStyling {
+///     func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color { .white }
+///     func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
+///         isPressed ? .blue.opacity(0.8) : .blue
+///     }
+///     func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? { nil }
+/// }
+///
+/// LubaButton("Continue", styling: BrandStyle()) { }
+/// ```
+///
+/// See <doc:CustomizingButtonStyles> for a full guide.
 public protocol LubaButtonStyling {
     /// Foreground (text/icon) color
     func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color
