@@ -187,7 +187,7 @@ struct AccessibilityScreen: View {
     private func a11yFeature(icon: String, title: String, desc: String) -> some View {
         HStack(alignment: .top, spacing: LubaSpacing.md) {
             LubaCircledIcon(icon, size: .sm, style: .subtle)
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(title)
                     .font(LubaTypography.headline)
                     .foregroundStyle(LubaColors.textPrimary)
@@ -218,7 +218,7 @@ struct AccessibilityScreen: View {
                     .foregroundStyle(fg)
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.caption)
                     .foregroundStyle(LubaColors.textPrimary)
@@ -241,7 +241,7 @@ struct AccessibilityScreen: View {
             .font(LubaTypography.caption)
             .foregroundStyle(passes ? LubaColors.success : LubaColors.error)
             .padding(.horizontal, LubaSpacing.sm)
-            .padding(.vertical, 2)
+            .padding(.vertical, LubaSpacing.xxs)
             .background(passes ? LubaColors.success.opacity(0.1) : LubaColors.error.opacity(0.1))
             .clipShape(Capsule())
     }
@@ -257,7 +257,7 @@ struct AccessibilityScreen: View {
                     .frame(width: size, height: size)
 
                 Image(systemName: "hand.tap")
-                    .font(.system(size: 16))
+                    .font(LubaTypography.body)
                     .foregroundStyle(passing ? LubaColors.success : LubaColors.error)
             }
 

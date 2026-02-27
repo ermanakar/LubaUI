@@ -219,7 +219,7 @@ struct AvatarsScreen: View {
                     .offset(x: 2, y: 2)
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textPrimary)

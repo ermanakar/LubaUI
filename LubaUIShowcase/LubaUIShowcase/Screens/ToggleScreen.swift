@@ -80,11 +80,14 @@ struct ToggleScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "power",
-                title: "Binary Clarity",
-                description: "A toggle represents an immediate, binary choice. On or off — no ambiguity. The spring animation and haptic tap confirm the state change before the UI even updates."
-            )
+            // Philosophy
+            DemoSection(title: "Binary Clarity") {
+                PhilosophyCard(
+                    icon: "power",
+                    title: "Binary Clarity",
+                    description: "A toggle represents an immediate, binary choice. On or off — no ambiguity. The spring animation and haptic tap confirm the state change before the UI even updates."
+                )
+            }
         }
     }
 

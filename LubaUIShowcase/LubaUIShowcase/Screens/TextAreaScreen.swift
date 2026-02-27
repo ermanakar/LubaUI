@@ -71,11 +71,14 @@ struct TextAreaScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "text.alignleft",
-                title: "Room To Breathe",
-                description: "Sometimes a single line isn't enough. Text areas give users space to express themselves, with gentle guardrails like character limits."
-            )
+            // Philosophy
+            DemoSection(title: "Room To Breathe") {
+                PhilosophyCard(
+                    icon: "text.alignleft",
+                    title: "Room To Breathe",
+                    description: "Sometimes a single line isn't enough. Text areas give users space to express themselves, with gentle guardrails like character limits."
+                )
+            }
         }
     }
 }

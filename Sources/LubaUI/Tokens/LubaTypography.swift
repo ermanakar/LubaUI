@@ -43,12 +43,27 @@ public enum LubaTypography {
     /// Custom fonts override the system font entirely. Monospaced is always preserved.
     private static func font(size: CGFloat, weight: Font.Weight, design: Font.Design = .rounded) -> Font {
         let config = LubaConfig.shared
+        
+        // Respect useBoldText for accessibility
+        let resolvedWeight: Font.Weight
+        if config.useBoldText {
+            switch weight {
+            case .regular: resolvedWeight = .medium
+            case .medium: resolvedWeight = .semibold
+            case .semibold: resolvedWeight = .bold
+            case .bold: resolvedWeight = .heavy
+            default: resolvedWeight = weight
+            }
+        } else {
+            resolvedWeight = weight
+        }
+
         if let family = config.customFontFamily {
             // Custom font family — preserve monospaced for code, use custom for everything else
             if design == .monospaced {
-                return .system(size: size, weight: weight, design: .monospaced)
+                return .system(size: size, weight: resolvedWeight, design: .monospaced)
             }
-            return .custom(family, size: size).weight(weight)
+            return .custom(family, size: size).weight(resolvedWeight)
         }
         // System font — respect useRoundedFont toggle
         let resolvedDesign: Font.Design
@@ -57,7 +72,7 @@ public enum LubaTypography {
         } else {
             resolvedDesign = config.useRoundedFont ? .rounded : .default
         }
-        return .system(size: size, weight: weight, design: resolvedDesign)
+        return .system(size: size, weight: resolvedWeight, design: resolvedDesign)
     }
 
     // MARK: - Custom

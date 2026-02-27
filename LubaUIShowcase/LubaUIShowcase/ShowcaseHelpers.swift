@@ -12,20 +12,14 @@ import LubaUI
 
 /// Standard header for all showcase screens.
 struct ShowcaseHeader: View {
-    let title: String
+    let title: String // Retained for compatibility with existing screens
     let description: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LubaSpacing.sm) {
-            Text(title)
-                .font(LubaTypography.title)
-                .foregroundStyle(LubaColors.textPrimary)
-
-            Text(description)
-                .font(LubaTypography.body)
-                .foregroundStyle(LubaColors.textSecondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        Text(description)
+            .font(LubaTypography.body)
+            .foregroundStyle(LubaColors.textSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -157,6 +151,6 @@ struct ShowcaseScreen<Content: View>: View {
         }
         .background(LubaColors.background)
         .navigationTitle(navigationTitle)
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
     }
 }

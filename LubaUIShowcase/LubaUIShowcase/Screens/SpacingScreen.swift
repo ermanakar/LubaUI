@@ -20,6 +20,7 @@ struct SpacingScreen: View {
             DemoSection(title: "Scale") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     VStack(spacing: LubaSpacing.md) {
+                        spacingRow(name: "xxs", value: LubaSpacing.xxs)
                         spacingRow(name: "xs", value: LubaSpacing.xs)
                         spacingRow(name: "sm", value: LubaSpacing.sm)
                         spacingRow(name: "md", value: LubaSpacing.md)
@@ -113,21 +114,11 @@ struct SpacingScreen: View {
 
             // Philosophy
             DemoSection(title: "The 4pt System") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    HStack(alignment: .top, spacing: LubaSpacing.md) {
-                        LubaCircledIcon("ruler.fill", size: .md, style: .subtle)
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Mathematical Rhythm")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-
-                            Text("Every spacing value is a multiple of 4pt. This creates visual consistency that users feel even if they can't articulate it.")
-                                .font(LubaTypography.caption)
-                                .foregroundStyle(LubaColors.textSecondary)
-                        }
-                    }
-                }
+                PhilosophyCard(
+                    icon: "ruler.fill",
+                    title: "Mathematical Rhythm",
+                    description: "Every spacing value is a multiple of 4pt. This creates visual consistency that users feel even if they can't articulate it."
+                )
             }
         }
     }

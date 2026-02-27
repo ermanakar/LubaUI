@@ -20,6 +20,9 @@ import SwiftUI
 /// Ratios: 2.0×, 1.5×, 1.33×, 1.5×, 1.33×, 1.5×, 1.33×
 public enum LubaSpacing {
     
+    /// 2pt - Ultra tight spacing for nested elements
+    public static let xxs: CGFloat = 2
+    
     /// 4pt - Extra small spacing for tight layouts
     public static let xs: CGFloat = 4
     

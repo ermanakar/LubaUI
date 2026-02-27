@@ -154,7 +154,7 @@ struct RadiusScreen: View {
                                 .frame(height: 120)
                                 .overlay(
                                     Image(systemName: "photo")
-                                        .font(.system(size: 28))
+                                        .font(LubaTypography.custom(size: 28, weight: .regular))
                                         .foregroundStyle(LubaColors.gray400)
                                 )
 
@@ -229,7 +229,7 @@ struct RadiusScreen: View {
                 .fill(LubaColors.accent)
                 .frame(width: 36, height: 36)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.headline)
                     .foregroundStyle(LubaColors.textPrimary)

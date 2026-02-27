@@ -145,7 +145,7 @@ struct LoadingPatternsScreen: View {
                                     RoundedRectangle.luba(LubaRadius.sm)
                                         .fill(LubaColors.gray100)
                                         .frame(width: 40, height: 40)
-                                    VStack(alignment: .leading, spacing: 4) {
+                                    VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                         RoundedRectangle.luba(LubaRadius.xs)
                                             .fill(LubaColors.gray100)
                                             .frame(height: 12)

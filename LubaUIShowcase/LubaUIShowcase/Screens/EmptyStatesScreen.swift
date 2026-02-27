@@ -21,7 +21,7 @@ struct EmptyStatesScreen: View {
                 LubaCard(elevation: .low) {
                     VStack(spacing: LubaSpacing.lg) {
                         Image(systemName: "tray")
-                            .font(.system(size: 40))
+                            .font(LubaTypography.custom(size: 40, weight: .regular))
                             .foregroundStyle(LubaColors.textTertiary)
 
                         VStack(spacing: LubaSpacing.xs) {
@@ -73,7 +73,7 @@ struct EmptyStatesScreen: View {
                                 .fill(LubaColors.accentSubtle)
                                 .frame(width: 80, height: 80)
                             Image(systemName: "wand.and.stars")
-                                .font(.system(size: 32))
+                                .font(LubaTypography.custom(size: 32, weight: .regular))
                                 .foregroundStyle(LubaColors.accent)
                         }
 

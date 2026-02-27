@@ -180,7 +180,7 @@ struct TextFieldsScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "User Name", size: .large)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Profile Photo")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)

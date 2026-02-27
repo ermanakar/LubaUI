@@ -50,7 +50,6 @@ enum ShowcaseSection: String, CaseIterable {
             ]
         case .foundation:
             return [
-                ShowcaseItem(icon: "book.closed", title: "Getting Started", description: "Quick-start guide & philosophy", destination: AnyView(GettingStartedScreen())),
                 ShowcaseItem(icon: "circle.lefthalf.filled", title: "Colors", description: "Greyscale palette with sage accent", destination: AnyView(ColorsScreen())),
                 ShowcaseItem(icon: "textformat", title: "Typography", description: "SF Rounded type scale", destination: AnyView(TypographyScreen())),
                 ShowcaseItem(icon: "square.split.2x2", title: "Spacing", description: "4pt grid system", destination: AnyView(SpacingScreen())),
@@ -153,7 +152,7 @@ struct ContentView: View {
                     .frame(width: 72, height: 72)
 
                 Image(systemName: isDarkMode ? "moon.fill" : "leaf.fill")
-                    .font(.system(size: 28))
+                    .font(LubaTypography.custom(size: 28, weight: .regular))
                     .foregroundStyle(LubaColors.accent)
             }
             .lubaPressable(scale: LubaMotion.pressScaleCompact, haptic: .medium) {
@@ -277,7 +276,7 @@ struct ContentView: View {
             if filtered.isEmpty {
                 VStack(spacing: LubaSpacing.md) {
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: 32))
+                        .font(LubaTypography.custom(size: 32, weight: .regular))
                         .foregroundStyle(LubaColors.textTertiary)
 
                     Text("No results found")

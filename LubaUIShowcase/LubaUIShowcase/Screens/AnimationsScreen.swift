@@ -69,6 +69,60 @@ struct AnimationsScreen: View {
                 }
             }
 
+            // Interactive Eased Demo
+            DemoSection(title: "Eased Comparison") {
+                LubaCard(elevation: .low) {
+                    VStack(spacing: LubaSpacing.lg) {
+                        HStack(spacing: LubaSpacing.md) {
+                            // Fade In
+                            VStack(spacing: LubaSpacing.sm) {
+                                RoundedRectangle(cornerRadius: LubaRadius.sm)
+                                    .fill(LubaColors.accent)
+                                    .frame(height: 40)
+                                    .opacity(easedDemo ? 1 : 0.2)
+                                    .animation(LubaAnimations.fadeIn, value: easedDemo)
+                                
+                                Text("fadeIn")
+                                    .font(LubaTypography.caption)
+                                    .foregroundStyle(LubaColors.textTertiary)
+                            }
+                            
+                            // Smooth
+                            VStack(spacing: LubaSpacing.sm) {
+                                RoundedRectangle(cornerRadius: LubaRadius.sm)
+                                    .fill(easedDemo ? LubaColors.success : LubaColors.border)
+                                    .frame(height: 40)
+                                    .animation(LubaAnimations.smooth, value: easedDemo)
+                                
+                                Text("smooth")
+                                    .font(LubaTypography.caption)
+                                    .foregroundStyle(LubaColors.textTertiary)
+                            }
+                            
+                            // Subtle
+                            VStack(spacing: LubaSpacing.sm) {
+                                RoundedRectangle(cornerRadius: LubaRadius.sm)
+                                    .fill(easedDemo ? LubaColors.surfaceSecondary : LubaColors.surface)
+                                    .frame(height: 40)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: LubaRadius.sm)
+                                            .strokeBorder(LubaColors.border, lineWidth: 1)
+                                    )
+                                    .animation(LubaAnimations.subtle, value: easedDemo)
+                                
+                                Text("subtle")
+                                    .font(LubaTypography.caption)
+                                    .foregroundStyle(LubaColors.textTertiary)
+                            }
+                        }
+                        
+                        LubaButton("Toggle State", style: .secondary, fullWidth: true) {
+                            easedDemo.toggle()
+                        }
+                    }
+                }
+            }
+
             // Stagger Demo
             DemoSection(title: "Stagger Animation") {
                 LubaCard(elevation: .low) {
@@ -206,10 +260,12 @@ struct AnimationsScreen: View {
 
     private func animatedDot(label: String, animation: Animation, isActive: Bool) -> some View {
         VStack(spacing: LubaSpacing.sm) {
+            Spacer()
+            
             Circle()
                 .fill(LubaColors.accent)
                 .frame(width: 24, height: 24)
-                .offset(y: isActive ? -40 : 0)
+                .offset(y: isActive ? -32 : 0)
                 .animation(animation, value: isActive)
 
             Text(label)
@@ -217,7 +273,7 @@ struct AnimationsScreen: View {
                 .foregroundStyle(LubaColors.textTertiary)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 80)
+        .frame(height: 100)
     }
 
     private func easedRow(name: String, desc: String, animation: Animation) -> some View {

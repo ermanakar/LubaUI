@@ -68,7 +68,8 @@ struct DarkModeScreen: View {
                 description: "LubaColors.adaptive(light:dark:) handles everything. Shadows get 50% stronger in dark mode. Borders become visible on filled cards. No manual overrides needed — it just works."
             )
         }
-        .preferredColorScheme(isDarkMode ? .dark : .light)
+        .environment(\.colorScheme, isDarkMode ? .dark : .light)
+        .toolbarColorScheme(isDarkMode ? .dark : .light, for: .navigationBar)
         .onAppear { isDarkMode = systemColorScheme == .dark }
     }
 
@@ -80,21 +81,29 @@ struct DarkModeScreen: View {
                 .font(LubaTypography.caption)
                 .foregroundStyle(LubaColors.textTertiary)
 
-            VStack(spacing: 2) {
-                colorSwatch("background", LubaColors.background, scheme: scheme)
-                colorSwatch("surface", LubaColors.surface, scheme: scheme)
-                colorSwatch("accent", LubaColors.accent, scheme: scheme)
-                colorSwatch("accentSubtle", LubaColors.accentSubtle, scheme: scheme)
-                colorSwatch("border", LubaColors.border, scheme: scheme)
-                colorSwatch("gray100", LubaColors.gray100, scheme: scheme)
-                colorSwatch("gray400", LubaColors.gray400, scheme: scheme)
-                colorSwatch("gray900", LubaColors.gray900, scheme: scheme)
+            VStack(spacing: LubaSpacing.xxs) {
+                colorSwatch("background", LubaColors.background)
+                colorSwatch("surface", LubaColors.surface)
+                colorSwatch("accent", LubaColors.accent)
+                colorSwatch("accentSubtle", LubaColors.accentSubtle)
+                colorSwatch("border", LubaColors.border)
+                colorSwatch("gray100", LubaColors.gray100)
+                colorSwatch("gray400", LubaColors.gray400)
+                colorSwatch("gray900", LubaColors.gray900)
             }
+            .padding(LubaSpacing.md)
+            .background(LubaColors.background)
+            .clipShape(RoundedRectangle.luba(LubaRadius.md))
+            .overlay(
+                RoundedRectangle.luba(LubaRadius.md)
+                    .strokeBorder(LubaColors.border, lineWidth: 1)
+            )
+            .environment(\.colorScheme, scheme)
         }
         .frame(maxWidth: .infinity)
     }
 
-    private func colorSwatch(_ name: String, _ color: Color, scheme: ColorScheme) -> some View {
+    private func colorSwatch(_ name: String, _ color: Color) -> some View {
         HStack(spacing: LubaSpacing.xs) {
             RoundedRectangle.luba(LubaRadius.xs)
                 .fill(color)
@@ -111,8 +120,7 @@ struct DarkModeScreen: View {
 
             Spacer()
         }
-        .padding(.vertical, 2)
-        .environment(\.colorScheme, scheme)
+        .padding(.vertical, LubaSpacing.xxs)
     }
 
     private func componentColumn(scheme: ColorScheme) -> some View {
@@ -125,7 +133,7 @@ struct DarkModeScreen: View {
                 LubaButton("Button", style: .primary, size: .small) { }
 
                 LubaCard(elevation: .flat, style: .outlined) {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                         Text("Card")
                             .font(LubaTypography.headline)
                             .foregroundStyle(LubaColors.textPrimary)
@@ -149,9 +157,9 @@ struct DarkModeScreen: View {
                 RoundedRectangle.luba(LubaRadius.md)
                     .strokeBorder(LubaColors.border, lineWidth: 1)
             )
+            .environment(\.colorScheme, scheme)
         }
         .frame(maxWidth: .infinity)
-        .environment(\.colorScheme, scheme)
     }
 
     private func elevationColumn(scheme: ColorScheme) -> some View {
@@ -182,9 +190,9 @@ struct DarkModeScreen: View {
             .padding(LubaSpacing.md)
             .background(LubaColors.background)
             .clipShape(RoundedRectangle.luba(LubaRadius.md))
+            .environment(\.colorScheme, scheme)
         }
         .frame(maxWidth: .infinity)
-        .environment(\.colorScheme, scheme)
     }
 }
 

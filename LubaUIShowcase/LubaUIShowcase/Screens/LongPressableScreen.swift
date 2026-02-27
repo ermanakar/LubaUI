@@ -43,7 +43,7 @@ struct LongPressableScreen: View {
                         HStack(spacing: LubaSpacing.xl) {
                             VStack(spacing: LubaSpacing.sm) {
                                 Image(systemName: "trash.fill")
-                                    .font(.system(size: 28))
+                                    .font(LubaTypography.custom(size: 28, weight: .regular))
                                     .foregroundStyle(LubaColors.error)
                                     .frame(width: 56, height: 56)
                                     .background(LubaColors.surface)
@@ -61,7 +61,7 @@ struct LongPressableScreen: View {
 
                             VStack(spacing: LubaSpacing.sm) {
                                 Image(systemName: "heart.fill")
-                                    .font(.system(size: 28))
+                                    .font(LubaTypography.custom(size: 28, weight: .regular))
                                     .foregroundStyle(LubaColors.accent)
                                     .frame(width: 56, height: 56)
                                     .background(LubaColors.accentSubtle)
@@ -94,7 +94,7 @@ struct LongPressableScreen: View {
                             .overlay(
                                 VStack(spacing: LubaSpacing.sm) {
                                     Image(systemName: "lock.fill")
-                                        .font(.system(size: 24))
+                                        .font(LubaTypography.custom(size: 24, weight: .regular))
                                     Text("Hold to unlock")
                                         .font(LubaTypography.caption)
                                 }
@@ -126,7 +126,7 @@ struct LongPressableScreen: View {
                                 lastAction = "Super liked!"
                             }
 
-                            LubaLongPressButton(icon: "trash", label: "Delete", duration: 1.0) {
+                            LubaLongPressButton(icon: "trash", label: "Delete", duration: 1.0, color: LubaColors.error) {
                                 deleteCount += 1
                                 lastAction = "Deleted! (\(deleteCount) times)"
                             }
@@ -151,7 +151,7 @@ struct LongPressableScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaCircledIcon("exclamationmark.triangle.fill", size: .md, style: .subtle)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Delete Account")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -199,7 +199,7 @@ struct LongPressableScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "LubaUI", size: .medium)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("LubaUI")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -223,21 +223,11 @@ struct LongPressableScreen: View {
 
             // Philosophy
             DemoSection(title: "Intentional Friction") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    HStack(alignment: .top, spacing: LubaSpacing.md) {
-                        LubaCircledIcon("timer", size: .md, style: .subtle)
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Deliberate Delay")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-
-                            Text("Long press adds intentional friction for dangerous or irreversible actions. The progress feedback gives users time to reconsider and the haptic confirms completion.")
-                                .font(LubaTypography.caption)
-                                .foregroundStyle(LubaColors.textSecondary)
-                        }
-                    }
-                }
+                PhilosophyCard(
+                    icon: "timer",
+                    title: "Deliberate Delay",
+                    description: "Long press adds intentional friction for dangerous or irreversible actions. The progress feedback gives users time to reconsider and the haptic confirms completion."
+                )
             }
 
             // Code Example

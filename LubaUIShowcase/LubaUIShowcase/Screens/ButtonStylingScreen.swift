@@ -58,21 +58,11 @@ struct ButtonStylingScreen: View {
 
             // Philosophy
             DemoSection(title: "Radical Composability") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    HStack(alignment: .top, spacing: LubaSpacing.md) {
-                        LubaCircledIcon("lightbulb.fill", size: .md, style: .subtle)
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Styles as Values")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-
-                            Text("Instead of switch statements scattered across components, each style is a self-contained struct. Create new styles by implementing one protocol — no touching button internals.")
-                                .font(LubaTypography.caption)
-                                .foregroundStyle(LubaColors.textSecondary)
-                        }
-                    }
-                }
+                PhilosophyCard(
+                    icon: "lightbulb.fill",
+                    title: "Styles as Values",
+                    description: "Instead of switch statements scattered across components, each style is a self-contained struct. Create new styles by implementing one protocol — no touching button internals."
+                )
             }
 
             // Built-in Styles

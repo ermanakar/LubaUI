@@ -67,7 +67,7 @@ struct GlassScreen: View {
                             }
                             Spacer()
                             Image(systemName: "sparkles")
-                                .font(.system(size: 24))
+                                .font(LubaTypography.custom(size: 24, weight: .regular))
                                 .foregroundStyle(LubaColors.accent)
                         }
                     }
@@ -213,7 +213,7 @@ struct GlassScreen: View {
 
     private func glassStyleDemo(_ title: String, subtitle: String, style: LubaGlassStyle) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(title)
                     .font(LubaTypography.headline)
                     .foregroundStyle(LubaColors.textPrimary)

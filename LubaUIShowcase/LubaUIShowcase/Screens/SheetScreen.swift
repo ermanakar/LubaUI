@@ -56,7 +56,7 @@ struct SheetScreen: View {
                 LubaCard(elevation: .low) {
                     VStack(spacing: LubaSpacing.lg) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Account Settings")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -101,6 +101,15 @@ struct SheetScreen: View {
                         codeRow("LubaSheetSize", ".small, .medium, .large, .full")
                     }
                 }
+            }
+
+            // Philosophy
+            DemoSection(title: "Focused Context") {
+                PhilosophyCard(
+                    icon: "rectangle.bottomthird.inset.filled",
+                    title: "Focused Context",
+                    description: "Bottom sheets allow users to perform secondary tasks without losing their context. Match the sheet size to the complexity of the task."
+                )
             }
         }
         // Sheet Modifiers
@@ -179,7 +188,7 @@ struct SheetScreen: View {
                     ForEach(1...6, id: \.self) { _ in
                         LubaCard(elevation: .flat, style: .outlined) {
                             HStack {
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                     Text("Content Block")
                                         .font(LubaTypography.headline)
                                         .foregroundStyle(LubaColors.textPrimary)
@@ -209,7 +218,7 @@ struct SheetScreen: View {
             ScrollView {
                 VStack(spacing: LubaSpacing.xl) {
                     Image(systemName: "rectangle.expand.vertical")
-                        .font(.system(size: 48))
+                        .font(LubaTypography.custom(size: 48, weight: .regular))
                         .foregroundStyle(LubaColors.accent)
                         .padding(.top, LubaSpacing.xxl)
 
@@ -258,7 +267,7 @@ struct SheetScreen: View {
     private func sheetButton(title: String, subtitle: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                     Text(title)
                         .font(LubaTypography.body)
                         .foregroundStyle(LubaColors.textPrimary)
@@ -283,7 +292,7 @@ struct SheetScreen: View {
                     .frame(width: 56, height: 56)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .font(LubaTypography.title2)
                     .foregroundStyle(LubaColors.textPrimary)
             }
 
@@ -333,7 +342,7 @@ struct SheetScreen: View {
     }
 
     private func codeRow(_ code: String, _ description: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
             Text(code)
                 .font(LubaTypography.custom(size: 12, weight: .medium, design: .monospaced))
                 .foregroundStyle(LubaColors.accent)

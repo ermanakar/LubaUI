@@ -60,7 +60,6 @@ public struct LubaLongPressableModifier: ViewModifier {
 
     @State private var isPressed = false
     @State private var progress: CGFloat = 0
-    @State private var timer: Timer?
     @Environment(\.lubaConfig) private var config
 
     public init(
@@ -85,24 +84,27 @@ public struct LubaLongPressableModifier: ViewModifier {
             .animation(LubaMotion.pressAnimation, value: isPressed)
             .overlay(
                 Group {
-                    if showProgress && isPressed {
+                    if showProgress {
                         progressRing
+                            .opacity(isPressed ? 1 : 0)
+                            .animation(.easeOut(duration: 0.15), value: isPressed)
                     }
                 }
             )
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        guard !isPressed else { return }
+            .onLongPressGesture(
+                minimumDuration: duration,
+                maximumDistance: 50,
+                perform: {
+                    completePress()
+                },
+                onPressingChanged: { pressing in
+                    if pressing {
                         startPress()
-                    }
-                    .onEnded { _ in
+                    } else {
                         cancelPress()
                     }
+                }
             )
-            .onDisappear {
-                cancelPress()
-            }
     }
 
     private var progressRing: some View {
@@ -125,7 +127,6 @@ public struct LubaLongPressableModifier: ViewModifier {
                     )
                 )
                 .rotationEffect(.degrees(-90))
-                .animation(.linear(duration: 0.05), value: progress)
         }
         .frame(width: progressSize, height: progressSize)
     }
@@ -139,30 +140,20 @@ public struct LubaLongPressableModifier: ViewModifier {
             haptic.trigger()
         }
 
-        // Start progress timer
-        let interval: Double = 0.02
-        let increment = CGFloat(interval / duration)
-
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { t in
-            progress += increment
-
-            if progress >= 1.0 {
-                completePress()
-            }
+        // Animate progress smoothly
+        withAnimation(.linear(duration: duration)) {
+            progress = 1.0
         }
     }
 
     private func cancelPress() {
         isPressed = false
-        progress = 0
-        timer?.invalidate()
-        timer = nil
+        withAnimation(.easeOut(duration: 0.15)) {
+            progress = 0
+        }
     }
 
     private func completePress() {
-        timer?.invalidate()
-        timer = nil
-
         // Completion haptic
         if config.hapticsEnabled {
             hapticOnComplete.trigger()
@@ -170,10 +161,12 @@ public struct LubaLongPressableModifier: ViewModifier {
 
         // Trigger action
         action()
-
-        // Reset state
+        
+        // Reset state instantly upon completion
         isPressed = false
-        progress = 0
+        withAnimation(.easeOut(duration: 0.15)) {
+            progress = 0
+        }
     }
 }
 
@@ -219,11 +212,11 @@ public struct LubaLongPressButton: View {
     let label: String?
     let duration: Double
     let size: CGFloat
+    let color: Color
     let action: () -> Void
 
     @State private var isPressed = false
     @State private var progress: CGFloat = 0
-    @State private var timer: Timer?
     @Environment(\.lubaConfig) private var config
 
     public init(
@@ -231,12 +224,14 @@ public struct LubaLongPressButton: View {
         label: String? = nil,
         duration: Double = LubaLongPressTokens.defaultDuration,
         size: CGFloat = 56,
+        color: Color = LubaLongPressTokens.progressColor,
         action: @escaping () -> Void
     ) {
         self.icon = icon
         self.label = label
         self.duration = max(LubaLongPressTokens.minimumDuration, duration)
         self.size = size
+        self.color = color
         self.action = action
     }
 
@@ -245,14 +240,14 @@ public struct LubaLongPressButton: View {
             ZStack {
                 // Background
                 Circle()
-                    .fill(isPressed ? LubaColors.accentSubtle : LubaColors.gray100)
+                    .fill(isPressed ? color.opacity(0.15) : LubaColors.gray100)
                     .frame(width: size, height: size)
 
                 // Progress ring
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
-                        LubaColors.accent,
+                        color,
                         style: StrokeStyle(
                             lineWidth: size * 0.06,
                             lineCap: .round
@@ -260,27 +255,30 @@ public struct LubaLongPressButton: View {
                     )
                     .frame(width: size - 8, height: size - 8)
                     .rotationEffect(.degrees(-90))
+                    .opacity(isPressed ? 1 : 0)
+                    .animation(.easeOut(duration: 0.15), value: isPressed)
 
                 // Icon
                 Image(systemName: icon)
                     .font(.system(size: size * 0.35))
-                    .foregroundStyle(isPressed ? LubaColors.accent : LubaColors.textSecondary)
+                    .foregroundStyle(isPressed ? color : LubaColors.textSecondary)
             }
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(LubaMotion.pressAnimation, value: isPressed)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        guard !isPressed else { return }
+            .onLongPressGesture(
+                minimumDuration: duration,
+                maximumDistance: 50,
+                perform: {
+                    completePress()
+                },
+                onPressingChanged: { pressing in
+                    if pressing {
                         startPress()
-                    }
-                    .onEnded { _ in
+                    } else {
                         cancelPress()
                     }
+                }
             )
-            .onDisappear {
-                cancelPress()
-            }
 
             if let label = label {
                 Text(label)
@@ -298,35 +296,29 @@ public struct LubaLongPressButton: View {
             LubaHaptics.light()
         }
 
-        let interval: Double = 0.02
-        let increment = CGFloat(interval / duration)
-
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
-            progress += increment
-            if progress >= 1.0 {
-                completePress()
-            }
+        withAnimation(.linear(duration: duration)) {
+            progress = 1.0
         }
     }
 
     private func cancelPress() {
         isPressed = false
-        progress = 0
-        timer?.invalidate()
-        timer = nil
+        withAnimation(.easeOut(duration: 0.15)) {
+            progress = 0
+        }
     }
 
     private func completePress() {
-        timer?.invalidate()
-        timer = nil
-
         if config.hapticsEnabled {
             LubaHaptics.success()
         }
 
         action()
+        
         isPressed = false
-        progress = 0
+        withAnimation(.easeOut(duration: 0.15)) {
+            progress = 0
+        }
     }
 }
 
@@ -398,7 +390,7 @@ public struct LubaLongPressButton: View {
                         message = "Liked!"
                     }
 
-                    LubaLongPressButton(icon: "trash", label: "Delete", duration: 1.0) {
+                    LubaLongPressButton(icon: "trash", label: "Delete", duration: 1.0, color: LubaColors.error) {
                         message = "Deleted!"
                     }
 

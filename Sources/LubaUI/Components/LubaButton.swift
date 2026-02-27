@@ -104,11 +104,11 @@ public enum LubaButtonSize {
         }
     }
 
-    /// Minimum height — all sizes meet the 44pt Apple HIG touch target.
-    /// Small buttons have compact visual padding but a full-size hit area.
+    /// Visual minimum height. 
+    /// Note: The actual touch target is always at least 44x44 for accessibility.
     var minHeight: CGFloat {
         switch self {
-        case .small: return 44
+        case .small: return 32
         case .medium: return 44  // Apple HIG minimum
         case .large: return 52
         }
@@ -149,7 +149,6 @@ public struct LubaButton: View {
     private let useGlass: Bool
     private let action: () -> Void
 
-    @State private var isPressed = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.lubaConfig) private var config
 
@@ -211,10 +210,12 @@ public struct LubaButton: View {
         Button(action: performAction) {
             buttonContent
         }
-        .buttonStyle(LubaInteractiveButtonStyle(
-            isPressed: $isPressed,
-            scale: LubaMotion.pressScale,
-            animation: LubaMotion.pressAnimation
+        .buttonStyle(LubaCoreButtonStyle(
+            styling: styling,
+            size: size,
+            useGlass: useGlass,
+            fullWidth: resolvedFullWidth,
+            colorScheme: colorScheme
         ))
         .disabled(isDisabled || isLoading)
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
@@ -227,7 +228,7 @@ public struct LubaButton: View {
 
     @ViewBuilder
     private var buttonContent: some View {
-        let label = HStack(spacing: LubaMotion.iconLabelSpacing) {
+        HStack(spacing: LubaMotion.iconLabelSpacing) {
             // Leading icon
             if !isLoading, let icon = icon, iconPosition == .leading {
                 iconView(icon)
@@ -252,23 +253,6 @@ public struct LubaButton: View {
                     .transition(.scale.combined(with: .opacity))
             }
         }
-        .padding(.horizontal, size.horizontalPadding)
-        .padding(.vertical, size.verticalPadding)
-        .frame(minHeight: size.minHeight)
-        .frame(maxWidth: resolvedFullWidth ? .infinity : nil)
-        .foregroundStyle(foregroundColor)
-
-        if useGlass {
-            label
-                .lubaGlass(.regular, cornerRadius: size.cornerRadius)
-                .animation(LubaMotion.colorAnimation, value: isPressed)
-        } else {
-            label
-                .background(backgroundColor)
-                .overlay(borderOverlay)
-                .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous))
-                .animation(LubaMotion.colorAnimation, value: isPressed)
-        }
     }
 
     @ViewBuilder
@@ -292,21 +276,58 @@ public struct LubaButton: View {
     private var resolvedFullWidth: Bool {
         fullWidth ?? styling.defaultsToFullWidth
     }
+}
 
-    private var foregroundColor: Color {
-        styling.foregroundColor(isPressed: isPressed, colorScheme: colorScheme)
-    }
+// MARK: - Core Button Style
 
-    private var backgroundColor: Color {
-        styling.backgroundColor(isPressed: isPressed, colorScheme: colorScheme)
-    }
+/// Internal style that applies the LubaButtonStyling protocol logic directly within `makeBody`.
+/// This eliminates the need for PreferenceKey propagation and improves performance.
+private struct LubaCoreButtonStyle: ButtonStyle {
+    let styling: any LubaButtonStyling
+    let size: LubaButtonSize
+    let useGlass: Bool
+    let fullWidth: Bool
+    let colorScheme: ColorScheme
 
-    @ViewBuilder
-    private var borderOverlay: some View {
-        if let borderColor = styling.borderColor(isPressed: isPressed, colorScheme: colorScheme) {
-            RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
-                .strokeBorder(borderColor, lineWidth: styling.borderWidth)
+    func makeBody(configuration: Configuration) -> some View {
+        let isPressed = configuration.isPressed
+        let fgColor = styling.foregroundColor(isPressed: isPressed, colorScheme: colorScheme)
+        let bgColor = styling.backgroundColor(isPressed: isPressed, colorScheme: colorScheme)
+
+        let label = configuration.label
+            .padding(.horizontal, size.horizontalPadding)
+            .padding(.vertical, size.verticalPadding)
+            .frame(minHeight: size.minHeight)
+            .frame(maxWidth: fullWidth ? .infinity : nil)
+            .foregroundStyle(fgColor)
+
+        Group {
+            if useGlass {
+                label
+                    .lubaGlass(.regular, cornerRadius: size.cornerRadius)
+            } else {
+                label
+                    .background(bgColor)
+                    .overlay(
+                        Group {
+                            if let borderColor = styling.borderColor(isPressed: isPressed, colorScheme: colorScheme) {
+                                RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
+                                    .strokeBorder(borderColor, lineWidth: styling.borderWidth)
+                            }
+                        }
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous))
+            }
         }
+        // Expand touch target invisibly to meet accessibility guidelines
+        .background(
+            Color.clear
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
+        )
+        .scaleEffect(isPressed ? LubaMotion.pressScale : 1.0)
+        .animation(LubaMotion.colorAnimation, value: isPressed)
+        .animation(LubaMotion.pressAnimation, value: isPressed)
     }
 }
 

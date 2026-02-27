@@ -147,7 +147,7 @@ struct SwipeableScreen: View {
         HStack(spacing: LubaSpacing.md) {
             LubaAvatar(name: message.sender, size: .medium)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                 HStack {
                     Text(message.sender)
                         .font(LubaTypography.headline)

@@ -90,11 +90,14 @@ struct CheckboxScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "checklist",
-                title: "Many From Many",
-                description: "Checkboxes let users select multiple options independently. Unlike radio buttons (one from many), checkboxes represent non-exclusive choices — each stands on its own."
-            )
+            // Philosophy
+            DemoSection(title: "Many From Many") {
+                PhilosophyCard(
+                    icon: "checklist",
+                    title: "Many From Many",
+                    description: "Checkboxes let users select multiple options independently. Unlike radio buttons (one from many), checkboxes represent non-exclusive choices — each stands on its own."
+                )
+            }
         }
     }
 }

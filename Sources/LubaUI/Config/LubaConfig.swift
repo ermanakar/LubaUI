@@ -12,7 +12,7 @@ import SwiftUI
 
 /// Central configuration for LubaUI.
 /// Modify these values to customize the design system for your brand.
-public struct LubaConfig {
+public struct LubaConfig: Equatable {
     
     // MARK: - Singleton
     

@@ -69,7 +69,7 @@ struct TypographyScreen: View {
                             .frame(height: 160)
                             .overlay(
                                 Image(systemName: "photo")
-                                    .font(.system(size: 32))
+                                    .font(LubaTypography.custom(size: 32, weight: .regular))
                                     .foregroundStyle(LubaColors.gray400)
                             )
 
@@ -115,7 +115,7 @@ struct TypographyScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Sarah Chen", size: .medium)
 
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                 Text("Sarah Chen")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -151,7 +151,7 @@ struct TypographyScreen: View {
                                 .foregroundStyle(LubaColors.accent)
                                 .tracking(2)
 
-                            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline, spacing: LubaSpacing.xs) {
                                 Text("$29")
                                     .font(LubaTypography.largeTitle)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -173,21 +173,11 @@ struct TypographyScreen: View {
 
             // Philosophy
             DemoSection(title: "Why SF Rounded?") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    HStack(alignment: .top, spacing: LubaSpacing.md) {
-                        LubaCircledIcon("textformat", size: .md, style: .subtle)
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Friendly & Approachable")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-
-                            Text("SF Rounded softens the edges while maintaining excellent legibility. It feels modern and welcoming — perfect for apps that prioritize user experience.")
-                                .font(LubaTypography.caption)
-                                .foregroundStyle(LubaColors.textSecondary)
-                        }
-                    }
-                }
+                PhilosophyCard(
+                    icon: "textformat",
+                    title: "Friendly & Approachable",
+                    description: "SF Rounded softens the edges while maintaining excellent legibility. It feels modern and welcoming — perfect for apps that prioritize user experience."
+                )
             }
         }
     }

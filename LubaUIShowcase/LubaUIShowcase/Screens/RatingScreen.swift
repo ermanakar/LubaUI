@@ -71,11 +71,14 @@ struct RatingScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "star",
-                title: "Universal Language",
-                description: "Stars are instantly understood. No labels needed, no instructions required. Five stars tell the whole story."
-            )
+            // Philosophy
+            DemoSection(title: "Universal Language") {
+                PhilosophyCard(
+                    icon: "star",
+                    title: "Universal Language",
+                    description: "Stars are instantly understood. No labels needed, no instructions required. Five stars tell the whole story."
+                )
+            }
         }
     }
 

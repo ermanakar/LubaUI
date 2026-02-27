@@ -52,7 +52,7 @@ struct SkeletonScreen: View {
                     } else {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Jane Doe", size: .medium)
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                 Text("Jane Doe")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -86,7 +86,7 @@ struct SkeletonScreen: View {
                     LubaCard(elevation: .low) {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Alex Smith", size: .medium)
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Alex Smith")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -114,7 +114,7 @@ struct SkeletonScreen: View {
                             ForEach(["Alice Johnson", "Bob Chen", "Carol White"], id: \.self) { name in
                                 HStack(spacing: LubaSpacing.md) {
                                     LubaAvatar(name: name, size: .medium)
-                                    VStack(alignment: .leading, spacing: 2) {
+                                    VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                         Text(name)
                                             .font(LubaTypography.body)
                                             .foregroundStyle(LubaColors.textPrimary)
@@ -156,7 +156,7 @@ struct SkeletonScreen: View {
                                 } else {
                                     HStack(spacing: LubaSpacing.md) {
                                         LubaAvatar(name: index == 0 ? "Sarah Kim" : "Mike Davis", size: .medium)
-                                        VStack(alignment: .leading, spacing: 2) {
+                                        VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                             Text(index == 0 ? "Sarah Kim" : "Mike Davis")
                                                 .font(LubaTypography.headline)
                                                 .foregroundStyle(LubaColors.textPrimary)
@@ -213,6 +213,15 @@ struct SkeletonScreen: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+            }
+
+            // Philosophy
+            DemoSection(title: "Perceived Performance") {
+                PhilosophyCard(
+                    icon: "hourglass.bottomhalf.fill",
+                    title: "Perceived Performance",
+                    description: "Skeletons reduce cognitive load and make wait times feel shorter by providing an immediate structural placeholder before data arrives."
+                )
             }
         }
         .animation(.easeInOut(duration: 0.3), value: isLoading)

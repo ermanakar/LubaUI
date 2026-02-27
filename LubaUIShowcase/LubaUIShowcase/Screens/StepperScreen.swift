@@ -88,11 +88,14 @@ struct StepperScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "plusminus",
-                title: "Precise Control",
-                description: "Steppers give users exact control over numeric values. Each tap provides haptic feedback, making counting feel tangible."
-            )
+            // Philosophy
+            DemoSection(title: "Precise Control") {
+                PhilosophyCard(
+                    icon: "plusminus",
+                    title: "Precise Control",
+                    description: "Steppers give users exact control over numeric values. Each tap provides haptic feedback, making counting feel tangible."
+                )
+            }
         }
     }
 

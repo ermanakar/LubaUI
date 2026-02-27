@@ -117,7 +117,7 @@ struct ComposabilityScreen: View {
                         }
                         Spacer()
                         Image(systemName: "hand.tap.fill")
-                            .font(.system(size: 20))
+                            .font(LubaTypography.title2)
                             .foregroundStyle(LubaColors.accent)
                     }
                     .padding(LubaSpacing.lg)

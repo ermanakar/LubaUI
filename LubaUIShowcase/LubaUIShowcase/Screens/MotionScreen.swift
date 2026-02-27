@@ -156,7 +156,7 @@ struct MotionScreen: View {
             HStack(alignment: .top, spacing: LubaSpacing.md) {
                 LubaCircledIcon("wand.and.stars", size: .md, style: .subtle)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                     Text("The Invisible Craft")
                         .font(LubaTypography.headline)
                         .foregroundStyle(LubaColors.textPrimary)
@@ -184,7 +184,7 @@ struct MotionScreen: View {
 
     private func animationRow(_ name: String, _ value: String, _ purpose: String) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.custom(size: 13, weight: .medium, design: .monospaced))
                     .foregroundStyle(LubaColors.accent)
@@ -201,7 +201,7 @@ struct MotionScreen: View {
     }
 
     private func craftItem(_ token: String, _ rationale: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
             Text(token)
                 .font(LubaTypography.custom(size: 13, weight: .semibold, design: .monospaced))
                 .foregroundStyle(LubaColors.textPrimary)

@@ -121,7 +121,7 @@ struct ThemeScreen: View {
         return HStack(spacing: LubaSpacing.md) {
             LubaCircledIcon(icon, size: .sm, style: .subtle)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.headline)
                     .foregroundStyle(LubaColors.textPrimary)
@@ -158,7 +158,7 @@ struct ThemeScreen: View {
             LubaCard(elevation: .flat, style: .outlined) {
                 HStack(spacing: LubaSpacing.md) {
                     LubaAvatar(name: "Theme Demo", size: .medium)
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                         Text("Themed Card")
                             .font(LubaTypography.headline)
                             .foregroundStyle(LubaColors.textPrimary)

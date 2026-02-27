@@ -164,7 +164,7 @@ struct ButtonsScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaCircledIcon("exclamationmark.triangle.fill", size: .md, style: .subtle)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Delete Account")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)

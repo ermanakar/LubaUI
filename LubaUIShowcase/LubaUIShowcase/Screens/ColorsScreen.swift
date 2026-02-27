@@ -150,21 +150,11 @@ struct ColorsScreen: View {
 
             // Philosophy
             DemoSection(title: "Why Sage Green?") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    HStack(alignment: .top, spacing: LubaSpacing.md) {
-                        LubaCircledIcon("leaf.fill", size: .md, style: .subtle)
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Organic & Calming")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-
-                            Text("Sage green feels natural and approachable. It's distinctive without being aggressive — standing out in a sea of blue apps while remaining professional.")
-                                .font(LubaTypography.caption)
-                                .foregroundStyle(LubaColors.textSecondary)
-                        }
-                    }
-                }
+                PhilosophyCard(
+                    icon: "leaf.fill",
+                    title: "Organic & Calming",
+                    description: "Sage green feels natural and approachable. It's distinctive without being aggressive — standing out in a sea of blue apps while remaining professional."
+                )
             }
         }
     }
@@ -201,7 +191,7 @@ struct ColorsScreen: View {
                 .fill(color)
                 .frame(height: 80)
 
-            VStack(spacing: 2) {
+            VStack(spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.caption)
                     .foregroundStyle(LubaColors.textSecondary)
@@ -234,10 +224,10 @@ struct ColorsScreen: View {
     private func notificationRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
         HStack(spacing: LubaSpacing.md) {
             Image(systemName: icon)
-                .font(.system(size: 20))
+                .font(LubaTypography.title2)
                 .foregroundStyle(iconColor)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(title)
                     .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textPrimary)

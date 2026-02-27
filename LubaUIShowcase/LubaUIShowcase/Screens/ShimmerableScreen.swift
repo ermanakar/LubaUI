@@ -34,7 +34,7 @@ struct ShimmerableScreen: View {
                             .frame(height: 120)
                             .overlay(
                                 Image(systemName: "photo")
-                                    .font(.system(size: 32))
+                                    .font(LubaTypography.custom(size: 32, weight: .regular))
                                     .foregroundStyle(LubaColors.gray400)
                             )
                             .lubaShimmerable(isLoading: isLoading)

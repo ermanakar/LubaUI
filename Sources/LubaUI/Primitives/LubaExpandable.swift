@@ -113,7 +113,7 @@ public struct LubaExpandable<Header: View, Content: View>: View {
             // Content (expandable)
             if isExpanded {
                 content()
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.opacity)
             }
         }
         .clipped()
@@ -269,7 +269,7 @@ public struct LubaExpandableModifier<ExpandedContent: View>: ViewModifier {
 
             if isExpanded {
                 expandedContent()
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.opacity)
             }
         }
         .clipped()

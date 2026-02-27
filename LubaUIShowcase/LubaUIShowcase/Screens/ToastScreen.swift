@@ -100,7 +100,7 @@ struct ToastScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaCircledIcon("envelope.fill", size: .md, style: .subtle)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Newsletter Signup")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -131,7 +131,7 @@ struct ToastScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Draft Post", size: .medium)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("My Draft Post")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -181,6 +181,15 @@ struct ToastScreen: View {
                     }
                     .font(LubaTypography.code)
                 }
+            }
+
+            // Philosophy
+            DemoSection(title: "Non-Intrusive Feedback") {
+                PhilosophyCard(
+                    icon: "bell.badge.fill",
+                    title: "Non-Intrusive Feedback",
+                    description: "Toasts provide temporary, dismissible feedback without interrupting the user's workflow. Perfect for confirmations and minor errors."
+                )
             }
         }
         .lubaToast(isPresented: $showInfoToast, message: "Here's some information", style: .info)

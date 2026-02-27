@@ -183,6 +183,12 @@ struct ConfigScreen: View {
                 description: "LubaConfig flows through the environment — set it once at the root and every component inherits it. Override per-subtree for contextual behavior like disabling haptics in a quiet zone."
             )
         }
+        .onChange(of: config) { newValue in
+            LubaConfig.shared = newValue
+        }
+        .onDisappear {
+            LubaConfig.shared = LubaConfig()
+        }
     }
 
     // MARK: - Components
@@ -193,7 +199,7 @@ struct ConfigScreen: View {
         return HStack(spacing: LubaSpacing.md) {
             LubaCircledIcon(icon, size: .sm, style: .subtle)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(name)
                     .font(LubaTypography.headline)
                     .foregroundStyle(LubaColors.textPrimary)
@@ -238,7 +244,7 @@ struct ConfigScreen: View {
                 HStack(spacing: LubaSpacing.md) {
                     LubaAvatar(name: "Config Test", size: .medium)
 
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                         Text("Preview Card")
                             .font(LubaTypography.headline)
                             .foregroundStyle(LubaColors.textPrimary)
@@ -284,7 +290,7 @@ struct ConfigScreen: View {
         HStack(spacing: LubaSpacing.md) {
             LubaCircledIcon(icon, size: .sm, style: .subtle)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(title)
                     .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textPrimary)

@@ -46,7 +46,7 @@ struct MenuScreen: View {
                     HStack {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Jane Doe", size: .medium)
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                 Text("Jane Doe")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -124,11 +124,14 @@ struct MenuScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "list.bullet",
-                title: "Actions in Context",
-                description: "Menus keep interfaces clean by hiding secondary actions until needed. The three-dot pattern is universally understood — no learning curve required."
-            )
+            // Philosophy
+            DemoSection(title: "Actions in Context") {
+                PhilosophyCard(
+                    icon: "list.bullet",
+                    title: "Actions in Context",
+                    description: "Menus keep interfaces clean by hiding secondary actions until needed. The three-dot pattern is universally understood — no learning curve required."
+                )
+            }
         }
     }
 }

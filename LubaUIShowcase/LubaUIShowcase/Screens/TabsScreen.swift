@@ -86,7 +86,7 @@ struct TabsScreen: View {
                             HStack(spacing: LubaSpacing.md) {
                                 LubaAvatar(name: "User \(index + 1)", size: .medium)
 
-                                VStack(alignment: .leading, spacing: 2) {
+                                VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                     Text("Task \(index + 1)")
                                         .font(LubaTypography.body)
                                         .foregroundStyle(LubaColors.textPrimary)
@@ -118,7 +118,7 @@ struct TabsScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Alex Morgan", size: .large)
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                 Text("Alex Morgan")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -200,13 +200,22 @@ struct TabsScreen: View {
                     }
                 }
             }
+
+            // Philosophy
+            DemoSection(title: "Clear Hierarchy") {
+                PhilosophyCard(
+                    icon: "folder.fill",
+                    title: "Clear Hierarchy",
+                    description: "Tabs organize content at the same level of hierarchy. Segmented controls work best for mutually exclusive views, while underline tabs handle broader sections."
+                )
+            }
         }
     }
 
     // MARK: - Components
 
     private func statItem(value: String, label: String) -> some View {
-        VStack(spacing: 2) {
+        VStack(spacing: LubaSpacing.xxs) {
             Text(value)
                 .font(LubaTypography.headline)
                 .foregroundStyle(LubaColors.textPrimary)

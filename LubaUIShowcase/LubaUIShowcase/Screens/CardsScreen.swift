@@ -61,7 +61,7 @@ struct CardsScreen: View {
                                 style: .filled
                             ) {
                                 HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
+                                    VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                         Text("Option \(index + 1)")
                                             .font(LubaTypography.headline)
                                             .foregroundStyle(LubaColors.textPrimary)
@@ -106,7 +106,7 @@ struct CardsScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaAvatar(name: "Sarah Chen", size: .medium)
 
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                 Text("Sarah Chen")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -142,7 +142,7 @@ struct CardsScreen: View {
                                 .textCase(.uppercase)
                                 .tracking(1)
 
-                            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline, spacing: LubaSpacing.xs) {
                                 Text("$29")
                                     .font(LubaTypography.largeTitle)
                                     .foregroundStyle(LubaColors.textPrimary)

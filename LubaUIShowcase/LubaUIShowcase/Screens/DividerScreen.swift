@@ -100,6 +100,15 @@ struct DividerScreen: View {
                     }
                 }
             }
+
+            // Philosophy
+            DemoSection(title: "Visual Structure") {
+                PhilosophyCard(
+                    icon: "line.3.horizontal",
+                    title: "Visual Structure",
+                    description: "Dividers create clear boundaries between distinct sections of content. Use them sparingly to establish hierarchy without adding visual noise."
+                )
+            }
         }
     }
 

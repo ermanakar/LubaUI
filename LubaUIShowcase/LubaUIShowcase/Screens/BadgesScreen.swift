@@ -202,7 +202,7 @@ struct BadgesScreen: View {
                     .frame(width: 48, height: 48)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .font(LubaTypography.title2)
                     .foregroundStyle(LubaColors.textPrimary)
             }
 

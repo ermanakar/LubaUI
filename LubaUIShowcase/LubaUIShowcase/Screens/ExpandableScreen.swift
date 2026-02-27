@@ -67,7 +67,7 @@ struct ExpandableScreen: View {
                 LubaExpandableCard(isExpanded: $isCardExpanded, elevation: .low) {
                     HStack(spacing: LubaSpacing.md) {
                         LubaAvatar(name: "Settings", size: .small)
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                             Text("Advanced Settings")
                                 .font(LubaTypography.headline)
                                 .foregroundStyle(LubaColors.textPrimary)

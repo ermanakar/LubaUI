@@ -82,11 +82,14 @@ struct SliderScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "slider.horizontal.3",
-                title: "Tangible Range",
-                description: "Sliders make abstract ranges physical. The thumb scales up on drag to confirm engagement, and optional step snapping adds tactile precision to discrete values."
-            )
+            // Philosophy
+            DemoSection(title: "Tangible Range") {
+                PhilosophyCard(
+                    icon: "slider.horizontal.3",
+                    title: "Tangible Range",
+                    description: "Sliders make abstract ranges physical. The thumb scales up on drag to confirm engagement, and optional step snapping adds tactile precision to discrete values."
+                )
+            }
         }
     }
 }

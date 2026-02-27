@@ -97,11 +97,14 @@ struct AlertScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "bell",
-                title: "Inline, Not Intrusive",
-                description: "Alerts live in the flow of content — they inform without interrupting. Use Toast for transient notifications, Alert for persistent contextual messages."
-            )
+            // Philosophy
+            DemoSection(title: "Inline, Not Intrusive") {
+                PhilosophyCard(
+                    icon: "bell",
+                    title: "Inline, Not Intrusive",
+                    description: "Alerts live in the flow of content — they inform without interrupting. Use Toast for transient notifications, Alert for persistent contextual messages."
+                )
+            }
         }
     }
 }

@@ -46,7 +46,7 @@ struct ChipScreen: View {
                             .font(LubaTypography.caption)
                             .foregroundStyle(LubaColors.textTertiary)
 
-                        FlowLayout(spacing: 8) {
+                        FlowLayout(spacing: LubaSpacing.sm) {
                             ForEach(filters, id: \.self) { filter in
                                 LubaChip(filter, isDismissible: true, onDismiss: {
                                     withAnimation(LubaAnimations.standard) {
@@ -75,7 +75,7 @@ struct ChipScreen: View {
                             .font(LubaTypography.body)
                             .foregroundStyle(LubaColors.textSecondary)
 
-                        FlowLayout(spacing: 8) {
+                        FlowLayout(spacing: LubaSpacing.sm) {
                             ForEach(allTags, id: \.self) { tag in
                                 LubaChip(
                                     tag,
@@ -110,11 +110,14 @@ struct ChipScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "tag",
-                title: "Small But Mighty",
-                description: "Chips turn abstract filters into tangible objects. Users can see, touch, and remove their selections — making complex filtering feel intuitive."
-            )
+            // Philosophy
+            DemoSection(title: "Small But Mighty") {
+                PhilosophyCard(
+                    icon: "tag",
+                    title: "Small But Mighty",
+                    description: "Chips turn abstract filters into tangible objects. Users can see, touch, and remove their selections — making complex filtering feel intuitive."
+                )
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ struct SearchBarScreen: View {
                             ForEach(filteredItems, id: \.self) { item in
                                 HStack(spacing: LubaSpacing.md) {
                                     Image(systemName: "cube")
-                                        .font(.system(size: 14))
+                                        .font(LubaTypography.bodySmall)
                                         .foregroundStyle(LubaColors.accent)
                                         .frame(width: 20)
 
@@ -71,7 +71,7 @@ struct SearchBarScreen: View {
                             if filteredItems.isEmpty {
                                 VStack(spacing: LubaSpacing.sm) {
                                     Image(systemName: "magnifyingglass")
-                                        .font(.system(size: 24))
+                                        .font(LubaTypography.custom(size: 24, weight: .regular))
                                         .foregroundStyle(LubaColors.textTertiary)
                                     Text("No results")
                                         .font(LubaTypography.caption)
@@ -94,11 +94,14 @@ struct SearchBarScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "magnifyingglass",
-                title: "Search is Navigation",
-                description: "A great search bar disappears — users focus on results, not the input. The pill shape, animated cancel button, and instant clear make searching feel effortless."
-            )
+            // Philosophy
+            DemoSection(title: "Search is Navigation") {
+                PhilosophyCard(
+                    icon: "magnifyingglass",
+                    title: "Search is Navigation",
+                    description: "A great search bar disappears — users focus on results, not the input. The pill shape, animated cancel button, and instant clear make searching feel effortless."
+                )
+            }
         }
     }
 }

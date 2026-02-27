@@ -78,11 +78,14 @@ struct LinkScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "link",
-                title: "The Gentle Invitation",
-                description: "Links don't demand attention — they offer it. A subtle accent color says 'you can go here' without screaming. Underline on press confirms the interaction."
-            )
+            // Philosophy
+            DemoSection(title: "The Gentle Invitation") {
+                PhilosophyCard(
+                    icon: "link",
+                    title: "The Gentle Invitation",
+                    description: "Links don't demand attention — they offer it. A subtle accent color says 'you can go here' without screaming. Underline on press confirms the interaction."
+                )
+            }
         }
     }
 }

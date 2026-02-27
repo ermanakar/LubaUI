@@ -49,7 +49,6 @@
 		8A3C2B722B0F5B4300E1F2D3 /* MenuScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B712B0F5B4300E1F2D3 /* MenuScreen.swift */; };
 		8A3C2B742B0F5B4400E1F2D3 /* ChipScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B732B0F5B4400E1F2D3 /* ChipScreen.swift */; };
 		8A3C2B762B0F5B4500E1F2D3 /* TooltipScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B752B0F5B4500E1F2D3 /* TooltipScreen.swift */; };
-		8A3C2B782B0F5B4600E1F2D3 /* GettingStartedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B772B0F5B4600E1F2D3 /* GettingStartedScreen.swift */; };
 		8A3C2B792B0F5B4700E1F2D3 /* StepperScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B7A2B0F5B4700E1F2D3 /* StepperScreen.swift */; };
 		8A3C2B7B2B0F5B4700E1F2D3 /* RatingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B7C2B0F5B4700E1F2D3 /* RatingScreen.swift */; };
 		8A3C2B7D2B0F5B4700E1F2D3 /* TextAreaScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B7E2B0F5B4700E1F2D3 /* TextAreaScreen.swift */; };
@@ -105,7 +104,6 @@
 		8A3C2B712B0F5B4300E1F2D3 /* MenuScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScreen.swift; sourceTree = "<group>"; };
 		8A3C2B732B0F5B4400E1F2D3 /* ChipScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipScreen.swift; sourceTree = "<group>"; };
 		8A3C2B752B0F5B4500E1F2D3 /* TooltipScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipScreen.swift; sourceTree = "<group>"; };
-		8A3C2B772B0F5B4600E1F2D3 /* GettingStartedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedScreen.swift; sourceTree = "<group>"; };
 		8A3C2B7A2B0F5B4700E1F2D3 /* StepperScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperScreen.swift; sourceTree = "<group>"; };
 		8A3C2B7C2B0F5B4700E1F2D3 /* RatingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingScreen.swift; sourceTree = "<group>"; };
 		8A3C2B7E2B0F5B4700E1F2D3 /* TextAreaScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAreaScreen.swift; sourceTree = "<group>"; };
@@ -198,7 +196,6 @@
 				8A3C2B712B0F5B4300E1F2D3 /* MenuScreen.swift */,
 				8A3C2B732B0F5B4400E1F2D3 /* ChipScreen.swift */,
 				8A3C2B752B0F5B4500E1F2D3 /* TooltipScreen.swift */,
-				8A3C2B772B0F5B4600E1F2D3 /* GettingStartedScreen.swift */,
 				8A3C2B7A2B0F5B4700E1F2D3 /* StepperScreen.swift */,
 				8A3C2B7C2B0F5B4700E1F2D3 /* RatingScreen.swift */,
 				8A3C2B7E2B0F5B4700E1F2D3 /* TextAreaScreen.swift */,
@@ -328,7 +325,6 @@
 				8A3C2B722B0F5B4300E1F2D3 /* MenuScreen.swift in Sources */,
 				8A3C2B742B0F5B4400E1F2D3 /* ChipScreen.swift in Sources */,
 				8A3C2B762B0F5B4500E1F2D3 /* TooltipScreen.swift in Sources */,
-				8A3C2B782B0F5B4600E1F2D3 /* GettingStartedScreen.swift in Sources */,
 				8A3C2B792B0F5B4700E1F2D3 /* StepperScreen.swift in Sources */,
 				8A3C2B7B2B0F5B4700E1F2D3 /* RatingScreen.swift in Sources */,
 				8A3C2B7D2B0F5B4700E1F2D3 /* TextAreaScreen.swift in Sources */,

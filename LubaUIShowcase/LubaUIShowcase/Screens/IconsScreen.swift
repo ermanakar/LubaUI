@@ -182,21 +182,11 @@ struct IconsScreen: View {
 
             // SF Symbols Note
             DemoSection(title: "About SF Symbols") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    HStack(alignment: .top, spacing: LubaSpacing.md) {
-                        LubaCircledIcon("info.circle.fill", size: .md, style: .subtle)
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("SF Symbols")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-
-                            Text("Icons are from Apple's SF Symbols library. Browse 5,000+ icons at developer.apple.com/sf-symbols")
-                                .font(LubaTypography.caption)
-                                .foregroundStyle(LubaColors.textSecondary)
-                        }
-                    }
-                }
+                PhilosophyCard(
+                    icon: "info.circle.fill",
+                    title: "SF Symbols",
+                    description: "Icons are from Apple's SF Symbols library. Browse 5,000+ icons at developer.apple.com/sf-symbols"
+                )
             }
         }
     }
@@ -207,7 +197,7 @@ struct IconsScreen: View {
         HStack(spacing: LubaSpacing.md) {
             LubaCircledIcon(icon, size: .md, style: .subtle)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(title)
                     .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textPrimary)

@@ -89,11 +89,14 @@ struct RadioScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "circle.inset.filled",
-                title: "One From Many",
-                description: "Radio buttons enforce mutual exclusivity — selecting one deselects the rest. Use them when the user must choose exactly one option from a small, visible set."
-            )
+            // Philosophy
+            DemoSection(title: "One From Many") {
+                PhilosophyCard(
+                    icon: "circle.inset.filled",
+                    title: "One From Many",
+                    description: "Radio buttons enforce mutual exclusivity — selecting one deselects the rest. Use them when the user must choose exactly one option from a small, visible set."
+                )
+            }
         }
     }
 }

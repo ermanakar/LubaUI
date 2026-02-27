@@ -137,7 +137,7 @@ struct ProgressScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             LubaCircledIcon("doc.fill", size: .md, style: .subtle)
 
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                                 Text("presentation.pdf")
                                     .font(LubaTypography.body)
                                     .foregroundStyle(LubaColors.textPrimary)
@@ -199,6 +199,15 @@ struct ProgressScreen: View {
                     .padding(.vertical, LubaSpacing.lg)
                 }
             }
+
+            // Philosophy
+            DemoSection(title: "Provide Certainty") {
+                PhilosophyCard(
+                    icon: "arrow.triangle.2.circlepath",
+                    title: "Provide Certainty",
+                    description: "Progress indicators reassure the user that the system is working. Use linear bars for quantifiable progress and spinners for indeterminate waits."
+                )
+            }
         }
     }
 
@@ -226,7 +235,7 @@ struct ProgressScreen: View {
                 style: status == .complete ? .filled : .subtle
             )
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                 Text(name)
                     .font(LubaTypography.body)
                     .foregroundStyle(LubaColors.textPrimary)

@@ -23,7 +23,7 @@ struct TooltipScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             LubaTooltip("This tooltip appears above the icon.") {
                                 Image(systemName: "info.circle")
-                                    .font(.system(size: 24))
+                                    .font(LubaTypography.custom(size: 24, weight: .regular))
                                     .foregroundStyle(LubaColors.accent)
                             }
                             Text("Top")
@@ -34,7 +34,7 @@ struct TooltipScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             LubaTooltip("This tooltip appears below the icon.", position: .bottom) {
                                 Image(systemName: "questionmark.circle")
-                                    .font(.system(size: 24))
+                                    .font(LubaTypography.custom(size: 24, weight: .regular))
                                     .foregroundStyle(LubaColors.accent)
                             }
                             Text("Bottom")
@@ -58,7 +58,7 @@ struct TooltipScreen: View {
                                 .foregroundStyle(LubaColors.textPrimary)
 
                             Image(systemName: "info.circle")
-                                .font(.system(size: 14))
+                                .font(LubaTypography.bodySmall)
                                 .foregroundStyle(LubaColors.textTertiary)
                                 .lubaTooltip("Must be 8+ characters with at least one number and one special character.")
                         }
@@ -82,7 +82,7 @@ struct TooltipScreen: View {
 
                                 LubaTooltip("Your API key can be found in Settings > Developer > API Keys. Keep it secret!") {
                                     Image(systemName: "questionmark.circle.fill")
-                                        .font(.system(size: 12))
+                                        .font(LubaTypography.caption)
                                         .foregroundStyle(LubaColors.textTertiary)
                                 }
                             }
@@ -98,7 +98,7 @@ struct TooltipScreen: View {
 
                                 LubaTooltip("We'll send POST requests to this URL when events occur.", position: .bottom) {
                                     Image(systemName: "questionmark.circle.fill")
-                                        .font(.system(size: 12))
+                                        .font(LubaTypography.caption)
                                         .foregroundStyle(LubaColors.textTertiary)
                                 }
                             }
@@ -118,11 +118,14 @@ struct TooltipScreen: View {
                 }
             }
 
-            PhilosophyCard(
-                icon: "lightbulb",
-                title: "Help Without Clutter",
-                description: "Tooltips reveal information on demand. They keep interfaces clean while ensuring no user is left confused. Tap to learn, tap to dismiss — simple."
-            )
+            // Philosophy
+            DemoSection(title: "Help Without Clutter") {
+                PhilosophyCard(
+                    icon: "lightbulb",
+                    title: "Help Without Clutter",
+                    description: "Tooltips reveal information on demand. They keep interfaces clean while ensuring no user is left confused. Tap to learn, tap to dismiss — simple."
+                )
+            }
         }
     }
 }

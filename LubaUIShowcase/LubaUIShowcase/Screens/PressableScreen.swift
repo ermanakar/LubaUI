@@ -30,7 +30,7 @@ struct PressableScreen: View {
                 VStack(spacing: LubaSpacing.lg) {
                     // Image
                     Image(systemName: heartFilled ? "heart.fill" : "heart")
-                        .font(.system(size: 48))
+                        .font(LubaTypography.custom(size: 48, weight: .regular))
                         .foregroundStyle(heartFilled ? LubaColors.error : LubaColors.textSecondary)
                         .frame(width: 80, height: 80)
                         .lubaPressable {
@@ -53,7 +53,7 @@ struct PressableScreen: View {
                             style: selectedCard == index ? .filled : .outlined
                         ) {
                             HStack {
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                     Text("Option \(index + 1)")
                                         .font(LubaTypography.headline)
                                         .foregroundStyle(LubaColors.textPrimary)
