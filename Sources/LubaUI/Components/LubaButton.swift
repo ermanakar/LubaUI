@@ -105,10 +105,10 @@ public enum LubaButtonSize {
     }
 
     /// Visual minimum height. 
-    /// Note: The actual touch target is always at least 44x44 for accessibility.
+    /// Keep all button sizes at or above Apple HIG 44pt touch target.
     var minHeight: CGFloat {
         switch self {
-        case .small: return 32
+        case .small: return 44
         case .medium: return 44  // Apple HIG minimum
         case .large: return 52
         }

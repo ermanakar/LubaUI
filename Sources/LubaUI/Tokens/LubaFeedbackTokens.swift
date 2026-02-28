@@ -379,4 +379,7 @@ public enum LubaTooltipTokens {
 
     /// Auto-dismiss duration in seconds
     public static let dismissDuration: Double = 3.0
+
+    /// Minimum horizontal distance from screen edge
+    public static let screenEdgePadding: CGFloat = LubaSpacing.lg
 }

@@ -199,6 +199,8 @@ struct AvatarsScreen: View {
                     .frame(maxWidth: .infinity)
                 }
             }
+            
+            philosophyCard
         }
     }
 
@@ -211,12 +213,12 @@ struct AvatarsScreen: View {
 
                 Circle()
                     .fill(isOnline ? LubaColors.success : LubaColors.gray400)
-                    .frame(width: 12, height: 12)
+                    .frame(width: LubaSpacing.md, height: LubaSpacing.md)
                     .overlay(
                         Circle()
-                            .strokeBorder(LubaColors.surface, lineWidth: 2)
+                            .strokeBorder(LubaColors.surface, lineWidth: LubaSpacing.xxs)
                     )
-                    .offset(x: 2, y: 2)
+                    .offset(x: LubaSpacing.xxs, y: LubaSpacing.xxs)
             }
 
             VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
@@ -238,6 +240,16 @@ struct AvatarsScreen: View {
         .padding(.vertical, LubaSpacing.sm)
     }
 
+}
+
+extension AvatarsScreen {
+    private var philosophyCard: some View {
+        PhilosophyCard(
+            icon: "person.circle.fill",
+            title: "Avatar Philosophy",
+            description: "Avatars in LubaUI are designed to be recognizable at any scale. We use automatic initials generation as a fallback, ensuring that every user has a unique visual representation even without an uploaded photo. The group component handles overflow elegantly, maintaining clear hierarchy in collaborative views."
+        )
+    }
 }
 
 #Preview {

@@ -50,7 +50,7 @@ struct LoadingPatternsScreen: View {
                 LubaCard(elevation: .flat, style: .outlined) {
                     VStack(spacing: LubaSpacing.lg) {
                         HStack(spacing: LubaSpacing.md) {
-                            LubaSpinner(size: 20, style: .arc)
+                            LubaSpinner(style: .arc)
                             Text("Refreshing feed...")
                                 .font(LubaTypography.body)
                                 .foregroundStyle(LubaColors.textSecondary)
@@ -60,7 +60,7 @@ struct LoadingPatternsScreen: View {
                         LubaDivider()
 
                         HStack(spacing: LubaSpacing.md) {
-                            LubaSpinner(size: 20, style: .dots)
+                            LubaSpinner(style: .dots)
                             Text("Syncing changes...")
                                 .font(LubaTypography.body)
                                 .foregroundStyle(LubaColors.textSecondary)
@@ -70,7 +70,7 @@ struct LoadingPatternsScreen: View {
                         LubaDivider()
 
                         HStack(spacing: LubaSpacing.md) {
-                            LubaSpinner(size: 20, style: .breathe)
+                            LubaSpinner(style: .breathe)
                             Text("Connecting...")
                                 .font(LubaTypography.body)
                                 .foregroundStyle(LubaColors.textSecondary)
@@ -144,11 +144,11 @@ struct LoadingPatternsScreen: View {
                                 HStack(spacing: LubaSpacing.md) {
                                     RoundedRectangle.luba(LubaRadius.sm)
                                         .fill(LubaColors.gray100)
-                                        .frame(width: 40, height: 40)
+                                        .frame(width: LubaSkeletonTokens.cardAvatarSize, height: LubaSkeletonTokens.cardAvatarSize)
                                     VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                                         RoundedRectangle.luba(LubaRadius.xs)
                                             .fill(LubaColors.gray100)
-                                            .frame(height: 12)
+                                            .frame(height: LubaSpacing.md)
                                         RoundedRectangle.luba(LubaRadius.xs)
                                             .fill(LubaColors.gray100)
                                             .frame(width: 100, height: 10)
@@ -159,7 +159,7 @@ struct LoadingPatternsScreen: View {
                         .opacity(0.5)
 
                         VStack(spacing: LubaSpacing.md) {
-                            LubaSpinner(size: 32, style: .arc)
+                            LubaSpinner(size: LubaIconSize.xl.dimension, style: .arc)
                             Text("Loading...")
                                 .font(LubaTypography.caption)
                                 .foregroundStyle(LubaColors.textSecondary)
@@ -169,12 +169,7 @@ struct LoadingPatternsScreen: View {
                 }
             }
 
-            // Philosophy
-            PhilosophyCard(
-                icon: "hourglass",
-                title: "Loading is Communication",
-                description: "Skeletons preserve layout and reduce perceived wait time. Progress indicators set expectations. Inline spinners keep context. Choose the right pattern for the right moment."
-            )
+            philosophyCard
         }
     }
 
@@ -220,6 +215,16 @@ struct LoadingPatternsScreen: View {
                 }
             }
         }
+    }
+}
+
+extension LoadingPatternsScreen {
+    private var philosophyCard: some View {
+        PhilosophyCard(
+            icon: "hourglass",
+            title: "Loading is Communication",
+            description: "Skeletons preserve layout and reduce perceived wait time. Progress indicators set expectations. Inline spinners keep context. Choose the right pattern for the right moment."
+        )
     }
 }
 

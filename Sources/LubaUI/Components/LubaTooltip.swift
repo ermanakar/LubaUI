@@ -4,54 +4,112 @@
 //
 //  Contextual help that appears on tap.
 //
-//  Design Decisions:
-//  - 240pt max width for comfortable reading
-//  - 8pt corner radius (tight, informational feel)
-//  - Auto-dismiss after 3s
-//  - Scale+fade entrance from anchor point
-//  - Available as both component and view modifier
+//  Architecture:
+//  - Trigger views emit global anchor rects
+//  - A single tooltip host renders in a root overlay layer
+//  - Placement is centralized (flip/clamp/edge-safe)
 //
 
 import SwiftUI
 
 // MARK: - Tooltip Position
 
-/// Anchor position for a ``LubaTooltip``.
-public enum LubaTooltipPosition {
+/// Anchor position preference for a ``LubaTooltip``.
+public enum LubaTooltipPosition: Sendable {
     case top
     case bottom
 }
 
+// MARK: - Controller
+
+final class LubaTooltipController: ObservableObject {
+    struct ActiveTooltip: Equatable {
+        let id: UUID
+        let message: String
+        let preferredPosition: LubaTooltipPosition
+        var anchor: CGRect
+    }
+
+    static let shared = LubaTooltipController()
+
+    @Published var active: ActiveTooltip?
+    private var dismissWorkItem: DispatchWorkItem?
+
+    func toggle(
+        id: UUID,
+        message: String,
+        preferredPosition: LubaTooltipPosition,
+        anchor: CGRect,
+        dismissAfter: Double
+    ) {
+        if active?.id == id {
+            dismiss()
+            return
+        }
+
+        show(
+            id: id,
+            message: message,
+            preferredPosition: preferredPosition,
+            anchor: anchor,
+            dismissAfter: dismissAfter
+        )
+    }
+
+    func dismiss(id: UUID? = nil) {
+        if let id, active?.id != id {
+            return
+        }
+        dismissWorkItem?.cancel()
+        dismissWorkItem = nil
+        active = nil
+    }
+
+    func updateAnchorIfActive(id: UUID, anchor: CGRect) {
+        guard var current = active, current.id == id else { return }
+        current.anchor = anchor
+        active = current
+    }
+
+    private func show(
+        id: UUID,
+        message: String,
+        preferredPosition: LubaTooltipPosition,
+        anchor: CGRect,
+        dismissAfter: Double
+    ) {
+        dismissWorkItem?.cancel()
+        active = ActiveTooltip(
+            id: id,
+            message: message,
+            preferredPosition: preferredPosition,
+            anchor: anchor
+        )
+
+        let work = DispatchWorkItem { [weak self] in
+            self?.dismiss(id: id)
+        }
+        dismissWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + dismissAfter, execute: work)
+    }
+}
+
 // MARK: - LubaTooltip
 
-/// A tooltip that appears on tap to show contextual help.
+/// A tooltip trigger that appears on tap to show contextual help.
 ///
-/// As a wrapper:
-/// ```swift
-/// LubaTooltip("This field is required") {
-///     Image(systemName: "info.circle")
-/// }
-/// ```
-///
-/// As a modifier:
-/// ```swift
-/// Text("Label")
-///     .lubaTooltip("Helpful explanation")
-/// ```
+/// To render correctly above complex view hierarchies, apply `.lubaTooltipHost()`
+/// at a root container (for example, on your screen-level wrapper).
 public struct LubaTooltip<Content: View>: View {
+    private let id = UUID()
     private let message: String
     private let position: LubaTooltipPosition
     private let content: Content
 
-    @State private var isPresented = false
+    @State private var anchorRect: CGRect = .zero
     @Environment(\.lubaConfig) private var config
+    private let tooltipController = LubaTooltipController.shared
 
-    /// Creates a tooltip wrapping the given content.
-    ///
-    /// - Parameters:
-    ///   - message: The tooltip text.
-    ///   - position: Whether the tooltip appears above or below.
-    ///   - content: The view that triggers the tooltip on tap.
     public init(
         _ message: String,
         position: LubaTooltipPosition = .top,
@@ -64,66 +122,233 @@ public struct LubaTooltip<Content: View>: View {
 
     public var body: some View {
         content
-            .lubaPressable {
+            .background {
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: TooltipAnchorPreferenceKey.self,
+                        value: proxy.frame(in: .global)
+                    )
+                }
+            }
+            .onPreferenceChange(TooltipAnchorPreferenceKey.self) { rect in
+                guard rect.width > 1, rect.height > 1 else { return }
+                anchorRect = rect
+                tooltipController.updateAnchorIfActive(id: id, anchor: rect)
+            }
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded {
+                guard anchorRect.width > 1, anchorRect.height > 1 else { return }
+
                 if config.hapticsEnabled {
                     LubaHaptics.light()
                 }
-                withAnimation(LubaMotion.micro) {
-                    isPresented.toggle()
+
+                let performToggle = {
+                    tooltipController.toggle(
+                        id: id,
+                        message: message,
+                        preferredPosition: position,
+                        anchor: anchorRect,
+                        dismissAfter: LubaTooltipTokens.dismissDuration
+                    )
                 }
-                if isPresented {
-                    scheduleDismiss()
+                if config.animationsEnabled {
+                    withAnimation(LubaMotion.micro) { performToggle() }
+                } else {
+                    performToggle()
                 }
-            }
-            .overlay(alignment: position == .top ? .top : .bottom) {
-                if isPresented {
-                    tooltipView
-                        .offset(y: position == .top ? -(LubaTooltipTokens.offsetFromAnchor + 30) : LubaTooltipTokens.offsetFromAnchor + 30)
-                        .transition(.scale(scale: 0.9, anchor: position == .top ? .bottom : .top).combined(with: .opacity))
-                }
-            }
+            })
             .accessibilityHint("Tap for more information")
+            .onDisappear {
+                tooltipController.dismiss(id: id)
+            }
+    }
+}
+
+// MARK: - Host Modifier
+
+private struct LubaTooltipHostModifier: ViewModifier {
+    @ObservedObject private var tooltipController = LubaTooltipController.shared
+    @Environment(\.lubaConfig) private var config
+    @State private var bubbleSize: CGSize = .zero
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .topLeading) {
+                GeometryReader { proxy in
+                    if let active = tooltipController.active {
+                        let placement = placement(for: active, in: proxy)
+                        TooltipBubble(
+                            message: active.message,
+                            position: placement.position,
+                            arrowOffset: placement.arrowOffset
+                        )
+                        .background {
+                            GeometryReader { bubbleProxy in
+                                Color.clear.preference(
+                                    key: TooltipBubbleSizePreferenceKey.self,
+                                    value: bubbleProxy.size
+                                )
+                            }
+                        }
+                        .position(x: placement.x, y: placement.y)
+                        .transition(
+                            .scale(
+                                scale: 0.9,
+                                anchor: placement.position == .top ? .bottom : .top
+                            )
+                            .combined(with: .opacity)
+                        )
+                        .zIndex(10_000)
+                    }
+                }
+                .allowsHitTesting(false)
+            }
+            .onPreferenceChange(TooltipBubbleSizePreferenceKey.self) { size in
+                bubbleSize = size
+            }
+            .onChange(of: tooltipController.active?.id) { _ in
+                bubbleSize = .zero
+            }
+            .animation(config.animationsEnabled ? LubaMotion.micro : nil, value: tooltipController.active?.id)
     }
 
-    private var tooltipView: some View {
+    private func placement(
+        for active: LubaTooltipController.ActiveTooltip,
+        in hostProxy: GeometryProxy
+    ) -> (x: CGFloat, y: CGFloat, position: LubaTooltipPosition, arrowOffset: CGFloat) {
+        let hostFrame = hostProxy.frame(in: .global)
+        let anchorInHost = CGRect(
+            x: active.anchor.minX - hostFrame.minX,
+            y: active.anchor.minY - hostFrame.minY,
+            width: active.anchor.width,
+            height: active.anchor.height
+        )
+
+        let measuredWidth = bubbleSize.width > 0 ? bubbleSize.width : LubaTooltipTokens.maxWidth
+        let measuredHeight = bubbleSize.height > 0 ? bubbleSize.height : 44
+        let edgePadding = LubaTooltipTokens.screenEdgePadding
+        let gap = LubaTooltipTokens.offsetFromAnchor
+
+        let minCenterX = edgePadding + measuredWidth / 2
+        let maxCenterX = hostProxy.size.width - edgePadding - measuredWidth / 2
+        let centerX = min(max(anchorInHost.midX, minCenterX), maxCenterX)
+        
+        // Ensure the arrow doesn't detach from the bubble by clamping it to the rounded corners
+        let maxArrowOffset = (measuredWidth / 2) - LubaTooltipTokens.cornerRadius - LubaTooltipTokens.arrowSize
+        let arrowOffset = min(max(anchorInHost.midX - centerX, -maxArrowOffset), maxArrowOffset)
+
+        let availableAbove = anchorInHost.minY - edgePadding
+        let availableBelow = hostProxy.size.height - anchorInHost.maxY - edgePadding
+        let fitsAbove = availableAbove >= measuredHeight + gap
+        let fitsBelow = availableBelow >= measuredHeight + gap
+
+        let resolvedPosition: LubaTooltipPosition
+        switch active.preferredPosition {
+        case .top:
+            resolvedPosition = fitsAbove || !fitsBelow ? .top : .bottom
+        case .bottom:
+            resolvedPosition = fitsBelow || !fitsAbove ? .bottom : .top
+        }
+
+        let centerY: CGFloat
+        switch resolvedPosition {
+        case .top:
+            centerY = anchorInHost.minY - gap - measuredHeight / 2
+        case .bottom:
+            centerY = anchorInHost.maxY + gap + measuredHeight / 2
+        }
+
+        return (centerX, centerY, resolvedPosition, arrowOffset)
+    }
+}
+
+public extension View {
+    /// Adds a tooltip trigger that appears when this view is tapped.
+    func lubaTooltip(_ message: String, position: LubaTooltipPosition = .top) -> some View {
+        LubaTooltip(message, position: position) {
+            self
+        }
+    }
+
+    /// Installs a root tooltip overlay layer for all nested `LubaTooltip` triggers.
+    ///
+    /// Apply this once near screen/root containers so tooltips render above siblings.
+    func lubaTooltipHost() -> some View {
+        modifier(LubaTooltipHostModifier())
+    }
+}
+
+// MARK: - Bubble
+
+private struct TooltipBubble: View {
+    let message: String
+    let position: LubaTooltipPosition
+    let arrowOffset: CGFloat
+
+    var body: some View {
         Text(message)
-            .font(LubaTypography.footnote)
+            .font(LubaTypography.custom(size: LubaTooltipTokens.fontSize, weight: .regular))
             .foregroundStyle(LubaColors.textPrimary)
             .padding(LubaTooltipTokens.padding)
-            .frame(maxWidth: LubaTooltipTokens.maxWidth)
+            .frame(maxWidth: LubaTooltipTokens.maxWidth, alignment: .leading)
             .background(LubaColors.surface)
             .clipShape(RoundedRectangle(cornerRadius: LubaTooltipTokens.cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: LubaTooltipTokens.cornerRadius, style: .continuous)
                     .strokeBorder(LubaColors.border, lineWidth: 1)
             )
+            .overlay(alignment: position == .top ? .bottom : .top) {
+                TooltipArrow(position: position)
+                    .fill(LubaColors.surface)
+                    .frame(width: LubaTooltipTokens.arrowSize * 2, height: LubaTooltipTokens.arrowSize)
+                    .overlay(
+                        TooltipArrow(position: position)
+                            .stroke(LubaColors.border, lineWidth: 1)
+                    )
+                    .offset(x: arrowOffset, y: position == .top ? LubaTooltipTokens.arrowSize - 1 : -LubaTooltipTokens.arrowSize + 1)
+            }
             .shadow(
                 color: Color.black.opacity(LubaTooltipTokens.shadowOpacity),
                 radius: LubaTooltipTokens.shadowBlur,
                 y: LubaTooltipTokens.shadowY
             )
-            .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel(message)
             .accessibilityAddTraits(.isStaticText)
     }
+}
 
-    private func scheduleDismiss() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + LubaTooltipTokens.dismissDuration) {
-            withAnimation(LubaMotion.micro) {
-                isPresented = false
-            }
+private struct TooltipArrow: Shape {
+    let position: LubaTooltipPosition
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        if position == .top {
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+            path.closeSubpath()
+        } else {
+            path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
+            path.closeSubpath()
         }
+        return path
     }
 }
 
-// MARK: - View Modifier
+private struct TooltipAnchorPreferenceKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
+    }
+}
 
-public extension View {
-    /// Adds a tooltip that appears when this view is tapped.
-    func lubaTooltip(_ message: String, position: LubaTooltipPosition = .top) -> some View {
-        LubaTooltip(message, position: position) {
-            self
-        }
+private struct TooltipBubbleSizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
     }
 }
 
@@ -142,6 +367,7 @@ public extension View {
             .foregroundStyle(LubaColors.textSecondary)
             .lubaTooltip("Here's some extra context about this feature.", position: .bottom)
     }
+    .lubaTooltipHost()
     .padding(40)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(LubaColors.background)

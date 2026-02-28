@@ -244,6 +244,15 @@ final class ComponentTokenTests: XCTestCase {
         XCTAssertEqual(LubaTooltipTokens.dismissDuration, 3.0)
         XCTAssertGreaterThan(LubaTooltipTokens.padding, 0)
         XCTAssertGreaterThan(LubaTooltipTokens.offsetFromAnchor, 0)
+        XCTAssertEqual(LubaTooltipTokens.screenEdgePadding, LubaSpacing.lg)
+    }
+
+    func testChipTokens() {
+        XCTAssertEqual(LubaChipTokens.contentSpacing, LubaMotion.iconLabelSpacing)
+        XCTAssertEqual(LubaChipTokens.horizontalPadding, LubaSpacing.md)
+        XCTAssertEqual(LubaChipTokens.height, 32)
+        XCTAssertEqual(LubaChipTokens.borderWidth, 1)
+        XCTAssertGreaterThan(LubaChipTokens.dismissButtonSize, 0)
     }
 
     // MARK: - Primitive Token Tests (Expandable, Swipeable, Shimmer, LongPress)

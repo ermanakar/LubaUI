@@ -21,6 +21,32 @@ public enum LubaChipStyle {
     case outlined
 }
 
+// MARK: - Chip Tokens
+
+/// Design tokens for LubaChip.
+public enum LubaChipTokens {
+    /// Spacing between icon, label, and dismiss affordance.
+    public static let contentSpacing: CGFloat = LubaMotion.iconLabelSpacing
+
+    /// Horizontal content inset.
+    public static let horizontalPadding: CGFloat = LubaSpacing.md
+
+    /// Visual chip height.
+    public static let height: CGFloat = 32
+
+    /// Leading icon font size.
+    public static let iconFontSize: CGFloat = 12
+
+    /// Dismiss glyph font size.
+    public static let dismissIconFontSize: CGFloat = 9
+
+    /// Dismiss button hit area inside chip.
+    public static let dismissButtonSize: CGFloat = 16
+
+    /// Border width for outlined style.
+    public static let borderWidth: CGFloat = 1
+}
+
 // MARK: - LubaChip
 
 /// A dismissible chip for filters, tags, and selections.
@@ -69,10 +95,10 @@ public struct LubaChip: View {
     }
 
     public var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: LubaChipTokens.contentSpacing) {
             if let icon = icon {
                 icon
-                    .font(.system(size: 12, weight: .medium))
+                    .font(LubaTypography.custom(size: LubaChipTokens.iconFontSize, weight: .medium))
             }
 
             Text(label)
@@ -81,8 +107,8 @@ public struct LubaChip: View {
             if isDismissible {
                 Button(action: dismiss) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 9, weight: .bold))
-                        .frame(width: 16, height: 16)
+                        .font(LubaTypography.custom(size: LubaChipTokens.dismissIconFontSize, weight: .bold))
+                        .frame(width: LubaChipTokens.dismissButtonSize, height: LubaChipTokens.dismissButtonSize)
                         .background(dismissBackground)
                         .clipShape(Circle())
                 }
@@ -90,8 +116,8 @@ public struct LubaChip: View {
                 .accessibilityLabel("Remove \(label)")
             }
         }
-        .padding(.horizontal, 12)
-        .frame(height: 32)
+        .padding(.horizontal, LubaChipTokens.horizontalPadding)
+        .frame(height: LubaChipTokens.height)
         .foregroundStyle(foregroundColor)
         .background(backgroundColor)
         .clipShape(Capsule())
@@ -128,7 +154,7 @@ public struct LubaChip: View {
     private var borderOverlay: some View {
         if style == .outlined {
             Capsule()
-                .strokeBorder(isSelected ? LubaColors.accent : LubaColors.border, lineWidth: 1)
+                .strokeBorder(isSelected ? LubaColors.accent : LubaColors.border, lineWidth: LubaChipTokens.borderWidth)
         }
     }
 

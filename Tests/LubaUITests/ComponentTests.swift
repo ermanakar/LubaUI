@@ -298,6 +298,13 @@ final class ComponentTests: XCTestCase {
         XCTAssertNotNil(menu)
     }
 
+    func testCardCreationWithoutClipping() {
+        let card = LubaCard(clipsContent: false) {
+            Text("Overflow content")
+        }
+        XCTAssertNotNil(card)
+    }
+
     func testMenuItemCreation() {
         var actionCalled = false
         let item = LubaMenuItem("Edit", icon: Image(systemName: "pencil"), role: .normal) {

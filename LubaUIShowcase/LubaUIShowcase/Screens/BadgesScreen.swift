@@ -66,7 +66,7 @@ struct BadgesScreen: View {
                         VStack(spacing: LubaSpacing.sm) {
                             LubaBadge("Medium", style: .accent, size: .medium)
                             Text("12pt")
-                                .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
+                                .font(LubaTypography.custom(size: 12, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }
                     }
@@ -189,6 +189,8 @@ struct BadgesScreen: View {
                     }
                 }
             }
+            
+            philosophyCard
         }
     }
 
@@ -199,7 +201,7 @@ struct BadgesScreen: View {
             ZStack {
                 Circle()
                     .fill(LubaColors.gray100)
-                    .frame(width: 48, height: 48)
+                    .frame(width: LubaSpacing.xxxl, height: LubaSpacing.xxxl)
 
                 Image(systemName: icon)
                     .font(LubaTypography.title2)
@@ -207,7 +209,7 @@ struct BadgesScreen: View {
             }
 
             LubaBadge(count > 99 ? "99+" : "\(count)", style: .error, size: .small)
-                .offset(x: 8, y: -4)
+                .offset(x: LubaSpacing.sm, y: -LubaSpacing.xs)
         }
     }
 
@@ -224,7 +226,7 @@ struct BadgesScreen: View {
             }
 
             Image(systemName: "chevron.right")
-                .font(LubaTypography.custom(size: 12, weight: .semibold))
+                .font(LubaTypography.custom(size: LubaSpacing.md, weight: .semibold))
                 .foregroundStyle(LubaColors.textTertiary)
         }
         .padding(.vertical, LubaSpacing.sm)
@@ -243,6 +245,16 @@ struct BadgesScreen: View {
         .padding(.vertical, LubaSpacing.sm)
     }
 
+}
+
+extension BadgesScreen {
+    private var philosophyCard: some View {
+        PhilosophyCard(
+            icon: "tag.fill",
+            title: "Badge Philosophy",
+            description: "Badges in LubaUI are designed to be high-contrast indicators that don't overwhelm the visual hierarchy. We use semantic colors for meaning (success/error) and subtle/neutral styles for categorization. They are always pill-shaped to distinguish them from rectangular buttons or square avatars."
+        )
+    }
 }
 
 #Preview {

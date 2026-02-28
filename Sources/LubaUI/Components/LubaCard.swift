@@ -141,6 +141,7 @@ public struct LubaCard<Content: View>: View {
     private let style: LubaCardStyle
     private let cornerRadius: CGFloat
     private let padding: CGFloat
+    private let clipsContent: Bool
     private let content: Content
 
     @Environment(\.colorScheme) private var colorScheme
@@ -150,27 +151,14 @@ public struct LubaCard<Content: View>: View {
         style: LubaCardStyle = .filled,
         cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
         padding: CGFloat = LubaCardTokens.padding,
+        clipsContent: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.elevation = elevation
         self.style = style
         self.cornerRadius = cornerRadius
         self.padding = padding
-        self.content = content()
-    }
-
-    /// Backwards-compatible initializer with hasBorder parameter.
-    public init(
-        elevation: LubaCardElevation = .low,
-        cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
-        padding: CGFloat = LubaCardTokens.padding,
-        hasBorder: Bool,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.elevation = elevation
-        self.style = hasBorder ? .outlined : .filled
-        self.cornerRadius = cornerRadius
-        self.padding = padding
+        self.clipsContent = clipsContent
         self.content = content()
     }
 
@@ -180,17 +168,30 @@ public struct LubaCard<Content: View>: View {
                 .padding(padding)
                 .lubaGlass(.regular, cornerRadius: cornerRadius)
         } else {
-            content
-                .padding(padding)
-                .background(backgroundColor)
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .overlay(borderOverlay)
-                .shadow(
-                    color: shadowColor,
-                    radius: elevation.shadowRadius,
-                    x: 0,
-                    y: elevation.shadowY
-                )
+            if clipsContent {
+                content
+                    .padding(padding)
+                    .background(cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                    .overlay(borderOverlay)
+                    .shadow(
+                        color: shadowColor,
+                        radius: elevation.shadowRadius,
+                        x: 0,
+                        y: elevation.shadowY
+                    )
+            } else {
+                content
+                    .padding(padding)
+                    .background(cardBackground)
+                    .overlay(borderOverlay)
+                    .shadow(
+                        color: shadowColor,
+                        radius: elevation.shadowRadius,
+                        x: 0,
+                        y: elevation.shadowY
+                    )
+            }
         }
     }
 
@@ -198,6 +199,16 @@ public struct LubaCard<Content: View>: View {
 
     private var backgroundColor: Color {
         style.hasBackground ? LubaColors.surface : .clear
+    }
+
+    @ViewBuilder
+    private var cardBackground: some View {
+        if style.hasBackground {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(backgroundColor)
+        } else {
+            Color.clear
+        }
     }
 
     private var shadowColor: Color {
@@ -229,48 +240,6 @@ public extension LubaCard {
         action: @escaping () -> Void
     ) -> some View {
         self.lubaPressable(scale: scale, haptic: haptic, action: action)
-    }
-}
-
-// MARK: - Backwards Compatibility
-
-/// A tappable card with press animation.
-/// Deprecated: Use `LubaCard { }.lubaPressable { }` instead.
-@available(*, deprecated, message: "Use LubaCard with .lubaPressable() modifier instead")
-public struct LubaTappableCard<Content: View>: View {
-    private let elevation: LubaCardElevation
-    private let cornerRadius: CGFloat
-    private let padding: CGFloat
-    private let action: () -> Void
-    private let content: Content
-
-    @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.lubaConfig) private var config
-
-    public init(
-        elevation: LubaCardElevation = .low,
-        cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
-        padding: CGFloat = LubaCardTokens.padding,
-        action: @escaping () -> Void,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.elevation = elevation
-        self.cornerRadius = cornerRadius
-        self.padding = padding
-        self.action = action
-        self.content = content()
-    }
-
-    public var body: some View {
-        LubaCard(elevation: elevation, cornerRadius: cornerRadius, padding: padding) {
-            content
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .lubaPressable(
-            scale: LubaMotion.pressScaleProminent,
-            haptic: .light,
-            action: action
-        )
     }
 }
 

@@ -150,6 +150,7 @@ struct ShowcaseScreen<Content: View>: View {
             .padding(LubaSpacing.lg)
         }
         .background(LubaColors.background)
+        .lubaTooltipHost()
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.large)
     }

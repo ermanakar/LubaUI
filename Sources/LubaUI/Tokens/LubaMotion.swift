@@ -79,6 +79,10 @@ public enum LubaMotion {
     /// Space between icon and label
     public static let iconLabelSpacing: CGFloat = 6
 
+    /// Maximum finger movement that still counts as a tap.
+    /// Helps prevent accidental tap actions during scroll gestures.
+    public static let tapMovementTolerance: CGFloat = 10
+
     // MARK: - Semantic Presets
 
     /// Quick micro-interaction (toggles, checkboxes)

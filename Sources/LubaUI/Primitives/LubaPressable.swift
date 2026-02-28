@@ -89,16 +89,23 @@ public struct LubaPressableModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .scaleEffect(isPressed ? scale : 1.0)
-            .animation(animation, value: isPressed)
+            .animation(config.animationsEnabled ? animation : nil, value: isPressed)
             .simultaneousGesture(
                 DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        guard !isPressed else { return }
-                        isPressed = true
+                    .onChanged { value in
+                        let distance = hypot(value.translation.width, value.translation.height)
+                        if distance > LubaMotion.tapMovementTolerance {
+                            isPressed = false
+                        } else if !isPressed {
+                            isPressed = true
+                        }
                     }
                     .onEnded { _ in
+                        let wasPressed = isPressed
                         isPressed = false
-                        triggerAction()
+                        if wasPressed {
+                            triggerAction()
+                        }
                     }
             )
     }
@@ -147,6 +154,8 @@ public struct LubaPressableButtonStyle: ButtonStyle {
     let scale: CGFloat
     let animation: Animation
 
+    @Environment(\.lubaConfig) private var config
+
     public init(
         scale: CGFloat = LubaMotion.pressScale,
         animation: Animation = LubaMotion.pressAnimation
@@ -158,7 +167,7 @@ public struct LubaPressableButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? scale : 1.0)
-            .animation(animation, value: configuration.isPressed)
+            .animation(config.animationsEnabled ? animation : nil, value: configuration.isPressed)
     }
 }
 
@@ -168,6 +177,8 @@ public struct LubaInteractiveButtonStyle: ButtonStyle {
     @Binding var isPressed: Bool
     let scale: CGFloat
     let animation: Animation
+
+    @Environment(\.lubaConfig) private var config
 
     public init(
         isPressed: Binding<Bool>,
@@ -182,7 +193,7 @@ public struct LubaInteractiveButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? scale : 1.0)
-            .animation(animation, value: configuration.isPressed)
+            .animation(config.animationsEnabled ? animation : nil, value: configuration.isPressed)
             .preference(key: PressStateKey.self, value: configuration.isPressed)
             .onPreferenceChange(PressStateKey.self) { value in
                 isPressed = value

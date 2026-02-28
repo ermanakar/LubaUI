@@ -180,6 +180,8 @@ struct FormControlsScreen: View {
                     }
                 }
             }
+            
+            philosophyCard
         }
         .lubaToast(isPresented: $showSuccess, message: "Account created successfully!", style: .success)
     }
@@ -262,6 +264,16 @@ struct FormControlsScreen: View {
         .padding(.vertical, LubaSpacing.xs)
     }
 
+}
+
+extension FormControlsScreen {
+    private var philosophyCard: some View {
+        PhilosophyCard(
+            icon: "checkmark.seal.fill",
+            title: "Form Philosophy",
+            description: "Form controls in LubaUI focus on interactive clarity. We use haptic feedback for every toggle and selection to confirm user actions. Every input is designed with 'failure-awareness'—built-in validation, helper text, and error states are first-class citizens, not an afterthought."
+        )
+    }
 }
 
 #Preview {

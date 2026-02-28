@@ -262,6 +262,11 @@ final class TokenTests: XCTestCase {
         XCTAssertEqual(LubaMotion.iconLabelSpacing, 6)
     }
 
+    func testMotionTapMovementTolerance() {
+        XCTAssertEqual(LubaMotion.tapMovementTolerance, 10)
+        XCTAssertGreaterThan(LubaMotion.tapMovementTolerance, 0)
+    }
+
     func testMotionAnimationsExist() {
         XCTAssertNotNil(LubaMotion.pressAnimation)
         XCTAssertNotNil(LubaMotion.colorAnimation)
