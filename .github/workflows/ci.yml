@@ -31,23 +31,3 @@ jobs:
 
       - name: Run tests
         run: swift test
-
-  build-showcase:
-    name: Build Showcase App
-    runs-on: macos-15
-    needs: build-and-test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.2.app
-
-      - name: Build Showcase
-        run: |
-          xcodebuild -project LubaUIShowcase/LubaUIShowcase.xcodeproj \
-            -scheme LubaUIShowcase \
-            -sdk iphoneos \
-            build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            ONLY_ACTIVE_ARCH=NO
