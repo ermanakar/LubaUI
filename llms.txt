@@ -5,7 +5,7 @@
 > MCP server: `claude mcp add lubaui -- npx lubaui-mcp` (npm: lubaui-mcp)
 > Website: https://shopofluba.de/lubaui
 > Repository: https://github.com/ermanakar/LubaUI
-> Last updated: 2026-02-15
+> Last updated: 2026-03-01
 
 ---
 
@@ -43,7 +43,8 @@ Sources/LubaUI/
 │   ├── LubaRadius.swift          # Tier 2: Corner radii
 │   ├── LubaMotion.swift          # Tier 2: Animation constants ★
 │   ├── LubaControlTokens.swift   # Tier 3: Form control tokens
-│   └── LubaFeedbackTokens.swift  # Tier 3: Feedback component tokens
+│   ├── LubaFeedbackTokens.swift  # Tier 3: Feedback component tokens
+│   └── LubaChartTokens.swift     # Tier 3: Chart component tokens
 ├── Primitives/                   # Reusable behaviors ★
 │   ├── LubaPressable.swift       # .lubaPressable() — tap with scale + haptics
 │   ├── LubaButtonStyling.swift   # Button style protocol
@@ -51,8 +52,9 @@ Sources/LubaUI/
 │   ├── LubaLongPressable.swift   # .lubaLongPressable() — long press + progress ring
 │   ├── LubaShimmerable.swift     # .lubaShimmerable() — loading shimmer effect
 │   ├── LubaSwipeable.swift       # .lubaSwipeable() — swipe actions (delete, archive, pin)
-│   └── LubaGlass.swift           # .lubaGlass() — frosted glass effect (iOS 26 Liquid Glass ready)
-├── Components/                   # UI components (25 files)
+│   ├── LubaGlass.swift           # .lubaGlass() — frosted glass effect (iOS 26 Liquid Glass ready)
+│   └── LubaChartStyle.swift      # .lubaChartStyle() — token-based chart styling
+├── Components/                   # UI components (26 files)
 │   ├── LubaAlert.swift           # Inline notification banner
 │   ├── LubaAvatar.swift          # Profile image/initials + AvatarGroup
 │   ├── LubaBadge.swift           # Status indicator
@@ -77,7 +79,8 @@ Sources/LubaUI/
 │   ├── LubaTextField.swift       # Text input with states
 │   ├── LubaToast.swift           # Overlay notification
 │   ├── LubaToggle.swift          # Switch control
-│   └── LubaTooltip.swift         # Contextual help popup
+│   ├── LubaTooltip.swift         # Contextual help popup
+│   └── LubaChart.swift           # Bar, line, pie, sparkline charts (wraps Swift Charts)
 ├── Config/
 │   └── LubaConfig.swift          # Runtime config (haptics, a11y, debug)
 ├── Theme/
@@ -183,6 +186,10 @@ Use `LubaMotion` for raw values/constants. Use `LubaAnimations` for applied `Ani
 - `LubaIconTokens` — touchTarget: 44, pressScale: 0.95 (refs LubaMotion.pressScaleCompact), circledPaddingMultiplier: 1.8
 - `LubaMenuTokens` — minWidth: 200, itemHeight: 44, cornerRadius: 12, iconSize: 16
 - `LubaTooltipTokens` — maxWidth: 240, padding: 10, cornerRadius: 8, dismissDuration: 3.0
+
+**Charts** (LubaChartTokens.swift):
+- `LubaChartTokens` — defaultHeight: 200, compactHeight: 140, expandedHeight: 300, sparklineHeight: 40, barCornerRadius: 4, lineWidth: 2.5, pointSize: 6, areaOpacity: 0.15, gridOpacity: 0.12
+- `LubaColors.Chart` — 6-color adaptive palette (sage, slate blue, terracotta, dusty violet, teal, warm sand), grid/axis colors
 
 ---
 
@@ -376,6 +383,39 @@ LubaIcon("heart.fill", size: .md, color: LubaColors.accent)
 LubaIconButton("bell") { showNotifications() }
 LubaSkeleton(height: 14)
 LubaSkeletonCard()
+```
+
+### Charts
+```swift
+// Requires: import Charts
+
+// Bar chart (conforms data to LubaChartData protocol)
+LubaBarChart(data: items)
+LubaBarChart(data: items, height: LubaChartTokens.compactHeight, horizontal: true)
+
+// Grouped multi-series bar (data conforms to LubaSeriesChartData)
+LubaGroupedBarChart(data: seriesItems)
+
+// Line chart with area fill and points
+LubaLineChart(data: items, showArea: true, showPoints: true)
+
+// Multi-series line
+LubaMultiLineChart(data: seriesItems)
+
+// Pie/donut (iOS 17+)
+LubaPieChart(data: items)
+LubaPieChart(data: items, innerRadius: .ratio(0.55))  // donut
+
+// Sparkline — minimal inline trend
+LubaSparkline(values: [4, 7, 5, 9, 6, 8, 12])
+    .frame(width: 80, height: 40)
+
+// Loading skeleton
+LubaChartSkeleton(style: .bar)
+LubaChartSkeleton(style: .line)
+
+// Style any raw Chart with LubaUI tokens
+Chart { ... }.lubaChartStyle(height: 200, showAxes: true)
 ```
 
 ### Layout

@@ -83,7 +83,7 @@ Every token, every constant, every API in LubaUI is designed to be understood by
 
 ### One Import, Whole Design Language
 
-You get colors, typography, spacing, motion, haptics, accessibility, and 25+ components that all share the same DNA. Your settings screen looks like it belongs with your onboarding flow because they're built from the same tokens.
+You get colors, typography, spacing, motion, haptics, accessibility, and 35+ components that all share the same DNA. Your settings screen looks like it belongs with your onboarding flow because they're built from the same tokens.
 
 ### The Details Are Done
 
@@ -215,6 +215,19 @@ LubaExpandable(isExpanded: $isOpen) {
 | `LubaChip` | Dismissible filter/tag pill with selection state |
 | `LubaLink` | Inline text link with default, subtle, and external styles |
 | `LubaMenu` | Context menu with icons and destructive item support |
+
+### Data Visualization
+
+| Component | What It Does |
+|-----------|-------------|
+| `LubaBarChart` | Vertical/horizontal bar chart with token-based styling |
+| `LubaGroupedBarChart` | Multi-series grouped bar chart with auto palette |
+| `LubaLineChart` | Line chart with optional area fill and point markers |
+| `LubaMultiLineChart` | Multi-series line chart |
+| `LubaPieChart` | Pie and donut chart (iOS 17+, uses `SectorMark`) |
+| `LubaSparkline` | Minimal inline trend chart for dashboards |
+| `LubaChartSkeleton` | Animated loading placeholder (bar/line styles) |
+| `LubaChartLegend` | Custom legend row for chart labels |
 
 ---
 

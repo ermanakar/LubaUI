@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		555F53FB2F5481C1007E8A4E /* ChartsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555F53FA2F5481C1007E8A4E /* ChartsScreen.swift */; };
 		8A3C2B1D2B0F5A8C00E1F2D3 /* LubaUIShowcaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B1C2B0F5A8C00E1F2D3 /* LubaUIShowcaseApp.swift */; };
 		8A3C2B1F2B0F5A8C00E1F2D3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3C2B1E2B0F5A8C00E1F2D3 /* ContentView.swift */; };
 		8A3C2B212B0F5A8D00E1F2D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A3C2B202B0F5A8D00E1F2D3 /* Assets.xcassets */; };
@@ -62,6 +63,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		555F53FA2F5481C1007E8A4E /* ChartsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsScreen.swift; sourceTree = "<group>"; };
 		8A3C2B192B0F5A8C00E1F2D3 /* LubaUIShowcase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LubaUIShowcase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A3C2B1C2B0F5A8C00E1F2D3 /* LubaUIShowcaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LubaUIShowcaseApp.swift; sourceTree = "<group>"; };
 		8A3C2B1E2B0F5A8C00E1F2D3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 		8A3C2B502B0F5B3000E1F2D3 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				555F53FA2F5481C1007E8A4E /* ChartsScreen.swift */,
 				8A3C2B3B2B0F5B2800E1F2D3 /* PressableScreen.swift */,
 				8A3C2B3D2B0F5B2900E1F2D3 /* MotionScreen.swift */,
 				8A3C2B2B2B0F5B2000E1F2D3 /* ColorsScreen.swift */,
@@ -303,6 +306,7 @@
 				8A3C2B462B0F5B2D00E1F2D3 /* FormControlsScreen.swift in Sources */,
 				8A3C2B482B0F5B2E00E1F2D3 /* DividerScreen.swift in Sources */,
 				8A3C2B4A2B0F5B2F00E1F2D3 /* SheetScreen.swift in Sources */,
+				555F53FB2F5481C1007E8A4E /* ChartsScreen.swift in Sources */,
 				8A3C2B4C2B0F5B3000E1F2D3 /* AvatarsScreen.swift in Sources */,
 				8A3C2B4E2B0F5B3100E1F2D3 /* BadgesScreen.swift in Sources */,
 				8A3C2B502B0F5B3200E1F2D3 /* ShimmerableScreen.swift in Sources */,

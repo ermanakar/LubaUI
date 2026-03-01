@@ -84,6 +84,19 @@ LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 - ``LubaSpinner``
 - ``LubaSkeleton``
 
+### Data Visualization
+
+- ``LubaBarChart``
+- ``LubaGroupedBarChart``
+- ``LubaLineChart``
+- ``LubaMultiLineChart``
+- ``LubaSparkline``
+- ``LubaChartSkeleton``
+- ``LubaChartEmptyState``
+- ``LubaChartLegend``
+- ``LubaChartStyleModifier``
+- <doc:Charts>
+
 ### Navigation
 
 - ``LubaTabs``
@@ -120,6 +133,7 @@ LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 - ``LubaTooltipTokens``
 - ``LubaAlertTokens``
 - ``LubaSearchBarTokens``
+- ``LubaChartTokens``
 
 ### Accessibility
 

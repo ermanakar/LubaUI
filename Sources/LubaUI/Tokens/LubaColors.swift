@@ -239,6 +239,39 @@ public enum LubaColors {
     public static let navy500 = gray600
     public static let accentBlue = accent
     public static let accentGold = accent
+
+    // MARK: - Chart Palette
+
+    /// Data visualization colors designed for charts and graphs.
+    /// Ordered palette: distinct, WCAG AA accessible, organic tones.
+    public enum Chart {
+
+        /// 6-color palette for multi-series data.
+        /// Sage green leads (matches accent), followed by complementary muted tones.
+        public static let palette: [Color] = [
+            LubaColors.accent,
+            adaptive(light: Color(hex: 0x5B7FA5), dark: Color(hex: 0x8CB4D8)),  // Slate blue
+            adaptive(light: Color(hex: 0xC47B5A), dark: Color(hex: 0xD9A68A)),  // Terracotta
+            adaptive(light: Color(hex: 0x8B7BA5), dark: Color(hex: 0xB5A8CC)),  // Dusty violet
+            adaptive(light: Color(hex: 0x5A9E8F), dark: Color(hex: 0x8CCABC)),  // Teal
+            adaptive(light: Color(hex: 0xA5895B), dark: Color(hex: 0xCCB88A)),  // Warm sand
+        ]
+
+        /// Gradient start for single-series area fills
+        public static let gradientStart = LubaColors.accent
+
+        /// Gradient end for single-series area fills
+        public static let gradientEnd = LubaColors.accentSubtle
+
+        /// Grid line color — subtle dividers within chart area
+        public static let grid = adaptive(
+            light: Color(hex: 0xE0E0E0),
+            dark: Color(hex: 0x333333)
+        )
+
+        /// Axis label color
+        public static let axisLabel = LubaColors.textTertiary
+    }
     
     // MARK: - Adaptive Color Helper
     

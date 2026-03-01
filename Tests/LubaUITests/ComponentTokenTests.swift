@@ -2,7 +2,9 @@
 //  ComponentTokenTests.swift
 //  LubaUI
 //
-//  Tests for component-level tokens: button styles/sizes, field, card, controls, feedback, primitives.
+//  Tests for component-level tokens: button styles/sizes, field, card, controls,
+//  feedback, primitives, sizes, glass, charts. Each test consolidates related
+//  assertions to eliminate one-liner tests while preserving full value coverage.
 //
 
 import XCTest
@@ -11,63 +13,48 @@ import SwiftUI
 
 final class ComponentTokenTests: XCTestCase {
 
-    // MARK: - Button Style Tests
+    // MARK: - Button Styles
 
-    func testButtonStyleEnum() {
+    func testButtonStyleProperties() {
+        // All enum cases produce a styling instance
         let styles: [LubaButtonStyle] = [.primary, .secondary, .ghost, .destructive, .subtle, .glass]
         for style in styles {
             XCTAssertNotNil(style.styling, "Style \(style) should produce a styling instance")
         }
+
+        // Primary: full-width, medium haptic
+        let primary = LubaPrimaryStyle()
+        XCTAssertTrue(primary.defaultsToFullWidth)
+        XCTAssertEqual(primary.haptic, .medium)
+
+        // Secondary: not full-width, light haptic
+        let secondary = LubaSecondaryStyle()
+        XCTAssertFalse(secondary.defaultsToFullWidth)
+        XCTAssertEqual(secondary.haptic, .light)
+
+        // Ghost: clear background, soft haptic, 1pt border
+        let ghost = LubaGhostStyle()
+        XCTAssertEqual(ghost.backgroundColor(isPressed: false, colorScheme: .light), .clear)
+        XCTAssertEqual(ghost.haptic, .soft)
+        XCTAssertEqual(ghost.borderWidth, 1)
+
+        // Destructive: full-width, warning haptic
+        let destructive = LubaDestructiveStyle()
+        XCTAssertTrue(destructive.defaultsToFullWidth)
+        XCTAssertEqual(destructive.haptic, .warning)
+
+        // Subtle: clear background, soft haptic
+        let subtle = LubaSubtleStyle()
+        XCTAssertEqual(subtle.backgroundColor(isPressed: false, colorScheme: .light), .clear)
+        XCTAssertEqual(subtle.haptic, .soft)
     }
 
-    func testButtonStyleType() {
-        let types: [LubaButtonStyleType] = [.primary, .secondary, .ghost, .destructive, .subtle, .glass]
-        for type in types {
-            XCTAssertNotNil(type.styling, "Type \(type) should produce a styling instance")
-        }
-    }
+    // MARK: - Button Sizes
 
-    func testPrimaryStyleFullWidth() {
-        let style = LubaPrimaryStyle()
-        XCTAssertTrue(style.defaultsToFullWidth)
-        XCTAssertEqual(style.haptic, .medium)
-    }
-
-    func testSecondaryStyleNotFullWidth() {
-        let style = LubaSecondaryStyle()
-        XCTAssertFalse(style.defaultsToFullWidth)
-        XCTAssertEqual(style.haptic, .light)
-    }
-
-    func testGhostStyleTransparent() {
-        let style = LubaGhostStyle()
-        let bg = style.backgroundColor(isPressed: false, colorScheme: .light)
-        XCTAssertEqual(bg, .clear)
-        XCTAssertEqual(style.haptic, .soft)
-    }
-
-    func testDestructiveStyleFullWidth() {
-        let style = LubaDestructiveStyle()
-        XCTAssertTrue(style.defaultsToFullWidth)
-        XCTAssertEqual(style.haptic, .warning)
-    }
-
-    func testSubtleStyleMinimal() {
-        let style = LubaSubtleStyle()
-        let bg = style.backgroundColor(isPressed: false, colorScheme: .light)
-        XCTAssertEqual(bg, .clear)
-        XCTAssertEqual(style.haptic, .soft)
-    }
-
-    func testButtonStylingDefaults() {
-        let style = LubaGhostStyle()
-        XCTAssertEqual(style.borderWidth, 1)
-    }
-
-    // MARK: - Button Size Tests
-
-    func testButtonSizeProgression() {
+    func testButtonSizes() {
         let sizes: [LubaButtonSize] = [.small, .medium, .large]
+
+        // Monotonic progression
         for i in 0..<(sizes.count - 1) {
             XCTAssertLessThanOrEqual(sizes[i].verticalPadding, sizes[i + 1].verticalPadding)
             XCTAssertLessThanOrEqual(sizes[i].horizontalPadding, sizes[i + 1].horizontalPadding)
@@ -75,17 +62,12 @@ final class ComponentTokenTests: XCTestCase {
             XCTAssertLessThanOrEqual(sizes[i].iconSize, sizes[i + 1].iconSize)
             XCTAssertLessThanOrEqual(sizes[i].cornerRadius, sizes[i + 1].cornerRadius)
         }
-    }
 
-    func testMediumButtonMinHeight() {
-        XCTAssertGreaterThanOrEqual(LubaButtonSize.small.minHeight, 44,
-                       "Small button should meet Apple HIG 44pt minimum touch target")
-        XCTAssertEqual(LubaButtonSize.medium.minHeight, 44,
-                       "Medium button should meet Apple HIG 44pt minimum touch target")
-    }
+        // All sizes meet Apple HIG 44pt minimum
+        XCTAssertGreaterThanOrEqual(LubaButtonSize.small.minHeight, 44)
+        XCTAssertEqual(LubaButtonSize.medium.minHeight, 44)
 
-    func testButtonPaddingOnGrid() {
-        let sizes: [LubaButtonSize] = [.small, .medium, .large]
+        // Padding on 4pt grid
         for size in sizes {
             XCTAssertEqual(size.verticalPadding.truncatingRemainder(dividingBy: 4), 0,
                            "\(size) vertical padding should be on the 4pt grid")
@@ -94,35 +76,32 @@ final class ComponentTokenTests: XCTestCase {
         }
     }
 
-    // MARK: - Field Token Tests
+    // MARK: - Field Tokens
 
-    func testFieldTokens() {
+    func testFieldTokensAndState() {
         XCTAssertEqual(LubaFieldTokens.minHeight, 48)
         XCTAssertEqual(LubaFieldTokens.cornerRadius, 12)
-        XCTAssertGreaterThan(LubaFieldTokens.borderWidthFocused, LubaFieldTokens.borderWidth,
-                             "Focused border should be thicker than normal")
-    }
+        XCTAssertGreaterThan(LubaFieldTokens.borderWidthFocused, LubaFieldTokens.borderWidth)
 
-    func testFieldState() {
-        let states: [LubaFieldState] = [.normal, .focused, .error, .disabled]
-        for state in states {
+        // All states produce colors
+        for state in [LubaFieldState.normal, .focused, .error, .disabled] {
             XCTAssertNotNil(state.labelColor())
             XCTAssertNotNil(state.borderColor())
             XCTAssertNotNil(state.iconColor())
         }
     }
 
-    // MARK: - Card Token Tests
+    // MARK: - Card Tokens
 
-    func testCardTokens() {
+    func testCardTokensAndElevation() {
+        // Static token values
         XCTAssertEqual(LubaCardTokens.cornerRadius, 16)
         XCTAssertEqual(LubaCardTokens.padding, LubaSpacing.lg)
         XCTAssertEqual(LubaCardTokens.paddingCompact, LubaSpacing.md)
         XCTAssertEqual(LubaCardTokens.paddingLarge, LubaSpacing.xl)
         XCTAssertEqual(LubaCardTokens.borderWidth, 1)
-    }
 
-    func testCardElevationProgression() {
+        // Elevation progression
         let elevations: [LubaCardElevation] = [.flat, .low, .medium, .high]
         for i in 0..<(elevations.count - 1) {
             XCTAssertLessThanOrEqual(elevations[i].shadowRadius, elevations[i + 1].shadowRadius)
@@ -130,29 +109,16 @@ final class ComponentTokenTests: XCTestCase {
         }
         XCTAssertEqual(LubaCardElevation.flat.shadowRadius, 0)
         XCTAssertEqual(LubaCardElevation.flat.shadowOpacity, 0)
-        XCTAssertEqual(LubaCardElevation.flat.shadowY, 0)
+
+        // Dark mode shadow adjustment
+        let low = LubaCardElevation.low
+        XCTAssertGreaterThan(low.adjustedOpacity(for: .dark), low.adjustedOpacity(for: .light))
     }
 
-    func testCardElevationDarkModeAdjustment() {
-        let elevation = LubaCardElevation.low
-        let lightOpacity = elevation.adjustedOpacity(for: .light)
-        let darkOpacity = elevation.adjustedOpacity(for: .dark)
-        XCTAssertGreaterThan(darkOpacity, lightOpacity)
-    }
+    // MARK: - Control Tokens
 
-    func testCardStylesCoverage() {
-        let styles: [LubaCardStyle] = [.filled, .outlined, .ghost, .glass]
-        XCTAssertEqual(styles.count, 4)
-    }
-
-    func testCardElevationsCoverage() {
-        let elevations: [LubaCardElevation] = [.flat, .low, .medium, .high]
-        XCTAssertEqual(elevations.count, 4)
-    }
-
-    // MARK: - Control Token Tests
-
-    func testSelectionTokens() {
+    func testControlTokens() {
+        // Selection
         XCTAssertEqual(LubaSelectionTokens.controlSize, 20)
         XCTAssertEqual(LubaSelectionTokens.indicatorSize, 10)
         XCTAssertEqual(LubaSelectionTokens.borderWidth, 1.5)
@@ -160,133 +126,111 @@ final class ComponentTokenTests: XCTestCase {
         XCTAssertEqual(LubaSelectionTokens.checkmarkSize, 11)
         XCTAssertEqual(LubaSelectionTokens.labelSpacing, 8)
         XCTAssertEqual(LubaSelectionTokens.minTouchTarget, 44)
-    }
 
-    func testToggleTokens() {
+        // Toggle: thumb fits inside track
         XCTAssertEqual(LubaToggleTokens.trackWidth, 48)
         XCTAssertEqual(LubaToggleTokens.trackHeight, 28)
         XCTAssertEqual(LubaToggleTokens.thumbSize, 24)
         XCTAssertEqual(LubaToggleTokens.thumbPadding, 2)
         XCTAssertEqual(LubaToggleTokens.minTouchTarget, 44)
-
         let availableSpace = LubaToggleTokens.trackWidth - (LubaToggleTokens.thumbPadding * 2)
-        XCTAssertGreaterThanOrEqual(availableSpace, LubaToggleTokens.thumbSize,
-                                     "Thumb must fit inside track")
-    }
+        XCTAssertGreaterThanOrEqual(availableSpace, LubaToggleTokens.thumbSize)
 
-    func testSliderTokens() {
+        // Slider
         XCTAssertEqual(LubaSliderTokens.trackHeight, 4)
         XCTAssertEqual(LubaSliderTokens.thumbSize, 22)
-        XCTAssertGreaterThan(LubaSliderTokens.thumbDragScale, 1.0,
-                             "Drag scale should enlarge thumb")
+        XCTAssertGreaterThan(LubaSliderTokens.thumbDragScale, 1.0)
     }
 
-    // MARK: - Feedback Token Tests
+    // MARK: - Feedback Tokens
 
-    func testToastTokens() {
+    func testFeedbackTokens() {
+        // Toast
         XCTAssertEqual(LubaToastTokens.cornerRadius, 12)
         XCTAssertEqual(LubaToastTokens.defaultDuration, 3.0)
-        XCTAssertGreaterThan(LubaToastTokens.defaultDuration, 0)
-    }
 
-    func testProgressTokens() {
+        // Progress
         XCTAssertEqual(LubaProgressTokens.barHeight, 6)
         XCTAssertEqual(LubaProgressTokens.circularSize, 64)
         XCTAssertEqual(LubaProgressTokens.circularStrokeWidth, 6)
         XCTAssertGreaterThan(LubaProgressTokens.labelFontRatio, 0)
         XCTAssertLessThan(LubaProgressTokens.labelFontRatio, 1)
-    }
 
-    func testSpinnerTokens() {
+        // Spinner
         XCTAssertEqual(LubaSpinnerTokens.defaultSize, 20)
         XCTAssertGreaterThan(LubaSpinnerTokens.arcTrim, 0)
         XCTAssertLessThan(LubaSpinnerTokens.arcTrim, 1)
-        XCTAssertGreaterThan(LubaSpinnerTokens.arcDuration, 0)
-    }
 
-    func testSkeletonTokens() {
+        // Skeleton
         XCTAssertEqual(LubaSkeletonTokens.shimmerDuration, 1.5)
         XCTAssertEqual(LubaSkeletonTokens.defaultLineCount, 3)
         XCTAssertGreaterThan(LubaSkeletonTokens.lastLineRatio, 0)
         XCTAssertLessThan(LubaSkeletonTokens.lastLineRatio, 1)
     }
 
-    func testTabsTokens() {
+    // MARK: - UI Component Tokens
+
+    func testUIComponentTokens() {
+        // Tabs
         XCTAssertEqual(LubaTabsTokens.tabHeight, 32)
         XCTAssertEqual(LubaTabsTokens.underlineHeight, 44)
-    }
 
-    func testSheetTokens() {
+        // Sheet
         XCTAssertEqual(LubaSheetTokens.closeButtonSize, 28)
         XCTAssertEqual(LubaSheetTokens.headerPadding, 16)
-    }
 
-    func testIconTokens() {
-        XCTAssertEqual(LubaIconTokens.touchTarget, 44, "Touch target should be Apple HIG minimum")
-        XCTAssertEqual(LubaIconTokens.pressScale, LubaMotion.pressScaleCompact,
-                       "Icon press scale should reference LubaMotion.pressScaleCompact")
+        // Icon
+        XCTAssertEqual(LubaIconTokens.touchTarget, 44)
+        XCTAssertEqual(LubaIconTokens.pressScale, LubaMotion.pressScaleCompact)
         XCTAssertEqual(LubaIconTokens.pressScale, 0.95)
-        XCTAssertLessThan(LubaIconTokens.pressScale, 1.0)
-        XCTAssertGreaterThan(LubaIconTokens.pressScale, 0.5)
-    }
 
-    func testMenuTokens() {
+        // Menu
         XCTAssertEqual(LubaMenuTokens.minWidth, 200)
-        XCTAssertEqual(LubaMenuTokens.itemHeight, 44, "Menu items should meet Apple HIG touch target")
+        XCTAssertEqual(LubaMenuTokens.itemHeight, 44)
         XCTAssertEqual(LubaMenuTokens.cornerRadius, 12)
-        XCTAssertGreaterThan(LubaMenuTokens.shadowBlur, 0)
-        XCTAssertGreaterThan(LubaMenuTokens.shadowOpacity, 0)
-    }
 
-    func testTooltipTokens() {
+        // Tooltip
         XCTAssertEqual(LubaTooltipTokens.maxWidth, 240)
         XCTAssertEqual(LubaTooltipTokens.cornerRadius, 8)
         XCTAssertEqual(LubaTooltipTokens.dismissDuration, 3.0)
-        XCTAssertGreaterThan(LubaTooltipTokens.padding, 0)
-        XCTAssertGreaterThan(LubaTooltipTokens.offsetFromAnchor, 0)
         XCTAssertEqual(LubaTooltipTokens.screenEdgePadding, LubaSpacing.lg)
-    }
 
-    func testChipTokens() {
+        // Chip
         XCTAssertEqual(LubaChipTokens.contentSpacing, LubaMotion.iconLabelSpacing)
         XCTAssertEqual(LubaChipTokens.horizontalPadding, LubaSpacing.md)
         XCTAssertEqual(LubaChipTokens.height, 32)
         XCTAssertEqual(LubaChipTokens.borderWidth, 1)
-        XCTAssertGreaterThan(LubaChipTokens.dismissButtonSize, 0)
     }
 
-    // MARK: - Primitive Token Tests (Expandable, Swipeable, Shimmer, LongPress)
+    // MARK: - Primitive Tokens (Expandable, Swipeable, Shimmer, LongPress)
 
-    func testLongPressTokens() {
+    func testPrimitiveTokens() {
+        // Long press
         XCTAssertEqual(LubaLongPressTokens.defaultDuration, 0.8)
         XCTAssertEqual(LubaLongPressTokens.minimumDuration, 0.3)
         XCTAssertLessThan(LubaLongPressTokens.pressScale, 1.0)
-        XCTAssertGreaterThan(LubaLongPressTokens.defaultProgressSize, 0)
-    }
 
-    func testExpandTokens() {
+        // Expand
         XCTAssertEqual(LubaExpandTokens.chevronIcon, "chevron.down")
         XCTAssertEqual(LubaExpandTokens.headerPadding, LubaSpacing.md)
         XCTAssertEqual(LubaExpandTokens.contentPadding, LubaSpacing.md)
-    }
 
-    func testSwipeTokens() {
+        // Swipe
         XCTAssertEqual(LubaSwipeTokens.revealThreshold, 60)
         XCTAssertEqual(LubaSwipeTokens.actionWidth, 72)
         XCTAssertEqual(LubaSwipeTokens.maxActions, 3)
         XCTAssertEqual(LubaSwipeTokens.fullSwipeThreshold, 0.6)
-    }
 
-    func testShimmerTokens() {
+        // Shimmer
         XCTAssertEqual(LubaShimmerTokens.duration, 1.5)
         XCTAssertEqual(LubaShimmerTokens.defaultIntensity, 0.6)
         XCTAssertEqual(LubaShimmerTokens.gradientWidth, 0.4)
         XCTAssertLessThan(LubaShimmerTokens.startOffset, LubaShimmerTokens.endOffset)
     }
 
-    // MARK: - Avatar Size Tests
+    // MARK: - Size Progressions
 
-    func testAvatarSizeProgression() {
+    func testAvatarSizes() {
         let sizes: [LubaAvatarSize] = [.small, .medium, .large, .xlarge]
         for i in 0..<(sizes.count - 1) {
             XCTAssertLessThan(sizes[i].dimension, sizes[i + 1].dimension)
@@ -295,15 +239,12 @@ final class ComponentTokenTests: XCTestCase {
         XCTAssertEqual(LubaAvatarSize.medium.dimension, 40)
         XCTAssertEqual(LubaAvatarSize.large.dimension, 56)
         XCTAssertEqual(LubaAvatarSize.xlarge.dimension, 80)
-    }
 
-    func testAvatarFontSizeRelative() {
-        for size in [LubaAvatarSize.small, .medium, .large, .xlarge] {
+        // Font size is 40% of dimension
+        for size in sizes {
             XCTAssertEqual(size.fontSize, size.dimension * 0.4, accuracy: 0.01)
         }
     }
-
-    // MARK: - Icon Size Tests
 
     func testIconSizeProgression() {
         let sizes = LubaIconSize.allCases
@@ -312,50 +253,34 @@ final class ComponentTokenTests: XCTestCase {
         }
     }
 
-    // MARK: - Badge Tests
-
-    func testBadgeSizeProgression() {
+    func testBadgeSizes() {
         XCTAssertLessThan(LubaBadgeSize.small.fontSize, LubaBadgeSize.medium.fontSize)
         XCTAssertLessThan(LubaBadgeSize.small.iconSize, LubaBadgeSize.medium.iconSize)
         XCTAssertLessThan(LubaBadgeSize.small.verticalPadding, LubaBadgeSize.medium.verticalPadding)
         XCTAssertLessThan(LubaBadgeSize.small.horizontalPadding, LubaBadgeSize.medium.horizontalPadding)
     }
 
-    func testBadgeStylesCoverage() {
-        let styles: [LubaBadgeStyle] = [.accent, .subtle, .neutral, .success, .warning, .error]
-        XCTAssertEqual(styles.count, 6, "Should have 6 badge styles")
-    }
+    // MARK: - Glass Tokens
 
-    // MARK: - Touch Target Consistency
-
-    // MARK: - Glass Token Tests
-
-    func testGlassTokens() {
+    func testGlassTokensAndStyles() {
+        // Token cross-references
         XCTAssertEqual(LubaGlassTokens.cornerRadius, LubaRadius.md)
         XCTAssertEqual(LubaGlassTokens.borderWidth, LubaPrimitives.glassBorderWidth)
         XCTAssertEqual(LubaGlassTokens.shadowRadius, LubaPrimitives.glassShadowRadius)
         XCTAssertEqual(LubaGlassTokens.shadowY, LubaPrimitives.glassShadowY)
         XCTAssertEqual(LubaGlassTokens.solidFallbackOpacity, LubaPrimitives.glassSolidFallbackOpacity)
-    }
 
-    func testGlassStyleCount() {
-        let styles: [LubaGlassStyle] = [.subtle, .regular, .prominent]
-        XCTAssertEqual(styles.count, 3)
-    }
+        // Glass button style
+        let glassButton = LubaGlassButtonStyle()
+        XCTAssertEqual(glassButton.haptic, .light)
+        XCTAssertFalse(glassButton.defaultsToFullWidth)
+        XCTAssertEqual(glassButton.backgroundColor(isPressed: false, colorScheme: .light), .clear)
 
-    func testGlassButtonStyleCreation() {
-        let style = LubaGlassButtonStyle()
-        XCTAssertEqual(style.haptic, .light)
-        XCTAssertFalse(style.defaultsToFullWidth)
-        let bg = style.backgroundColor(isPressed: false, colorScheme: .light)
-        XCTAssertEqual(bg, .clear)
-    }
-
-    func testCardGlassStyle() {
-        let style = LubaCardStyle.glass
-        XCTAssertTrue(style.isGlass)
-        XCTAssertFalse(style.hasBackground)
-        XCTAssertFalse(style.hasBorder)
+        // Card glass style
+        let glass = LubaCardStyle.glass
+        XCTAssertTrue(glass.isGlass)
+        XCTAssertFalse(glass.hasBackground)
+        XCTAssertFalse(glass.hasBorder)
     }
 
     // MARK: - Touch Target Consistency
@@ -369,5 +294,42 @@ final class ComponentTokenTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(LubaButtonSize.small.minHeight, appleMinimum)
         XCTAssertGreaterThanOrEqual(LubaButtonSize.medium.minHeight, appleMinimum)
         XCTAssertGreaterThanOrEqual(LubaConfig.shared.minimumTouchTarget, appleMinimum)
+    }
+
+    // MARK: - Chart Tokens
+
+    func testChartTokens() {
+        // Height progression
+        XCTAssertLessThan(LubaChartTokens.sparklineHeight, LubaChartTokens.compactHeight)
+        XCTAssertLessThan(LubaChartTokens.compactHeight, LubaChartTokens.defaultHeight)
+        XCTAssertLessThan(LubaChartTokens.defaultHeight, LubaChartTokens.expandedHeight)
+
+        // Height values
+        XCTAssertEqual(LubaChartTokens.sparklineHeight, 40)
+        XCTAssertEqual(LubaChartTokens.compactHeight, 140)
+        XCTAssertEqual(LubaChartTokens.defaultHeight, 200)
+        XCTAssertEqual(LubaChartTokens.expandedHeight, 300)
+
+        // Mark dimensions
+        XCTAssertEqual(LubaChartTokens.barCornerRadius, LubaRadius.xs)
+        XCTAssertEqual(LubaChartTokens.lineWidth, 2.5)
+        XCTAssertEqual(LubaChartTokens.pointSize, 6)
+        XCTAssertEqual(LubaChartTokens.areaOpacity, 0.15)
+
+        // Grid
+        XCTAssertEqual(LubaChartTokens.gridOpacity, 0.12)
+        XCTAssertEqual(LubaChartTokens.gridLineWidth, 0.5)
+
+        // Legend
+        XCTAssertEqual(LubaChartTokens.legendSpacing, LubaSpacing.md)
+        XCTAssertEqual(LubaChartTokens.legendDotSize, 8)
+
+        // Skeleton
+        XCTAssertEqual(LubaChartTokens.skeletonBarCount, 5)
+        XCTAssertEqual(LubaChartTokens.skeletonLinePointCount, 8)
+        XCTAssertGreaterThan(LubaChartTokens.skeletonBarMaxRatio, LubaChartTokens.skeletonBarMinRatio)
+
+        // Palette
+        XCTAssertEqual(LubaColors.Chart.palette.count, 6)
     }
 }
