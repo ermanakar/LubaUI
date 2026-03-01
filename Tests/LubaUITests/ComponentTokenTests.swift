@@ -331,5 +331,19 @@ final class ComponentTokenTests: XCTestCase {
 
         // Palette
         XCTAssertEqual(LubaColors.Chart.palette.count, 6)
+
+        // New tokens — sparkline, annotations, selection, legend
+        XCTAssertEqual(LubaChartTokens.sparklineLineWidth, 1.5)
+        XCTAssertLessThan(LubaChartTokens.sparklineLineWidth, LubaChartTokens.lineWidth)
+        XCTAssertEqual(LubaChartTokens.sectorAngularInset, 1.5)
+        XCTAssertEqual(LubaChartTokens.annotationOffset, -8)
+        XCTAssertEqual(LubaChartTokens.selectionLineWidth, 1)
+        XCTAssertEqual(LubaChartTokens.selectionDashPattern, [5, 3])
+        XCTAssertEqual(LubaChartTokens.legendRowSpacing, LubaSpacing.xs)
+
+        // Sparkline trend
+        XCTAssertEqual(LubaSparklineTrend.up.iconName, "arrow.up.right")
+        XCTAssertEqual(LubaSparklineTrend.down.iconName, "arrow.down.right")
+        XCTAssertEqual(LubaSparklineTrend.flat.iconName, "arrow.right")
     }
 }

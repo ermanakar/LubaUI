@@ -38,11 +38,30 @@ public enum LubaChartTokens {
     /// Line stroke width — 2.5pt provides clear visibility without heaviness
     public static let lineWidth: CGFloat = 2.5
 
+    /// Sparkline stroke width — 1.5pt, thinner than standard line for inline use
+    public static let sparklineLineWidth: CGFloat = 1.5
+
     /// Point marker diameter — 6pt is visible without obscuring data
     public static let pointSize: CGFloat = 6
 
     /// Area fill opacity — 15% provides subtle fill without obscuring grid
     public static let areaOpacity: Double = 0.15
+
+    /// Pie/donut sector angular inset — 1.5pt gap between slices
+    public static let sectorAngularInset: CGFloat = 1.5
+
+    // MARK: - Annotations
+
+    /// Vertical offset for value annotation labels above marks — negative moves up
+    public static let annotationOffset: CGFloat = -8
+
+    // MARK: - Selection
+
+    /// Rule mark line width for selection indicators
+    public static let selectionLineWidth: CGFloat = 1
+
+    /// Selection rule mark dash pattern
+    public static let selectionDashPattern: [CGFloat] = [5, 3]
 
     // MARK: - Spacing
 
@@ -54,6 +73,9 @@ public enum LubaChartTokens {
 
     /// Legend dot size
     public static let legendDotSize: CGFloat = 8
+
+    /// Vertical spacing between legend rows when using vertical layout
+    public static let legendRowSpacing: CGFloat = LubaSpacing.xs
 
     // MARK: - Grid & Axes
 

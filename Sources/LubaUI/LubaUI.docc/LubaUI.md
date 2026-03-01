@@ -91,6 +91,7 @@ LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 - ``LubaLineChart``
 - ``LubaMultiLineChart``
 - ``LubaSparkline``
+- ``LubaSparklineTrend``
 - ``LubaChartSkeleton``
 - ``LubaChartEmptyState``
 - ``LubaChartLegend``

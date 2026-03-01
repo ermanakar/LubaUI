@@ -341,5 +341,121 @@
     "example": "LubaLink(\"Learn more\", style: .external) { openDocs() }",
     "tokens": ["LubaColors.accent"],
     "notes": "Default uses accent color with underline. External appends arrow icon."
+  },
+  {
+    "name": "LubaBarChart",
+    "description": "A bar chart styled with LubaUI tokens. Supports vertical/horizontal orientation, value annotations, interactive selection highlighting, and custom colors.",
+    "parameters": [
+      { "name": "data", "type": "[D: LubaChartData]", "required": true, "description": "Array of data conforming to LubaChartData protocol" },
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Chart height (200pt default, 140 compact, 300 expanded)" },
+      { "name": "showAxes", "type": "Bool", "default": "true", "description": "Show axis labels and grid" },
+      { "name": "horizontal", "type": "Bool", "default": "false", "description": "Render as horizontal bar chart" },
+      { "name": "showAnnotations", "type": "Bool", "default": "false", "description": "Show value labels above each bar" },
+      { "name": "color", "type": "Color", "default": "LubaColors.accent", "description": "Bar fill color" }
+    ],
+    "example": "LubaBarChart(data: sales, showAnnotations: true)",
+    "tokens": ["LubaChartTokens", "LubaColors.Chart"],
+    "notes": "Conform your model to LubaChartData (requires `label: String` and `value: Double`). Drag to highlight bars interactively. Shows LubaChartEmptyState when data is empty."
+  },
+  {
+    "name": "LubaGroupedBarChart",
+    "description": "A grouped bar chart for multi-series data, styled with LubaUI tokens. Series are color-coded using the Chart palette.",
+    "parameters": [
+      { "name": "data", "type": "[D: LubaSeriesChartData]", "required": true, "description": "Array of data conforming to LubaSeriesChartData" },
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Chart height" },
+      { "name": "showAxes", "type": "Bool", "default": "true", "description": "Show axis labels" },
+      { "name": "showAnnotations", "type": "Bool", "default": "false", "description": "Show value labels above bars" }
+    ],
+    "example": "LubaGroupedBarChart(data: departmentData)",
+    "tokens": ["LubaChartTokens", "LubaColors.Chart.palette"],
+    "notes": "Conform your model to LubaSeriesChartData (adds `series: String` to LubaChartData). Colors auto-assigned from the 6-color LubaColors.Chart.palette."
+  },
+  {
+    "name": "LubaLineChart",
+    "description": "A line chart with optional area fill, point markers, interactive selection with value callout, and custom color.",
+    "parameters": [
+      { "name": "data", "type": "[D: LubaChartData]", "required": true, "description": "Array of data conforming to LubaChartData" },
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Chart height" },
+      { "name": "showAxes", "type": "Bool", "default": "true", "description": "Show axis labels" },
+      { "name": "showArea", "type": "Bool", "default": "false", "description": "Fill area under the line with gradient" },
+      { "name": "showPoints", "type": "Bool", "default": "false", "description": "Show point markers on data points" },
+      { "name": "color", "type": "Color", "default": "LubaColors.accent", "description": "Line and area color" }
+    ],
+    "example": "LubaLineChart(data: trend, showArea: true, showPoints: true)",
+    "tokens": ["LubaChartTokens", "LubaColors.Chart"],
+    "notes": "Drag to show a dashed rule mark with value callout. Uses catmullRom interpolation for smooth curves. Point markers enlarge on selection."
+  },
+  {
+    "name": "LubaMultiLineChart",
+    "description": "A multi-series line chart with optional area fill and point markers. Series color-coded from the Chart palette.",
+    "parameters": [
+      { "name": "data", "type": "[D: LubaSeriesChartData]", "required": true, "description": "Array of data conforming to LubaSeriesChartData" },
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Chart height" },
+      { "name": "showAxes", "type": "Bool", "default": "true", "description": "Show axis labels" },
+      { "name": "showArea", "type": "Bool", "default": "false", "description": "Fill area under lines" },
+      { "name": "showPoints", "type": "Bool", "default": "false", "description": "Show point markers on data points" }
+    ],
+    "example": "LubaMultiLineChart(data: platformData, showArea: true, showPoints: true)",
+    "tokens": ["LubaChartTokens", "LubaColors.Chart.palette"],
+    "notes": "Series colors come from LubaColors.Chart.palette (6-color adaptive palette). Requires LubaSeriesChartData conformance."
+  },
+  {
+    "name": "LubaPieChart",
+    "description": "A pie or donut chart styled with LubaUI tokens. Requires iOS 17+ / macOS 14+ (uses SectorMark). Supports center label for donut charts.",
+    "parameters": [
+      { "name": "data", "type": "[D: LubaChartData]", "required": true, "description": "Array of data conforming to LubaChartData" },
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Chart height" },
+      { "name": "innerRadius", "type": "MarkDimension", "default": ".ratio(0)", "description": "Inner radius — .ratio(0) for full pie, .ratio(0.55) for donut" },
+      { "name": "centerLabel", "type": "String?", "default": "nil", "description": "Optional text displayed in donut center" }
+    ],
+    "example": "LubaPieChart(data: segments, innerRadius: .ratio(0.55), centerLabel: \"Total\")",
+    "tokens": ["LubaChartTokens", "LubaColors.Chart.palette"],
+    "notes": "iOS 17+ only. Colors from LubaColors.Chart.palette. Sector gaps use LubaChartTokens.sectorAngularInset."
+  },
+  {
+    "name": "LubaSparkline",
+    "description": "A minimal inline chart for dashboard-style layouts. No axes, no labels — just a clean trend line with optional area fill. Includes a `trend` property for detecting direction.",
+    "parameters": [
+      { "name": "values", "type": "[Double]", "required": true, "description": "Array of numeric values to plot" },
+      { "name": "showArea", "type": "Bool", "default": "true", "description": "Fill area under the line" },
+      { "name": "color", "type": "Color", "default": "LubaColors.accent", "description": "Line color" }
+    ],
+    "example": "LubaSparkline(values: [4, 7, 5, 9, 6, 8, 12])\n    .frame(width: 80, height: 40)",
+    "tokens": ["LubaChartTokens.sparklineHeight", "LubaChartTokens.sparklineLineWidth"],
+    "notes": "Access `.trend` property to get LubaSparklineTrend (.up/.down/.flat) with `.iconName` (SF Symbol) and `.color` (semantic green/red/gray)."
+  },
+  {
+    "name": "LubaChartSkeleton",
+    "description": "An animated loading placeholder for charts. Shows pulsing bars or a wavy line.",
+    "parameters": [
+      { "name": "style", "type": "LubaChartSkeleton.Style", "default": ".bar", "options": [".bar", ".line"], "description": "Bar or line skeleton visual style" },
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Height of the placeholder" }
+    ],
+    "example": "LubaChartSkeleton(style: .bar, height: LubaChartTokens.compactHeight)",
+    "tokens": ["LubaChartTokens"],
+    "notes": "Respects LubaConfig.animationsEnabled. Uses deterministic pseudo-random heights for consistent appearance."
+  },
+  {
+    "name": "LubaChartEmptyState",
+    "description": "Placeholder shown when chart data is empty. Customizable message and icon.",
+    "parameters": [
+      { "name": "height", "type": "CGFloat", "default": "LubaChartTokens.defaultHeight", "description": "Height of the placeholder" },
+      { "name": "message", "type": "String", "default": "\"No data\"", "description": "Description text" },
+      { "name": "icon", "type": "String", "default": "\"chart.bar\"", "description": "SF Symbol name" }
+    ],
+    "example": "LubaChartEmptyState(message: \"No sales this week\", icon: \"chart.line.downtrend.xyaxis\")",
+    "tokens": ["LubaChartTokens", "LubaColors"],
+    "notes": "Automatically shown by all chart components when data array is empty."
+  },
+  {
+    "name": "LubaChartLegend",
+    "description": "A custom legend for use alongside charts. Supports horizontal and vertical layouts.",
+    "parameters": [
+      { "name": "items", "type": "[(label: String, color: Color)]", "required": true, "description": "Array of label/color pairs" },
+      { "name": "layout", "type": "LubaChartLegend.Layout", "default": ".horizontal", "options": [".horizontal", ".vertical"], "description": "Legend layout direction" }
+    ],
+    "example": "LubaChartLegend(items: [\n    (\"Sales\", LubaColors.Chart.palette[0]),\n    (\"Marketing\", LubaColors.Chart.palette[1]),\n], layout: .vertical)",
+    "tokens": ["LubaChartTokens.legendSpacing", "LubaChartTokens.legendDotSize"],
+    "notes": "Use alongside charts that don't have a built-in legend. Vertical layout useful for many categories."
   }
 ]

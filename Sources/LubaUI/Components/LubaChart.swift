@@ -33,6 +33,9 @@ public protocol LubaSeriesChartData: LubaChartData {
 
 /// A bar chart styled with LubaUI tokens.
 ///
+/// Supports vertical/horizontal orientation, value annotations,
+/// interactive selection with a rule mark, and custom colors.
+///
 /// ```swift
 /// struct Revenue: LubaChartData {
 ///     let id = UUID()
@@ -44,15 +47,19 @@ public protocol LubaSeriesChartData: LubaChartData {
 ///     Revenue(label: "Jan", value: 120),
 ///     Revenue(label: "Feb", value: 180),
 ///     Revenue(label: "Mar", value: 150),
-/// ])
+/// ], showAnnotations: true)
 /// ```
 public struct LubaBarChart<D: LubaChartData>: View {
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
     private let horizontal: Bool
+    private let showAnnotations: Bool
+    private let color: Color
 
     @Environment(\.lubaConfig) private var config
+    @State private var selectedLabel: String?
+    @State private var animatedData: [D] = []
 
     /// Create a bar chart.
     /// - Parameters:
@@ -60,16 +67,22 @@ public struct LubaBarChart<D: LubaChartData>: View {
     ///   - height: Chart height. Defaults to ``LubaChartTokens/defaultHeight``.
     ///   - showAxes: Show axis labels. Defaults to `true`.
     ///   - horizontal: Horizontal bars. Defaults to `false`.
+    ///   - showAnnotations: Show value labels above bars. Defaults to `false`.
+    ///   - color: Bar fill color. Defaults to ``LubaColors/accent``.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
         showAxes: Bool = true,
-        horizontal: Bool = false
+        horizontal: Bool = false,
+        showAnnotations: Bool = false,
+        color: Color = LubaColors.accent
     ) {
         self.data = data
         self.height = height
         self.showAxes = showAxes
         self.horizontal = horizontal
+        self.showAnnotations = showAnnotations
+        self.color = color
     }
 
     public var body: some View {
@@ -77,28 +90,84 @@ public struct LubaBarChart<D: LubaChartData>: View {
             LubaChartEmptyState(height: height)
         } else {
             chartContent
+                .onAppear {
+                    guard animatedData.isEmpty else { return }
+                    if config.animationsEnabled {
+                        withAnimation(.easeOut(duration: LubaChartTokens.revealDuration)) {
+                            animatedData = data
+                        }
+                    } else {
+                        animatedData = data
+                    }
+                }
+                .onChange(of: data.map(\.label)) { _ in
+                    animatedData = data
+                }
         }
     }
 
     private var chartContent: some View {
-        Chart(data) { item in
+        Chart(animatedData.isEmpty ? data : animatedData) { item in
             if horizontal {
                 BarMark(
                     x: .value("Value", item.value),
                     y: .value("Category", item.label)
                 )
-                .foregroundStyle(LubaColors.accent)
+                .foregroundStyle(barColor(for: item))
                 .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous))
             } else {
                 BarMark(
                     x: .value("Category", item.label),
                     y: .value("Value", item.value)
                 )
-                .foregroundStyle(LubaColors.accent)
+                .foregroundStyle(barColor(for: item))
                 .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous))
+                .annotation(position: .top) {
+                    if showAnnotations {
+                        Text(formattedValue(item.value))
+                            .font(LubaTypography.caption2)
+                            .foregroundStyle(LubaColors.textSecondary)
+                            .offset(y: LubaChartTokens.annotationOffset)
+                    }
+                }
+            }
+        }
+        .chartOverlay { proxy in
+            if !horizontal {
+                GeometryReader { geometry in
+                    Rectangle()
+                        .fill(.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let x = value.location.x - geometry[proxy.plotAreaFrame].origin.x
+                                    if let label: String = proxy.value(atX: x) {
+                                        selectedLabel = label
+                                    }
+                                }
+                                .onEnded { _ in
+                                    selectedLabel = nil
+                                }
+                        )
+                }
             }
         }
         .lubaChartStyle(height: height, showAxes: showAxes)
+    }
+
+    private func barColor(for item: D) -> Color {
+        if let selected = selectedLabel {
+            return item.label == selected ? color : color.opacity(0.3)
+        }
+        return color
+    }
+
+    private func formattedValue(_ value: Double) -> String {
+        if value == value.rounded() {
+            return String(format: "%.0f", value)
+        }
+        return String(format: "%.1f", value)
     }
 }
 
@@ -120,6 +189,7 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
+    private let showAnnotations: Bool
 
     @Environment(\.lubaConfig) private var config
 
@@ -128,14 +198,17 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
     ///   - data: Array of data conforming to ``LubaSeriesChartData``.
     ///   - height: Chart height.
     ///   - showAxes: Show axis labels.
+    ///   - showAnnotations: Show value labels above bars. Defaults to `false`.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
-        showAxes: Bool = true
+        showAxes: Bool = true,
+        showAnnotations: Bool = false
     ) {
         self.data = data
         self.height = height
         self.showAxes = showAxes
+        self.showAnnotations = showAnnotations
     }
 
     public var body: some View {
@@ -149,6 +222,14 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
                 )
                 .foregroundStyle(by: .value("Series", item.series))
                 .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous))
+                .annotation(position: .top) {
+                    if showAnnotations {
+                        Text(formattedValue(item.value))
+                            .font(LubaTypography.caption2)
+                            .foregroundStyle(LubaColors.textTertiary)
+                            .offset(y: LubaChartTokens.annotationOffset)
+                    }
+                }
             }
             .chartForegroundStyleScale(range: chartColorRange)
             .lubaChartStyle(height: height, showAxes: showAxes)
@@ -159,11 +240,21 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
         let seriesCount = Set(data.map(\.series)).count
         return Array(LubaColors.Chart.palette.prefix(max(seriesCount, 1)))
     }
+
+    private func formattedValue(_ value: Double) -> String {
+        if value == value.rounded() {
+            return String(format: "%.0f", value)
+        }
+        return String(format: "%.1f", value)
+    }
 }
 
 // MARK: - LubaLineChart
 
 /// A line chart styled with LubaUI tokens.
+///
+/// Supports area fill, point markers, interactive selection with
+/// a vertical rule mark, and custom line color.
 ///
 /// ```swift
 /// struct Point: LubaChartData {
@@ -172,7 +263,7 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
 ///     let value: Double
 /// }
 ///
-/// LubaLineChart(data: points, showArea: true)
+/// LubaLineChart(data: points, showArea: true, showPoints: true)
 /// ```
 public struct LubaLineChart<D: LubaChartData>: View {
     private let data: [D]
@@ -180,8 +271,10 @@ public struct LubaLineChart<D: LubaChartData>: View {
     private let showAxes: Bool
     private let showArea: Bool
     private let showPoints: Bool
+    private let color: Color
 
     @Environment(\.lubaConfig) private var config
+    @State private var selectedLabel: String?
 
     /// Create a line chart.
     /// - Parameters:
@@ -190,18 +283,21 @@ public struct LubaLineChart<D: LubaChartData>: View {
     ///   - showAxes: Show axis labels.
     ///   - showArea: Fill area under the line.
     ///   - showPoints: Show point markers on data points.
+    ///   - color: Line and area color. Defaults to ``LubaColors/accent``.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
         showAxes: Bool = true,
         showArea: Bool = false,
-        showPoints: Bool = false
+        showPoints: Bool = false,
+        color: Color = LubaColors.accent
     ) {
         self.data = data
         self.height = height
         self.showAxes = showAxes
         self.showArea = showArea
         self.showPoints = showPoints
+        self.color = color
     }
 
     public var body: some View {
@@ -218,7 +314,7 @@ public struct LubaLineChart<D: LubaChartData>: View {
                 x: .value("Category", item.label),
                 y: .value("Value", item.value)
             )
-            .foregroundStyle(LubaColors.accent)
+            .foregroundStyle(color)
             .lineStyle(StrokeStyle(lineWidth: LubaChartTokens.lineWidth, lineCap: .round, lineJoin: .round))
             .interpolationMethod(.catmullRom)
 
@@ -230,8 +326,8 @@ public struct LubaLineChart<D: LubaChartData>: View {
                 .foregroundStyle(
                     LinearGradient(
                         colors: [
-                            LubaColors.accent.opacity(LubaChartTokens.areaOpacity),
-                            LubaColors.accent.opacity(0.02)
+                            color.opacity(LubaChartTokens.areaOpacity),
+                            color.opacity(0.02)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
@@ -245,11 +341,59 @@ public struct LubaLineChart<D: LubaChartData>: View {
                     x: .value("Category", item.label),
                     y: .value("Value", item.value)
                 )
-                .foregroundStyle(LubaColors.accent)
-                .symbolSize(LubaChartTokens.pointSize * LubaChartTokens.pointSize)
+                .foregroundStyle(selectedLabel == item.label ? color : color.opacity(showPoints ? 1 : 0))
+                .symbolSize(selectedLabel == item.label
+                    ? LubaChartTokens.pointSize * LubaChartTokens.pointSize * 2
+                    : LubaChartTokens.pointSize * LubaChartTokens.pointSize)
+            }
+
+            // Selection rule mark
+            if let selected = selectedLabel, selected == item.label {
+                RuleMark(x: .value("Selected", item.label))
+                    .foregroundStyle(LubaColors.textTertiary)
+                    .lineStyle(StrokeStyle(
+                        lineWidth: LubaChartTokens.selectionLineWidth,
+                        dash: LubaChartTokens.selectionDashPattern
+                    ))
+                    .annotation(position: .top, alignment: .center) {
+                        Text(formattedValue(item.value))
+                            .font(LubaTypography.caption2.weight(.medium))
+                            .foregroundStyle(LubaColors.textPrimary)
+                            .padding(.horizontal, LubaSpacing.xs)
+                            .padding(.vertical, LubaSpacing.xxs)
+                            .background(LubaColors.surface)
+                            .lubaCornerRadius(LubaRadius.xs)
+                            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                    }
+            }
+        }
+        .chartOverlay { proxy in
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(.clear)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let x = value.location.x - geometry[proxy.plotAreaFrame].origin.x
+                                if let label: String = proxy.value(atX: x) {
+                                    selectedLabel = label
+                                }
+                            }
+                            .onEnded { _ in
+                                selectedLabel = nil
+                            }
+                    )
             }
         }
         .lubaChartStyle(height: height, showAxes: showAxes)
+    }
+
+    private func formattedValue(_ value: Double) -> String {
+        if value == value.rounded() {
+            return String(format: "%.0f", value)
+        }
+        return String(format: "%.1f", value)
     }
 }
 
@@ -258,13 +402,14 @@ public struct LubaLineChart<D: LubaChartData>: View {
 /// A multi-series line chart.
 ///
 /// ```swift
-/// LubaMultiLineChart(data: seriesData, showArea: true)
+/// LubaMultiLineChart(data: seriesData, showArea: true, showPoints: true)
 /// ```
 public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
     private let showArea: Bool
+    private let showPoints: Bool
 
     @Environment(\.lubaConfig) private var config
 
@@ -274,16 +419,19 @@ public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
     ///   - height: Chart height.
     ///   - showAxes: Show axis labels.
     ///   - showArea: Fill area under lines.
+    ///   - showPoints: Show point markers on data points. Defaults to `false`.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
         showAxes: Bool = true,
-        showArea: Bool = false
+        showArea: Bool = false,
+        showPoints: Bool = false
     ) {
         self.data = data
         self.height = height
         self.showAxes = showAxes
         self.showArea = showArea
+        self.showPoints = showPoints
     }
 
     public var body: some View {
@@ -309,6 +457,15 @@ public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
                     .interpolationMethod(.catmullRom)
                     .opacity(LubaChartTokens.areaOpacity)
                 }
+
+                if showPoints {
+                    PointMark(
+                        x: .value("Category", item.label),
+                        y: .value("Value", item.value)
+                    )
+                    .foregroundStyle(by: .value("Series", item.series))
+                    .symbolSize(LubaChartTokens.pointSize * LubaChartTokens.pointSize)
+                }
             }
             .chartForegroundStyleScale(range: chartColorRange)
             .lubaChartStyle(height: height, showAxes: showAxes)
@@ -326,15 +483,18 @@ public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
 /// A pie or donut chart styled with LubaUI tokens.
 ///
 /// Requires iOS 17+ / macOS 14+ (uses `SectorMark`).
+/// Supports an optional center label for donut charts.
 ///
 /// ```swift
-/// LubaPieChart(data: segments, innerRadius: .ratio(0.5))
+/// LubaPieChart(data: segments, innerRadius: .ratio(0.55))
+/// LubaPieChart(data: segments, innerRadius: .ratio(0.55), centerLabel: "Total")
 /// ```
 @available(iOS 17, macOS 14, watchOS 10, tvOS 17, *)
 public struct LubaPieChart<D: LubaChartData>: View {
     private let data: [D]
     private let height: CGFloat
     private let innerRadius: MarkDimension
+    private let centerLabel: String?
 
     @Environment(\.lubaConfig) private var config
 
@@ -343,25 +503,34 @@ public struct LubaPieChart<D: LubaChartData>: View {
     ///   - data: Array of data conforming to ``LubaChartData``.
     ///   - height: Chart height.
     ///   - innerRadius: Inner radius for donut style. Use `.ratio(0)` for a full pie.
+    ///   - centerLabel: Optional text displayed in the center of donut charts.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
-        innerRadius: MarkDimension = .ratio(0)
+        innerRadius: MarkDimension = .ratio(0),
+        centerLabel: String? = nil
     ) {
         self.data = data
         self.height = height
         self.innerRadius = innerRadius
+        self.centerLabel = centerLabel
     }
 
     public var body: some View {
         if data.isEmpty {
             LubaChartEmptyState(height: height)
         } else {
+            chartBody
+        }
+    }
+
+    private var chartBody: some View {
+        ZStack {
             Chart(data) { item in
                 SectorMark(
                     angle: .value("Value", item.value),
                     innerRadius: innerRadius,
-                    angularInset: 1.5
+                    angularInset: LubaChartTokens.sectorAngularInset
                 )
                 .foregroundStyle(by: .value("Category", item.label))
                 .cornerRadius(LubaChartTokens.barCornerRadius)
@@ -369,7 +538,26 @@ public struct LubaPieChart<D: LubaChartData>: View {
             .chartForegroundStyleScale(range: chartColorRange)
             .frame(height: height)
             .chartLegend(position: .bottom, spacing: LubaChartTokens.legendSpacing)
+
+            if let centerLabel {
+                VStack(spacing: LubaSpacing.xxs) {
+                    Text(centerLabel)
+                        .font(LubaTypography.caption)
+                        .foregroundStyle(LubaColors.textTertiary)
+                    Text(formattedTotal)
+                        .font(LubaTypography.title3.weight(.semibold))
+                        .foregroundStyle(LubaColors.textPrimary)
+                }
+            }
         }
+    }
+
+    private var formattedTotal: String {
+        let total = data.reduce(0) { $0 + $1.value }
+        if total == total.rounded() {
+            return String(format: "%.0f", total)
+        }
+        return String(format: "%.1f", total)
     }
 
     private var chartColorRange: [Color] {
@@ -383,6 +571,7 @@ public struct LubaPieChart<D: LubaChartData>: View {
 /// A minimal inline chart for dashboard-style layouts.
 ///
 /// No axes, no labels — just a clean trend line with optional area fill.
+/// Includes a computed ``trend`` property for detecting direction.
 ///
 /// ```swift
 /// HStack {
@@ -412,6 +601,14 @@ public struct LubaSparkline: View {
         self.color = color
     }
 
+    /// The trend direction based on the first and last values.
+    public var trend: LubaSparklineTrend {
+        guard let first = values.first, let last = values.last else { return .flat }
+        if last > first { return .up }
+        if last < first { return .down }
+        return .flat
+    }
+
     public var body: some View {
         if values.isEmpty {
             Color.clear.frame(height: LubaChartTokens.sparklineHeight)
@@ -423,7 +620,7 @@ public struct LubaSparkline: View {
                         y: .value("Value", value)
                     )
                     .foregroundStyle(color)
-                    .lineStyle(StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+                    .lineStyle(StrokeStyle(lineWidth: LubaChartTokens.sparklineLineWidth, lineCap: .round, lineJoin: .round))
                     .interpolationMethod(.catmullRom)
 
                     if showArea {
@@ -446,6 +643,34 @@ public struct LubaSparkline: View {
             .chartYAxis(.hidden)
             .chartLegend(.hidden)
             .frame(height: LubaChartTokens.sparklineHeight)
+        }
+    }
+}
+
+/// Trend direction for a sparkline.
+public enum LubaSparklineTrend {
+    /// Values are increasing overall
+    case up
+    /// Values are decreasing overall
+    case down
+    /// Values are flat or unchanged
+    case flat
+
+    /// SF Symbol name for the trend direction.
+    public var iconName: String {
+        switch self {
+        case .up: return "arrow.up.right"
+        case .down: return "arrow.down.right"
+        case .flat: return "arrow.right"
+        }
+    }
+
+    /// Semantic color for the trend direction.
+    public var color: Color {
+        switch self {
+        case .up: return LubaColors.success
+        case .down: return LubaColors.error
+        case .flat: return LubaColors.textTertiary
         }
     }
 }
@@ -549,20 +774,40 @@ public struct LubaChartSkeleton: View {
 // MARK: - LubaChartEmptyState
 
 /// Placeholder shown when chart data is empty.
+///
+/// Customizable message and icon for contextual empty states.
+///
+/// ```swift
+/// LubaChartEmptyState()
+/// LubaChartEmptyState(message: "No sales this week", icon: "chart.line.downtrend.xyaxis")
+/// ```
 public struct LubaChartEmptyState: View {
     private let height: CGFloat
+    private let message: String
+    private let icon: String
 
-    public init(height: CGFloat = LubaChartTokens.defaultHeight) {
+    /// Create a chart empty state.
+    /// - Parameters:
+    ///   - height: Height of the placeholder.
+    ///   - message: Description text. Defaults to `"No data"`.
+    ///   - icon: SF Symbol name. Defaults to `"chart.bar"`.
+    public init(
+        height: CGFloat = LubaChartTokens.defaultHeight,
+        message: String = "No data",
+        icon: String = "chart.bar"
+    ) {
         self.height = height
+        self.message = message
+        self.icon = icon
     }
 
     public var body: some View {
         VStack(spacing: LubaSpacing.sm) {
-            Image(systemName: "chart.bar")
+            Image(systemName: icon)
                 .font(LubaTypography.title)
                 .foregroundStyle(LubaColors.textDisabled)
 
-            Text("No data")
+            Text(message)
                 .font(LubaTypography.caption)
                 .foregroundStyle(LubaColors.textTertiary)
         }
@@ -575,33 +820,64 @@ public struct LubaChartEmptyState: View {
 
 // MARK: - Chart Legend Helper
 
-/// A simple custom legend row for use alongside charts.
+/// A custom legend for use alongside charts.
+///
+/// Supports horizontal (default) and vertical layouts.
 ///
 /// ```swift
 /// LubaChartLegend(items: [
 ///     ("Sales", LubaColors.Chart.palette[0]),
 ///     ("Marketing", LubaColors.Chart.palette[1]),
 /// ])
+///
+/// LubaChartLegend(items: [...], layout: .vertical)
 /// ```
 public struct LubaChartLegend: View {
-    private let items: [(label: String, color: Color)]
 
-    public init(items: [(label: String, color: Color)]) {
+    /// Legend layout direction.
+    public enum Layout {
+        /// Items arranged horizontally (default)
+        case horizontal
+        /// Items arranged vertically
+        case vertical
+    }
+
+    private let items: [(label: String, color: Color)]
+    private let layout: Layout
+
+    /// Create a chart legend.
+    /// - Parameters:
+    ///   - items: Array of label/color pairs.
+    ///   - layout: Horizontal or vertical arrangement. Defaults to `.horizontal`.
+    public init(items: [(label: String, color: Color)], layout: Layout = .horizontal) {
         self.items = items
+        self.layout = layout
     }
 
     public var body: some View {
-        HStack(spacing: LubaChartTokens.legendSpacing) {
-            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
-                HStack(spacing: LubaSpacing.xs) {
-                    Circle()
-                        .fill(item.color)
-                        .frame(width: LubaChartTokens.legendDotSize, height: LubaChartTokens.legendDotSize)
+        switch layout {
+        case .horizontal:
+            HStack(spacing: LubaChartTokens.legendSpacing) {
+                legendItems
+            }
+        case .vertical:
+            VStack(alignment: .leading, spacing: LubaChartTokens.legendRowSpacing) {
+                legendItems
+            }
+        }
+    }
 
-                    Text(item.label)
-                        .font(LubaTypography.caption)
-                        .foregroundStyle(LubaColors.textSecondary)
-                }
+    @ViewBuilder
+    private var legendItems: some View {
+        ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+            HStack(spacing: LubaSpacing.xs) {
+                Circle()
+                    .fill(item.color)
+                    .frame(width: LubaChartTokens.legendDotSize, height: LubaChartTokens.legendDotSize)
+
+                Text(item.label)
+                    .font(LubaTypography.caption)
+                    .foregroundStyle(LubaColors.textSecondary)
             }
         }
     }
@@ -623,7 +899,7 @@ public struct LubaChartLegend: View {
             SampleData(label: "Mar", value: 150),
             SampleData(label: "Apr", value: 210),
             SampleData(label: "May", value: 165),
-        ])
+        ], showAnnotations: true)
 
         LubaSparkline(values: [4, 7, 5, 9, 6, 8, 12])
             .frame(width: 120, height: 40)

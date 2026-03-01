@@ -62,7 +62,30 @@ private let multiSeriesData: [DepartmentData] = [
     DepartmentData(label: "Q4", value: 170, series: "Engineering"),
 ]
 
-private let sparklineValues: [Double] = [4, 7, 5, 9, 6, 8, 12, 10, 14, 11]
+private let multiLineData: [DepartmentData] = [
+    DepartmentData(label: "Jan", value: 40, series: "Web"),
+    DepartmentData(label: "Feb", value: 55, series: "Web"),
+    DepartmentData(label: "Mar", value: 48, series: "Web"),
+    DepartmentData(label: "Apr", value: 72, series: "Web"),
+    DepartmentData(label: "May", value: 65, series: "Web"),
+    DepartmentData(label: "Jun", value: 80, series: "Web"),
+    DepartmentData(label: "Jan", value: 25, series: "Mobile"),
+    DepartmentData(label: "Feb", value: 35, series: "Mobile"),
+    DepartmentData(label: "Mar", value: 50, series: "Mobile"),
+    DepartmentData(label: "Apr", value: 45, series: "Mobile"),
+    DepartmentData(label: "May", value: 60, series: "Mobile"),
+    DepartmentData(label: "Jun", value: 75, series: "Mobile"),
+    DepartmentData(label: "Jan", value: 10, series: "Desktop"),
+    DepartmentData(label: "Feb", value: 15, series: "Desktop"),
+    DepartmentData(label: "Mar", value: 12, series: "Desktop"),
+    DepartmentData(label: "Apr", value: 18, series: "Desktop"),
+    DepartmentData(label: "May", value: 22, series: "Desktop"),
+    DepartmentData(label: "Jun", value: 20, series: "Desktop"),
+]
+
+private let sparklineRevenue: [Double] = [4, 7, 5, 9, 6, 8, 12, 10, 14, 11]
+private let sparklineUsers: [Double] = [3, 5, 4, 8, 6, 7, 9, 11, 13, 15]
+private let sparklineOrders: [Double] = [8, 6, 7, 4, 5, 3, 2, 4, 3, 2]
 
 // MARK: - Screen
 
@@ -71,10 +94,10 @@ struct ChartsScreen: View {
         ShowcaseScreen("Charts") {
             ShowcaseHeader(
                 title: "Charts",
-                description: "Data visualization with bar, line, pie, and sparkline charts — all styled with LubaUI tokens."
+                description: "Data visualization with bar, line, pie, and sparkline charts. Touch any chart to interact — bar charts highlight on tap, line charts show a value callout."
             )
 
-            // Bar Chart
+            // Bar Chart with Annotations
             DemoSection(title: "Bar Chart") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     VStack(alignment: .leading, spacing: LubaSpacing.sm) {
@@ -82,7 +105,14 @@ struct ChartsScreen: View {
                             .font(LubaTypography.subheadline)
                             .foregroundStyle(LubaColors.textPrimary)
 
-                        LubaBarChart(data: monthlySales)
+                        Text("Tap and drag to highlight")
+                            .font(LubaTypography.caption)
+                            .foregroundStyle(LubaColors.textTertiary)
+
+                        LubaBarChart(
+                            data: monthlySales,
+                            showAnnotations: true
+                        )
                     }
                 }
             }
@@ -104,6 +134,23 @@ struct ChartsScreen: View {
                 }
             }
 
+            // Custom Color Bar Chart
+            DemoSection(title: "Custom Colors") {
+                LubaCard(elevation: .flat, style: .outlined) {
+                    VStack(alignment: .leading, spacing: LubaSpacing.sm) {
+                        Text("Slate Blue Bars")
+                            .font(LubaTypography.subheadline)
+                            .foregroundStyle(LubaColors.textPrimary)
+
+                        LubaBarChart(
+                            data: weeklyTrend,
+                            height: LubaChartTokens.compactHeight,
+                            color: LubaColors.Chart.palette[1]
+                        )
+                    }
+                }
+            }
+
             // Grouped Bar Chart
             DemoSection(title: "Grouped Bar Chart") {
                 LubaCard(elevation: .flat, style: .outlined) {
@@ -117,7 +164,7 @@ struct ChartsScreen: View {
                 }
             }
 
-            // Line Chart
+            // Interactive Line Chart
             DemoSection(title: "Line Chart") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     VStack(alignment: .leading, spacing: LubaSpacing.sm) {
@@ -125,7 +172,14 @@ struct ChartsScreen: View {
                             .font(LubaTypography.subheadline)
                             .foregroundStyle(LubaColors.textPrimary)
 
-                        LubaLineChart(data: weeklyTrend, showPoints: true)
+                        Text("Drag to see values")
+                            .font(LubaTypography.caption)
+                            .foregroundStyle(LubaColors.textTertiary)
+
+                        LubaLineChart(
+                            data: weeklyTrend,
+                            showPoints: true
+                        )
                     }
                 }
             }
@@ -147,15 +201,19 @@ struct ChartsScreen: View {
                 }
             }
 
-            // Multi-Line Chart
+            // Multi-Line Chart with Points
             DemoSection(title: "Multi-Line Chart") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     VStack(alignment: .leading, spacing: LubaSpacing.sm) {
-                        Text("Design vs Engineering")
+                        Text("Platform Traffic")
                             .font(LubaTypography.subheadline)
                             .foregroundStyle(LubaColors.textPrimary)
 
-                        LubaMultiLineChart(data: multiSeriesData)
+                        LubaMultiLineChart(
+                            data: multiLineData,
+                            showArea: true,
+                            showPoints: true
+                        )
                     }
                 }
             }
@@ -163,15 +221,60 @@ struct ChartsScreen: View {
             // Pie Chart (iOS 17+)
             piechartSection
 
-            // Sparkline
-            DemoSection(title: "Sparkline") {
+            // Sparkline Dashboard
+            DemoSection(title: "Sparkline Dashboard") {
                 LubaCard(elevation: .flat, style: .outlined) {
                     VStack(spacing: LubaSpacing.md) {
-                        sparklineRow(title: "Revenue", value: "$12.4k", values: sparklineValues, color: LubaColors.Chart.palette[0])
+                        sparklineRow(
+                            title: "Revenue",
+                            value: "$12.4k",
+                            values: sparklineRevenue,
+                            color: LubaColors.Chart.palette[0]
+                        )
                         LubaDivider()
-                        sparklineRow(title: "Users", value: "1,284", values: [3, 5, 4, 8, 6, 7, 9], color: LubaColors.Chart.palette[1])
+                        sparklineRow(
+                            title: "Users",
+                            value: "1,284",
+                            values: sparklineUsers,
+                            color: LubaColors.Chart.palette[1]
+                        )
                         LubaDivider()
-                        sparklineRow(title: "Orders", value: "342", values: [8, 6, 7, 4, 5, 3, 2], color: LubaColors.Chart.palette[2])
+                        sparklineRow(
+                            title: "Orders",
+                            value: "342",
+                            values: sparklineOrders,
+                            color: LubaColors.Chart.palette[2]
+                        )
+                    }
+                }
+            }
+
+            // Height Comparison
+            DemoSection(title: "Height Presets") {
+                LubaCard(elevation: .flat, style: .outlined) {
+                    VStack(alignment: .leading, spacing: LubaSpacing.lg) {
+                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                            Text("Compact (140pt)")
+                                .font(LubaTypography.caption)
+                                .foregroundStyle(LubaColors.textTertiary)
+                            LubaLineChart(
+                                data: weeklyTrend,
+                                height: LubaChartTokens.compactHeight,
+                                showArea: true
+                            )
+                        }
+
+                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                            Text("Expanded (300pt)")
+                                .font(LubaTypography.caption)
+                                .foregroundStyle(LubaColors.textTertiary)
+                            LubaLineChart(
+                                data: monthlySales,
+                                height: LubaChartTokens.expandedHeight,
+                                showArea: true,
+                                showPoints: true
+                            )
+                        }
                     }
                 }
             }
@@ -197,20 +300,49 @@ struct ChartsScreen: View {
                 }
             }
 
-            // Empty State
-            DemoSection(title: "Empty State") {
-                LubaChartEmptyState()
+            // Empty State variations
+            DemoSection(title: "Empty States") {
+                VStack(spacing: LubaSpacing.md) {
+                    LubaChartEmptyState()
+
+                    LubaChartEmptyState(
+                        height: LubaChartTokens.compactHeight,
+                        message: "No sales this week",
+                        icon: "chart.line.downtrend.xyaxis"
+                    )
+                }
             }
 
-            // Legend
-            DemoSection(title: "Custom Legend") {
+            // Legend layouts
+            DemoSection(title: "Legend") {
                 LubaCard(elevation: .flat, style: .outlined) {
-                    LubaChartLegend(items: [
-                        ("Design", LubaColors.Chart.palette[0]),
-                        ("Engineering", LubaColors.Chart.palette[1]),
-                        ("Marketing", LubaColors.Chart.palette[2]),
-                    ])
-                    .frame(maxWidth: .infinity)
+                    VStack(alignment: .leading, spacing: LubaSpacing.lg) {
+                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                            Text("Horizontal")
+                                .font(LubaTypography.caption)
+                                .foregroundStyle(LubaColors.textTertiary)
+
+                            LubaChartLegend(items: [
+                                ("Design", LubaColors.Chart.palette[0]),
+                                ("Engineering", LubaColors.Chart.palette[1]),
+                                ("Marketing", LubaColors.Chart.palette[2]),
+                            ])
+                        }
+
+                        LubaDivider()
+
+                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                            Text("Vertical")
+                                .font(LubaTypography.caption)
+                                .foregroundStyle(LubaColors.textTertiary)
+
+                            LubaChartLegend(items: [
+                                ("Web", LubaColors.Chart.palette[0]),
+                                ("Mobile", LubaColors.Chart.palette[1]),
+                                ("Desktop", LubaColors.Chart.palette[2]),
+                            ], layout: .vertical)
+                        }
+                    }
                 }
             }
 
@@ -218,7 +350,7 @@ struct ChartsScreen: View {
             PhilosophyCard(
                 icon: "chart.xyaxis.line",
                 title: "Token-Driven Visualization",
-                description: "Every chart dimension — bar radius, line width, point size, grid opacity — comes from LubaChartTokens. Colors use the Chart palette for automatic light/dark adaptation."
+                description: "Every chart dimension — bar radius, line width, point size, grid opacity — comes from LubaChartTokens. Interaction patterns (selection rule marks, value callouts) use the same token layer for consistent, system-wide styling."
             )
         }
     }
@@ -242,13 +374,14 @@ struct ChartsScreen: View {
                         LubaDivider()
 
                         VStack(alignment: .leading, spacing: LubaSpacing.sm) {
-                            Text("Donut Chart")
+                            Text("Donut with Center Label")
                                 .font(LubaTypography.subheadline)
                                 .foregroundStyle(LubaColors.textPrimary)
 
                             LubaPieChart(
                                 data: categoryBreakdown,
-                                innerRadius: .ratio(0.55)
+                                innerRadius: .ratio(0.55),
+                                centerLabel: "Total"
                             )
                         }
                     }
@@ -260,19 +393,29 @@ struct ChartsScreen: View {
     // MARK: - Helpers
 
     private func sparklineRow(title: String, value: String, values: [Double], color: Color) -> some View {
-        HStack {
+        let sparkline = LubaSparkline(values: values, color: color)
+        let trend = sparkline.trend
+
+        return HStack {
             VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
                 Text(title)
                     .font(LubaTypography.subheadline)
                     .foregroundStyle(LubaColors.textPrimary)
-                Text(value)
-                    .font(LubaTypography.title3)
-                    .foregroundStyle(LubaColors.textPrimary)
+
+                HStack(spacing: LubaSpacing.xs) {
+                    Text(value)
+                        .font(LubaTypography.title3)
+                        .foregroundStyle(LubaColors.textPrimary)
+
+                    Image(systemName: trend.iconName)
+                        .font(LubaTypography.caption2)
+                        .foregroundStyle(trend.color)
+                }
             }
 
             Spacer()
 
-            LubaSparkline(values: values, color: color)
+            sparkline
                 .frame(width: 100, height: LubaChartTokens.sparklineHeight)
         }
     }
