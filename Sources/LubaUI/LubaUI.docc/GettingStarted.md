@@ -14,7 +14,7 @@ Or add it to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/AkademiaUI/LubaUI.git", from: "0.1.0"),
+    .package(url: "https://github.com/ermanakar/LubaUI", from: "0.1.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: ["LubaUI"]),

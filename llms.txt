@@ -1,7 +1,7 @@
 # LubaUI — AI Agent Reference
 
 > For human documentation, see README.md
-> For Claude Code guidance, see the project's CLAUDE.md (not included in repo)
+> For Claude Code guidance, see the project's CLAUDE.md
 > MCP server: `claude mcp add lubaui -- npx lubaui-mcp` (npm: lubaui-mcp)
 > Website: https://shopofluba.de/lubaui
 > Repository: https://github.com/ermanakar/LubaUI
@@ -106,7 +106,7 @@ Sources/LubaUI/
 
 ### Spacing (LubaSpacing) — 4pt base
 ```swift
-.xs = 4, .sm = 8, .md = 12, .lg = 16, .xl = 24, .xxl = 32, .xxxl = 48, .huge = 64
+.xxs = 2, .xs = 4, .sm = 8, .md = 12, .lg = 16, .xl = 24, .xxl = 32, .xxxl = 48, .huge = 64
 .custom(_ multiplier: Int) -> CGFloat   // multiplier * 4
 .insets(_ spacing: CGFloat) -> EdgeInsets
 ```
@@ -238,21 +238,6 @@ LubaTextField(
 // Convenience initializers
 LubaTextField.email(text: $email)
 LubaTextField.secure("Password", text: $password)
-```
-
-### LubaCard
-```swift
-LubaCard(
-    elevation: LubaCardElevation = .low,  // .flat | .low | .medium | .high
-    style: LubaCardStyle = .filled,       // .filled | .outlined | .ghost
-    cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
-    padding: CGFloat = LubaCardTokens.padding,
-    content: () -> Content
-)
-
-// Make it tappable via composition
-LubaCard { content }
-    .lubaPressable { action() }
 ```
 
 ### LubaTextArea
@@ -560,9 +545,9 @@ LubaUI has an MCP server (`lubaui-mcp` on npm) that makes the design system quer
 claude mcp add lubaui -- npx lubaui-mcp
 ```
 
-**7 tools:** lookup_token, lookup_component, lookup_primitive, validate_spacing, validate_radius, get_color_palette, suggest_tokens
+**10 tools:** lookup_token, lookup_component, lookup_primitive, lookup_components, lookup_tokens, validate_spacing, validate_radius, get_color_palette, suggest_tokens, plan_migration
 
-**3 resources:** lubaui://tokens/all, lubaui://architecture, lubaui://components
+**4 resources:** lubaui://reference/full, lubaui://tokens/all, lubaui://architecture, lubaui://components
 
 ---
 

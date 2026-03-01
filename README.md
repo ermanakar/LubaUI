@@ -238,6 +238,7 @@ All colors are adaptive — they switch automatically between light and dark mod
 
 ### Spacing (4pt base grid)
 ```swift
+LubaSpacing.xxs   // 2pt
 LubaSpacing.xs    // 4pt
 LubaSpacing.sm    // 8pt
 LubaSpacing.md    // 12pt
