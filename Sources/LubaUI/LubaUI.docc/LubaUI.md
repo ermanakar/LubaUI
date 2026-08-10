@@ -14,7 +14,8 @@ The library is built on three core ideas:
 
 - **Named tokens** replace magic numbers. `LubaSpacing.lg` instead of `16`, `LubaRadius.md` instead of `12`.
 - **Composable primitives** extract behaviors into modifiers. Any view can become pressable, expandable, or swipeable — no subclassing required.
-- **Accessible by default.** Every interactive component meets the 44pt touch target minimum, supports Dynamic Type, and integrates with VoiceOver.
+- **Accessible by default.** Every interactive component meets the 44pt touch target minimum, scales with Dynamic Type, honors Reduce Motion through a single shared policy, and speaks the user's language via package-localized strings.
+- **Themeable for real.** Components resolve their colors and fonts from ``LubaThemeConfiguration`` in the environment, so `.lubaTheme(…)` repaints the subtree it is applied to.
 
 LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 
@@ -25,6 +26,8 @@ LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 - <doc:GettingStarted>
 - <doc:ThreeTierTokenSystem>
 - <doc:ComposablePrimitives>
+- <doc:ConfiguringLubaUI>
+- <doc:AccessibilityAndMotion>
 
 ### Design Tokens
 
@@ -110,10 +113,17 @@ LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 - ``LubaSheetHeader``
 - ``LubaSheetSize``
 
-### Configuration
+### Configuration & Theming
 
+- ``LubaEnvironment``
+- ``LubaContext``
 - ``LubaConfig``
 - ``LubaThemeConfiguration``
+- ``LubaThemeColors``
+- ``LubaStatusRole``
+- ``LubaThemeTypography``
+- ``LubaThemeSpacing``
+- ``LubaThemeRadius``
 - <doc:ConfiguringLubaUI>
 
 ### Component Tokens
@@ -138,8 +148,12 @@ LubaUI targets iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, and visionOS 1.0+.
 
 ### Accessibility
 
+- ``LubaMotionPolicy``
+- ``LubaTextRole``
+- ``LubaFontSet``
+- ``LubaStrings``
 - ``LubaHaptics``
 - ``LubaAccessible``
-- ``LubaReducedMotion``
 - ``LubaContrast``
 - ``LubaAnnounce``
+- <doc:AccessibilityAndMotion>

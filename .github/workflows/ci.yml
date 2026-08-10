@@ -12,13 +12,13 @@ concurrency:
 
 jobs:
   build-and-test:
-    name: Build & Test
+    name: Build & Test (SwiftPM)
     runs-on: macos-15
     strategy:
       matrix:
         xcode: ['16.2']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
@@ -31,3 +31,40 @@ jobs:
 
       - name: Run tests
         run: swift test
+
+  ios-library-build:
+    name: iOS Simulator (library only)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+
+      # Deliberately uses the runner's *default* Xcode instead of pinning a
+      # version. GitHub installs simulator runtimes only for the default
+      # Xcode; a pinned older Xcode can still be on the image with its iOS
+      # platform stripped, which fails as "iOS <version> is not installed"
+      # and an empty destination list — not as a missing SDK, which makes it
+      # easy to misread as a bad destination specifier.
+      - name: Show toolchain and available iOS SDKs
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i "ios" || echo "no iOS SDK on this runner"
+
+      # Builds the LubaUI *library* target against the iOS SDK.
+      #
+      # - `generic/platform=iOS Simulator` needs no booted device and no
+      #   specific device name, so the job cannot break when GitHub changes
+      #   its simulator roster.
+      # - The scheme comes from Package.swift (xcodebuild synthesizes it), so
+      #   nothing depends on the showcase app or its asset catalog. A broken
+      #   showcase asset can never hide the fact that the library itself
+      #   compiles for iOS.
+      - name: Build LubaUI for iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -scheme LubaUI \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .build/ios \
+            -skipMacroValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            | tail -20

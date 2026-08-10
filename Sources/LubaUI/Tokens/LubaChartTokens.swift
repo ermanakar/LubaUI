@@ -34,6 +34,8 @@ public enum LubaChartTokens {
 
     /// Bar corner radius — 4pt (LubaRadius.xs) for subtle rounding
     public static let barCornerRadius: CGFloat = LubaRadius.xs
+    /// Resolved against a theme's radius scale.
+    public static func barCornerRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.xs }
 
     /// Line stroke width — 2.5pt provides clear visibility without heaviness
     public static let lineWidth: CGFloat = 2.5
@@ -67,15 +69,21 @@ public enum LubaChartTokens {
 
     /// Padding between axis labels and chart content
     public static let axisPadding: CGFloat = LubaSpacing.xs
+    /// Resolved against a theme's spacing scale.
+    public static func axisPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.xs }
 
     /// Spacing between legend items
     public static let legendSpacing: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func legendSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Legend dot size
     public static let legendDotSize: CGFloat = 8
 
     /// Vertical spacing between legend rows when using vertical layout
     public static let legendRowSpacing: CGFloat = LubaSpacing.xs
+    /// Resolved against a theme's spacing scale.
+    public static func legendRowSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.xs }
 
     // MARK: - Grid & Axes
 

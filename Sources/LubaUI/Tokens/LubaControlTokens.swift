@@ -23,14 +23,19 @@ public enum LubaSelectionTokens {
 
     /// Corner radius for checkbox
     public static let checkboxRadius: CGFloat = LubaRadius.xs
+    /// Resolved against a theme's radius scale.
+    public static func checkboxRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.xs }
 
     /// Checkmark icon size
     public static let checkmarkSize: CGFloat = 11
 
     /// Spacing between control and label
     public static let labelSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func labelSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.bodySmall, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 15
 
     /// Minimum touch target height
@@ -63,6 +68,7 @@ public enum LubaToggleTokens {
     public static let labelSpacing: CGFloat = 12
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.bodySmall, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 15
 
     /// Minimum touch target height
@@ -95,8 +101,10 @@ public enum LubaSliderTokens {
     public static let labelSpacing: CGFloat = 8
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.bodySmall, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 15
 
     /// Value label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.code, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let valueFontSize: CGFloat = 13
 }

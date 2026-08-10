@@ -1,0 +1,77 @@
+/*
+  Localizable.strings (Deutsch)
+  LubaUI
+
+  Eingebaute Bedien- und Barrierefreiheitstexte.
+  Schlüssel sind als `luba.<bereich>.<name>` benannt.
+*/
+
+/* Zustand */
+"luba.state.loading" = "Wird geladen";
+"luba.state.disabled" = "Deaktiviert";
+"luba.state.progress" = "Fortschritt";
+"luba.state.percent" = "%d Prozent";
+
+/* Aktionen */
+"luba.action.close" = "Schließen";
+"luba.action.cancel" = "Abbrechen";
+"luba.action.dismiss" = "Ausblenden";
+"luba.action.delete" = "Löschen";
+"luba.action.archive" = "Archivieren";
+"luba.action.pin" = "Anheften";
+"luba.action.unread" = "Ungelesen";
+"luba.action.flag" = "Markieren";
+"luba.action.share" = "Teilen";
+"luba.action.remove" = "%@ entfernen";
+"luba.alert.dismiss" = "Hinweis ausblenden";
+
+/* Suche */
+"luba.search.placeholder" = "Suchen";
+"luba.search.clear" = "Suche löschen";
+"luba.search.cancel" = "Suche abbrechen";
+
+/* Menü & Kurzinfo */
+"luba.menu.label" = "Menü";
+"luba.menu.hint" = "Zeigt Menüoptionen";
+"luba.tooltip.hint" = "Tippen für weitere Informationen";
+
+/* Bewertung */
+"luba.rating.value" = "%1$d von %2$d Sternen";
+
+/* Aufklappbereich */
+"luba.expandable.expand" = "Aufklappen";
+"luba.expandable.collapse" = "Zuklappen";
+"luba.expandable.expanded" = "Aufgeklappt";
+"luba.expandable.collapsed" = "Zugeklappt";
+
+/* Diagramme */
+"luba.chart.empty" = "Keine Daten";
+
+/* Status */
+"luba.status.info" = "Information";
+"luba.status.success" = "Erfolg";
+"luba.status.warning" = "Warnung";
+"luba.status.error" = "Fehler";
+"luba.status.message" = "%1$@: %2$@";
+
+/* Felder */
+"luba.field.email" = "E-Mail";
+"luba.field.password" = "Passwort";
+"luba.field.required" = "Erforderlich";
+
+/* Bedienelemente */
+"luba.control.checkbox" = "Kontrollkästchen";
+"luba.control.toggle" = "Schalter";
+"luba.control.slider" = "Schieberegler";
+"luba.control.stepper" = "Schrittwähler";
+"luba.control.rating" = "Bewertung";
+"luba.control.avatar" = "Avatar";
+"luba.control.avatarInitials" = "Avatar, %@";
+
+/* Werte */
+"luba.value.checked" = "Ausgewählt";
+"luba.value.unchecked" = "Nicht ausgewählt";
+"luba.value.on" = "Ein";
+"luba.value.off" = "Aus";
+"luba.value.selected" = "Ausgewählt";
+"luba.value.notSelected" = "Nicht ausgewählt";

@@ -25,6 +25,7 @@ import SwiftUI
 /// LubaDivider(orientation: .vertical)
 /// ```
 public struct LubaDivider: View {
+    @LubaEnvironment private var luba
     private let label: String?
     private let orientation: Orientation
 
@@ -68,8 +69,8 @@ public struct LubaDivider: View {
                 line
                 
                 Text(label)
-                    .font(LubaTypography.custom(size: 12, weight: .medium))
-                    .foregroundStyle(LubaColors.textTertiary)
+                    .font(luba.fonts.caption.weight(.medium))
+                    .foregroundStyle(luba.colors.textTertiary)
                 
                 line
             } else {
@@ -80,13 +81,13 @@ public struct LubaDivider: View {
     
     private var verticalDivider: some View {
         Rectangle()
-            .fill(LubaColors.border)
+            .fill(luba.colors.divider)
             .frame(width: 1)
     }
     
     private var line: some View {
         Rectangle()
-            .fill(LubaColors.border)
+            .fill(luba.colors.divider)
             .frame(height: 1)
     }
 }

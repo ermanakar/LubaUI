@@ -22,12 +22,12 @@ import SwiftUI
 /// LubaStepper(value: $count, step: 5)
 /// ```
 public struct LubaStepper: View {
+    @LubaEnvironment private var luba
     @Binding private var value: Int
     private let range: ClosedRange<Int>
     private let step: Int
     private let label: String?
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a stepper.
     ///
@@ -49,11 +49,11 @@ public struct LubaStepper: View {
     }
 
     public var body: some View {
-        HStack(spacing: LubaSpacing.md) {
+        HStack(spacing: luba.spacing.md) {
             if let label = label {
                 Text(label)
-                    .font(LubaTypography.body)
-                    .foregroundStyle(LubaColors.textPrimary)
+                    .font(luba.fonts.body)
+                    .foregroundStyle(luba.colors.textPrimary)
 
                 Spacer()
             }
@@ -62,22 +62,22 @@ public struct LubaStepper: View {
                 stepButton(systemName: "minus", action: decrement, isEnabled: canDecrement)
 
                 Text("\(value)")
-                    .font(LubaTypography.headline)
-                    .foregroundStyle(LubaColors.textPrimary)
+                    .font(luba.fonts.headline)
+                    .foregroundStyle(luba.colors.textPrimary)
                     .frame(minWidth: 40)
                     .monospacedDigit()
 
                 stepButton(systemName: "plus", action: increment, isEnabled: canIncrement)
             }
-            .background(LubaColors.surface)
+            .background(luba.colors.surface)
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .strokeBorder(LubaColors.border, lineWidth: 1)
+                    .strokeBorder(luba.colors.border, lineWidth: 1)
             )
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(label ?? "Stepper")
+        .accessibilityLabel(label ?? LubaStrings.stepper)
         .accessibilityValue("\(value)")
         .accessibilityAdjustableAction { direction in
             switch direction {
@@ -94,7 +94,7 @@ public struct LubaStepper: View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(isEnabled ? LubaColors.accent : LubaColors.textDisabled)
+                .foregroundStyle(isEnabled ? luba.colors.accent : luba.colors.textDisabled)
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
@@ -111,14 +111,14 @@ public struct LubaStepper: View {
         let newValue = min(value + step, range.upperBound)
         guard newValue != value else { return }
         value = newValue
-        if config.hapticsEnabled { LubaHaptics.light() }
+        if luba.hapticsEnabled { LubaHaptics.light() }
     }
 
     private func decrement() {
         let newValue = max(value - step, range.lowerBound)
         guard newValue != value else { return }
         value = newValue
-        if config.hapticsEnabled { LubaHaptics.light() }
+        if luba.hapticsEnabled { LubaHaptics.light() }
     }
 }
 

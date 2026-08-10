@@ -82,15 +82,25 @@ view.lubaAnimation(.bouncy, value: isActive)
 
 ### Respecting Reduced Motion
 
-Both systems integrate with `LubaConfig`. When `animationsEnabled` is `false` or the system's Reduce Motion setting is active, animations degrade gracefully:
+Do not gate animations by hand. ``LubaMotionPolicy`` is the single decision point,
+and it sees both `LubaConfig` *and* the system `accessibilityReduceMotion` value:
 
 ```swift
-@Environment(\.lubaConfig) private var config
+@LubaEnvironment private var luba
 
-withAnimation(config.animationsEnabled ? LubaAnimations.standard : nil) {
-    isVisible.toggle()
-}
+// Essential state change — cross-fades under Reduce Motion, off when disabled.
+luba.motion.run(LubaAnimations.standard) { isVisible.toggle() }
+
+// Decorative motion — removed entirely under Reduce Motion.
+view.animation(luba.motion.decorative(LubaMotion.pressAnimation), value: isPressed)
+
+// Transform amounts, neutralized rather than animated away.
+view.scaleEffect(luba.motion.pressScale(isPressed ? LubaMotion.pressScale : 1))
 ```
+
+See <doc:AccessibilityAndMotion> for the full method-by-method table, including
+the two cases that deliberately survive Reduce Motion: progress that carries
+information, and opacity-only busy indicators.
 
 ## Topics
 
@@ -98,4 +108,5 @@ withAnimation(config.animationsEnabled ? LubaAnimations.standard : nil) {
 
 - ``LubaMotion``
 - ``LubaAnimations``
-- ``LubaReducedMotion``
+- ``LubaMotionPolicy``
+- <doc:AccessibilityAndMotion>

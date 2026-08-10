@@ -30,6 +30,8 @@ public enum LubaChipTokens {
 
     /// Horizontal content inset.
     public static let horizontalPadding: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Visual chip height.
     public static let height: CGFloat = 32
@@ -56,6 +58,7 @@ public enum LubaChipTokens {
 /// LubaChip("Design", style: .outlined, isDismissible: true) { print("removed") }
 /// ```
 public struct LubaChip: View {
+    @LubaEnvironment private var luba
     private let label: String
     private let style: LubaChipStyle
     private let icon: Image?
@@ -64,7 +67,6 @@ public struct LubaChip: View {
     private let onDismiss: (() -> Void)?
     private let onTap: (() -> Void)?
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a chip.
     ///
@@ -98,36 +100,48 @@ public struct LubaChip: View {
         HStack(spacing: LubaChipTokens.contentSpacing) {
             if let icon = icon {
                 icon
-                    .font(LubaTypography.custom(size: LubaChipTokens.iconFontSize, weight: .medium))
+                    .font(luba.fonts.custom(size: LubaChipTokens.iconFontSize, weight: .medium))
             }
 
             Text(label)
-                .font(LubaTypography.subheadline)
+                .font(luba.fonts.subheadline)
+                // A chip is a compact token, not a paragraph. Wrapping makes it
+                // outgrow its own shape at accessibility sizes, so it stays on
+                // one line and truncates; VoiceOver still reads the full label.
+                .lineLimit(1)
+                .truncationMode(.tail)
 
             if isDismissible {
                 Button(action: dismiss) {
                     Image(systemName: "xmark")
-                        .font(LubaTypography.custom(size: LubaChipTokens.dismissIconFontSize, weight: .bold))
+                        .font(luba.fonts.custom(size: LubaChipTokens.dismissIconFontSize, weight: .bold))
                         .frame(width: LubaChipTokens.dismissButtonSize, height: LubaChipTokens.dismissButtonSize)
                         .background(dismissBackground)
                         .clipShape(Circle())
+                        // The visible glyph stays small, but the tappable area
+                        // fills the chip's full height. A chip is 32pt tall, so
+                        // it cannot host a 44pt target without changing the
+                        // component's proportions — this takes the affordance
+                        // as far as the geometry allows, at no layout cost.
+                        .frame(height: LubaChipTokens.height)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Remove \(label)")
+                .accessibilityLabel(LubaStrings.remove(label))
             }
         }
-        .padding(.horizontal, LubaChipTokens.horizontalPadding)
-        .frame(height: LubaChipTokens.height)
+        .padding(.horizontal, LubaChipTokens.horizontalPadding(luba.spacing))
+        .frame(minHeight: LubaChipTokens.height)
         .foregroundStyle(foregroundColor)
         .background(backgroundColor)
-        .clipShape(Capsule())
+        .clipShape(chipShape)
         .overlay(borderOverlay)
         .if(onTap != nil) { view in
             view.lubaPressable { onTap?() }
         }
         .accessibilityLabel(label)
         .accessibilityAddTraits(onTap != nil ? .isButton : .isStaticText)
-        .accessibilityValue(isSelected ? "Selected" : "")
+        .accessibilityValue(isSelected ? LubaStrings.selected : "")
     }
 
     // MARK: - Styling
@@ -135,40 +149,44 @@ public struct LubaChip: View {
     private var foregroundColor: Color {
         switch style {
         case .filled:
-            return isSelected ? LubaColors.textOnAccent : LubaColors.accent
+            return isSelected ? luba.colors.textOnAccent : luba.colors.accent
         case .outlined:
-            return isSelected ? LubaColors.accent : LubaColors.textSecondary
+            return isSelected ? luba.colors.accent : luba.colors.textSecondary
         }
     }
 
     private var backgroundColor: Color {
         switch style {
         case .filled:
-            return isSelected ? LubaColors.accent : LubaColors.accentSubtle
+            return isSelected ? luba.colors.accent : luba.colors.accentSubtle
         case .outlined:
-            return isSelected ? LubaColors.accentSubtle : Color.clear
+            return isSelected ? luba.colors.accentSubtle : Color.clear
         }
     }
 
     @ViewBuilder
     private var borderOverlay: some View {
         if style == .outlined {
-            Capsule()
-                .strokeBorder(isSelected ? LubaColors.accent : LubaColors.border, lineWidth: LubaChipTokens.borderWidth)
+            chipShape
+                .strokeBorder(isSelected ? luba.colors.accent : luba.colors.border, lineWidth: LubaChipTokens.borderWidth)
         }
     }
+
+    /// A capsule. Kept as one property so the fill and the outlined border
+    /// can never drift apart.
+    private var chipShape: Capsule { Capsule() }
 
     private var dismissBackground: Color {
         switch style {
         case .filled:
-            return isSelected ? LubaColors.textOnAccent.opacity(0.2) : LubaColors.accent.opacity(0.15)
+            return isSelected ? luba.colors.textOnAccent.opacity(0.2) : luba.colors.accent.opacity(0.15)
         case .outlined:
-            return LubaColors.textTertiary.opacity(0.15)
+            return luba.colors.textTertiary.opacity(0.15)
         }
     }
 
     private func dismiss() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.soft()
         }
         onDismiss?()

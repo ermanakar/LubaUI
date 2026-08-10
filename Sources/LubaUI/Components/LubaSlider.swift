@@ -21,6 +21,7 @@ import SwiftUI
 /// LubaSlider(value: $volume, in: 0...100, label: "Volume", showValue: true)
 /// ```
 public struct LubaSlider: View {
+    @LubaEnvironment private var luba
     @Binding private var value: Double
     private let range: ClosedRange<Double>
     private let step: Double?
@@ -31,7 +32,6 @@ public struct LubaSlider: View {
     @State private var lastHapticValue: Double = 0
     @State private var isDragging = false
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a slider.
     ///
@@ -65,7 +65,7 @@ public struct LubaSlider: View {
         }
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(label ?? "Slider")
+        .accessibilityLabel(label ?? LubaStrings.slider)
         .accessibilityValue(formattedValue)
         .accessibilityAdjustableAction { direction in
             let stepSize = step ?? (range.upperBound - range.lowerBound) / 10
@@ -85,16 +85,16 @@ public struct LubaSlider: View {
             HStack {
                 if let label = label {
                     Text(label)
-                        .font(LubaTypography.custom(size: LubaSliderTokens.labelFontSize, weight: .regular))
-                        .foregroundStyle(LubaColors.textPrimary)
+                        .font(luba.fonts.bodySmall)
+                        .foregroundStyle(luba.colors.textPrimary)
                 }
 
                 Spacer()
 
                 if showValue {
                     Text(formattedValue)
-                        .font(LubaTypography.custom(size: LubaSliderTokens.valueFontSize, weight: .medium, design: .monospaced))
-                        .foregroundStyle(LubaColors.textSecondary)
+                        .font(luba.fonts.code.weight(.medium))
+                        .foregroundStyle(luba.colors.textSecondary)
                 }
             }
         }
@@ -105,21 +105,21 @@ public struct LubaSlider: View {
             ZStack(alignment: .leading) {
                 // Background track
                 Capsule()
-                    .fill(LubaColors.gray200)
+                    .fill(luba.colors.fill)
                     .frame(height: LubaSliderTokens.trackHeight)
 
                 // Filled track
                 Capsule()
-                    .fill(LubaColors.accent)
+                    .fill(luba.colors.accent)
                     .frame(width: filledWidth(for: geometry.size.width), height: LubaSliderTokens.trackHeight)
 
                 // Thumb
                 Circle()
-                    .fill(LubaColors.surface)
+                    .fill(luba.colors.surface)
                     .frame(width: LubaSliderTokens.thumbSize, height: LubaSliderTokens.thumbSize)
                     .overlay(
                         Circle()
-                            .strokeBorder(LubaColors.accent, lineWidth: LubaSliderTokens.thumbBorderWidth)
+                            .strokeBorder(luba.colors.accent, lineWidth: LubaSliderTokens.thumbBorderWidth)
                     )
                     .shadow(
                         color: Color.black.opacity(LubaSliderTokens.thumbShadowOpacity),
@@ -128,7 +128,7 @@ public struct LubaSlider: View {
                     )
                     .scaleEffect(isDragging ? LubaSliderTokens.thumbDragScale : 1.0)
                     .offset(x: thumbOffset(for: geometry.size.width))
-                    .animation(LubaMotion.micro, value: isDragging)
+                    .animation(luba.motion.decorative(LubaMotion.micro), value: isDragging)
             }
             // Full-width touch target for better interaction
             .contentShape(Rectangle())
@@ -180,7 +180,7 @@ public struct LubaSlider: View {
         newValue = max(range.lowerBound, min(range.upperBound, newValue))
 
         // Haptic at bounds
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             if (newValue == range.lowerBound || newValue == range.upperBound) && lastHapticValue != newValue {
                 LubaHaptics.light()
             }

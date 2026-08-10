@@ -47,7 +47,7 @@ public struct LubaShimmerableModifier: ViewModifier {
     let intensity: CGFloat
 
     @State private var shimmerOffset: CGFloat = LubaShimmerTokens.startOffset
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public init(isLoading: Bool, intensity: CGFloat = LubaShimmerTokens.defaultIntensity) {
         self.isLoading = isLoading
@@ -95,9 +95,13 @@ public struct LubaShimmerableModifier: ViewModifier {
     }
 
     private func startShimmer() {
-        guard config.animationsEnabled else { return }
+        // Route through the policy rather than animating directly, so the
+        // shimmer honors `animationSpeed` as well as Reduce Motion.
+        guard let shimmer = luba.motion.repeating(
+            .linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)
+        ) else { return }
         shimmerOffset = LubaShimmerTokens.startOffset
-        withAnimation(.linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)) {
+        withAnimation(shimmer) {
             shimmerOffset = LubaShimmerTokens.endOffset
         }
     }
@@ -111,7 +115,7 @@ public struct LubaRedactedShimmerModifier: ViewModifier {
     let intensity: CGFloat
 
     @State private var shimmerOffset: CGFloat = LubaShimmerTokens.startOffset
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public init(isLoading: Bool, intensity: CGFloat = LubaShimmerTokens.defaultIntensity) {
         self.isLoading = isLoading
@@ -160,9 +164,13 @@ public struct LubaRedactedShimmerModifier: ViewModifier {
     }
 
     private func startShimmer() {
-        guard config.animationsEnabled else { return }
+        // Route through the policy rather than animating directly, so the
+        // shimmer honors `animationSpeed` as well as Reduce Motion.
+        guard let shimmer = luba.motion.repeating(
+            .linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)
+        ) else { return }
         shimmerOffset = LubaShimmerTokens.startOffset
-        withAnimation(.linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)) {
+        withAnimation(shimmer) {
             shimmerOffset = LubaShimmerTokens.endOffset
         }
     }

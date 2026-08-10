@@ -21,11 +21,11 @@ import SwiftUI
 /// LubaCheckbox(isChecked: $agreedToTerms, label: "I agree to the terms")
 /// ```
 public struct LubaCheckbox: View {
+    @LubaEnvironment private var luba
     @Binding private var isChecked: Bool
     private let label: String?
     private let isDisabled: Bool
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a checkbox.
     ///
@@ -45,7 +45,7 @@ public struct LubaCheckbox: View {
 
     public var body: some View {
         Button(action: toggle) {
-            HStack(spacing: LubaSelectionTokens.labelSpacing) {
+            HStack(spacing: LubaSelectionTokens.labelSpacing(luba.spacing)) {
                 checkboxControl
                 labelView
                 Spacer(minLength: 0)
@@ -56,10 +56,10 @@ public struct LubaCheckbox: View {
         .buttonStyle(.plain)
         .disabled(isDisabled)
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
-        .animation(LubaMotion.micro, value: isChecked)
+        .animation(luba.motion.animation(LubaMotion.micro), value: isChecked)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(label ?? "Checkbox")
-        .accessibilityValue(isChecked ? "Checked" : "Unchecked")
+        .accessibilityLabel(label ?? LubaStrings.checkbox)
+        .accessibilityValue(isChecked ? LubaStrings.checked : LubaStrings.unchecked)
         .accessibilityAddTraits(.isButton)
     }
 
@@ -68,14 +68,14 @@ public struct LubaCheckbox: View {
     private var checkboxControl: some View {
         ZStack {
             // Background
-            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius, style: .continuous)
-                .fill(isChecked ? LubaColors.accent : LubaColors.surface)
+            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius(luba.radius), style: .continuous)
+                .fill(isChecked ? luba.colors.accent : luba.colors.surface)
                 .frame(width: LubaSelectionTokens.controlSize, height: LubaSelectionTokens.controlSize)
 
             // Border
-            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius(luba.radius), style: .continuous)
                 .strokeBorder(
-                    isChecked ? LubaColors.accent : LubaColors.gray400,
+                    isChecked ? luba.colors.accent : luba.colors.borderStrong,
                     lineWidth: LubaSelectionTokens.borderWidth
                 )
                 .frame(width: LubaSelectionTokens.controlSize, height: LubaSelectionTokens.controlSize)
@@ -85,7 +85,7 @@ public struct LubaCheckbox: View {
                 Image(systemName: "checkmark")
                     .font(.system(size: LubaSelectionTokens.checkmarkSize, weight: .bold))
                     .foregroundStyle(checkmarkColor)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
             }
         }
     }
@@ -94,21 +94,22 @@ public struct LubaCheckbox: View {
     private var labelView: some View {
         if let label = label {
             Text(label)
-                .font(LubaTypography.custom(size: LubaSelectionTokens.labelFontSize, weight: .regular))
-                .foregroundStyle(LubaColors.textPrimary)
+                .font(luba.fonts.bodySmall)
+                .foregroundStyle(luba.colors.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     // MARK: - Computed
 
     private var checkmarkColor: Color {
-        LubaColors.textOnAccent
+        luba.colors.textOnAccent
     }
 
     // MARK: - Actions
 
     private func toggle() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
         isChecked.toggle()

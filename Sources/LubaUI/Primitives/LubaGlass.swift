@@ -91,12 +91,12 @@ public enum LubaGlassStyle {
 /// Provides a solid opaque fallback when Reduce Transparency or
 /// High Contrast Mode is active.
 public struct LubaGlassModifier: ViewModifier {
+    @LubaEnvironment private var luba
     let style: LubaGlassStyle
     let tint: Color?
     let cornerRadius: CGFloat
     let isInteractive: Bool
 
-    @Environment(\.lubaConfig) private var config
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
@@ -127,17 +127,17 @@ public struct LubaGlassModifier: ViewModifier {
     /// Whether to use a solid (non-transparent) fallback.
     /// Triggers for: reduceTransparency, highContrastMode.
     private var shouldUseSolidFallback: Bool {
-        reduceTransparency || config.highContrastMode
+        reduceTransparency || luba.config.highContrastMode
     }
 
     /// Solid opaque background for accessibility
     @ViewBuilder
     private var solidFallbackBackground: some View {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .fill(LubaColors.surface.opacity(LubaGlassTokens.solidFallbackOpacity))
+            .fill(luba.colors.surface.opacity(LubaGlassTokens.solidFallbackOpacity))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(LubaColors.border, lineWidth: 1)
+                    .strokeBorder(luba.colors.border, lineWidth: 1)
             )
     }
 
@@ -164,13 +164,16 @@ public struct LubaGlassModifier: ViewModifier {
             .overlay(
                 // Layer 3: Luminous border (edge highlight)
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    // The glass roles already carry their own light/dark
+                    // luminance and opacity — applying the token ratios again
+                    // here would double-attenuate them.
                     .strokeBorder(
-                        Color.white.opacity(borderLuminance),
+                        luba.colors.glassBorder,
                         lineWidth: LubaGlassTokens.borderWidth
                     )
             )
             .shadow(
-                color: Color.black.opacity(shadowOpacity),
+                color: luba.colors.glassShadow,
                 radius: LubaGlassTokens.shadowRadius,
                 x: 0,
                 y: LubaGlassTokens.shadowY
@@ -206,17 +209,6 @@ public struct LubaGlassModifier: ViewModifier {
             : LubaGlassTokens.tintOpacityLight
     }
 
-    private var borderLuminance: CGFloat {
-        colorScheme == .dark
-            ? LubaGlassTokens.borderLuminanceDark
-            : LubaGlassTokens.borderLuminanceLight
-    }
-
-    private var shadowOpacity: CGFloat {
-        colorScheme == .dark
-            ? LubaGlassTokens.shadowOpacityDark
-            : LubaGlassTokens.shadowOpacityLight
-    }
 }
 
 // MARK: - View Extension

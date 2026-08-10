@@ -22,12 +22,18 @@ public enum LubaFieldTokens {
 
     /// Corner radius (matches buttons, on the LubaRadius grid)
     public static let cornerRadius: CGFloat = LubaRadius.md
+    /// Resolved against a theme's radius scale.
+    public static func cornerRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.md }
 
     /// Horizontal padding inside field
     public static let horizontalPadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Spacing between icon and text
     public static let iconSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func iconSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 
     /// Icon size
     public static let iconSize: CGFloat = 18
@@ -36,9 +42,11 @@ public enum LubaFieldTokens {
     public static let iconFrameWidth: CGFloat = 20
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.footnote, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 13
 
     /// Helper/error text font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.caption, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let helperFontSize: CGFloat = 12
 
     /// Spacing between label and field
@@ -63,32 +71,39 @@ public enum LubaFieldState: Equatable {
     case error
     case disabled
 
-    func labelColor() -> Color {
+    /// Label color for this state, resolved against a theme palette.
+    public func labelColor(_ colors: LubaThemeColors) -> Color {
         switch self {
-        case .normal: return LubaColors.textSecondary
-        case .focused: return LubaColors.accent
-        case .error: return LubaColors.error
-        case .disabled: return LubaColors.textDisabled
+        case .normal: return colors.textSecondary
+        case .focused: return colors.accent
+        case .error: return colors.error
+        case .disabled: return colors.textDisabled
         }
     }
 
-    func borderColor() -> Color {
+    /// Border color for this state, resolved against a theme palette.
+    public func borderColor(_ colors: LubaThemeColors) -> Color {
         switch self {
-        case .normal: return LubaColors.border
-        case .focused: return LubaColors.accent
-        case .error: return LubaColors.error
-        case .disabled: return LubaColors.border
+        case .normal: return colors.border
+        case .focused: return colors.borderFocused
+        case .error: return colors.error
+        case .disabled: return colors.border
         }
     }
 
-    func iconColor() -> Color {
+    /// Icon color for this state, resolved against a theme palette.
+    public func iconColor(_ colors: LubaThemeColors) -> Color {
         switch self {
-        case .normal: return LubaColors.textTertiary
-        case .focused: return LubaColors.accent
-        case .error: return LubaColors.error
-        case .disabled: return LubaColors.textDisabled
+        case .normal: return colors.textTertiary
+        case .focused: return colors.accent
+        case .error: return colors.error
+        case .disabled: return colors.textDisabled
         }
     }
+
+    func labelColor() -> Color { labelColor(.default) }
+    func borderColor() -> Color { borderColor(.default) }
+    func iconColor() -> Color { iconColor(.default) }
 }
 
 // MARK: - LubaTextField
@@ -111,6 +126,7 @@ public enum LubaFieldState: Equatable {
 /// )
 /// ```
 public struct LubaTextField: View {
+    @LubaEnvironment private var luba
     private let label: String
     @Binding private var text: String
     private let placeholder: String
@@ -124,7 +140,6 @@ public struct LubaTextField: View {
 
     @FocusState private var isFocused: Bool
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.lubaConfig) private var config
 
     public init(
         _ label: String,
@@ -163,28 +178,28 @@ public struct LubaTextField: View {
         }
         .disabled(isDisabled)
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
-        .animation(LubaMotion.stateAnimation, value: isDisabled)
+        .animation(luba.motion.animation(LubaMotion.stateAnimation), value: isDisabled)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(label)
-        .accessibilityValue(error != nil ? "Error: \(error!)" : helperText ?? "")
+        .accessibilityValue(error.map(LubaStrings.fieldError) ?? helperText ?? "")
     }
 
     // MARK: - Subviews
 
     private var labelView: some View {
         Text(label)
-            .font(LubaTypography.custom(size: LubaFieldTokens.labelFontSize, weight: .medium))
-            .foregroundStyle(currentState.labelColor())
-            .animation(LubaMotion.colorAnimation, value: currentState)
+            .font(luba.fonts.footnote.weight(.medium))
+            .foregroundStyle(currentState.labelColor(luba.colors))
+            .animation(luba.motion.interaction(LubaMotion.colorAnimation), value: currentState)
     }
 
     private var fieldView: some View {
-        HStack(spacing: LubaFieldTokens.iconSpacing) {
+        HStack(spacing: LubaFieldTokens.iconSpacing(luba.spacing)) {
             // Leading icon
             if let icon = leadingIcon {
                 icon
                     .font(.system(size: LubaFieldTokens.iconSize, weight: .regular))
-                    .foregroundStyle(currentState.iconColor())
+                    .foregroundStyle(currentState.iconColor(luba.colors))
                     .frame(width: LubaFieldTokens.iconFrameWidth)
             }
 
@@ -200,17 +215,17 @@ public struct LubaTextField: View {
             if let icon = trailingIcon {
                 icon
                     .font(.system(size: LubaFieldTokens.iconSize, weight: .regular))
-                    .foregroundStyle(currentState.iconColor())
+                    .foregroundStyle(currentState.iconColor(luba.colors))
                     .frame(width: LubaFieldTokens.iconFrameWidth)
             }
         }
-        .padding(.horizontal, LubaFieldTokens.horizontalPadding)
+        .padding(.horizontal, LubaFieldTokens.horizontalPadding(luba.spacing))
         .frame(minHeight: LubaFieldTokens.minHeight)
-        .background(LubaColors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius, style: .continuous))
+        .background(luba.colors.surface)
+        .clipShape(RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius(luba.radius), style: .continuous))
         .overlay(borderOverlay)
-        .animation(LubaMotion.colorAnimation, value: isFocused)
-        .animation(LubaMotion.colorAnimation, value: error != nil)
+        .animation(luba.motion.interaction(LubaMotion.colorAnimation), value: isFocused)
+        .animation(luba.motion.interaction(LubaMotion.colorAnimation), value: error != nil)
     }
 
     @ViewBuilder
@@ -222,7 +237,7 @@ public struct LubaTextField: View {
                 TextField(placeholder, text: $text)
             }
         }
-        .font(LubaTypography.body)
+        .font(luba.fonts.body)
         .focused($isFocused)
     }
 
@@ -230,10 +245,10 @@ public struct LubaTextField: View {
         Button(action: clearText) {
             Image(systemName: "xmark.circle.fill")
                 .font(.system(size: LubaFieldTokens.clearButtonSize))
-                .foregroundStyle(LubaColors.textTertiary)
+                .foregroundStyle(luba.colors.textTertiary)
         }
         .buttonStyle(.plain)
-        .transition(.scale.combined(with: .opacity))
+        .transition(luba.motion.transition(.scale.combined(with: .opacity)))
     }
 
     @ViewBuilder
@@ -241,23 +256,23 @@ public struct LubaTextField: View {
         if let error = error {
             HStack(spacing: 4) {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .font(LubaTypography.custom(size: LubaFieldTokens.helperFontSize, weight: .regular))
+                    .font(luba.fonts.caption)
                 Text(error)
-                    .font(LubaTypography.custom(size: LubaFieldTokens.helperFontSize, weight: .regular))
+                    .font(luba.fonts.caption)
             }
-            .foregroundStyle(LubaColors.error)
-            .transition(.opacity.combined(with: .move(edge: .top)))
+            .foregroundStyle(luba.colors.error)
+            .transition(luba.motion.transition(.opacity.combined(with: .move(edge: .top))))
         } else if let helperText = helperText {
             Text(helperText)
-                .font(LubaTypography.custom(size: LubaFieldTokens.helperFontSize, weight: .regular))
-                .foregroundStyle(LubaColors.textTertiary)
+                .font(luba.fonts.caption)
+                .foregroundStyle(luba.colors.textTertiary)
         }
     }
 
     private var borderOverlay: some View {
-        RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius, style: .continuous)
+        RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius(luba.radius), style: .continuous)
             .strokeBorder(
-                currentState.borderColor(),
+                currentState.borderColor(luba.colors),
                 lineWidth: isFocused ? LubaFieldTokens.borderWidthFocused : LubaFieldTokens.borderWidth
             )
     }
@@ -272,10 +287,10 @@ public struct LubaTextField: View {
     }
 
     private func clearText() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
-        withAnimation(LubaMotion.micro) {
+        luba.motion.run(LubaMotion.micro) {
             text = ""
         }
     }
@@ -305,7 +320,7 @@ public extension LubaTextField {
 
     /// Create an email text field
     static func email(
-        _ label: String = "Email",
+        _ label: String = LubaStrings.email,
         text: Binding<String>,
         placeholder: String = "you@example.com",
         error: String? = nil

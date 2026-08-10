@@ -57,13 +57,13 @@ public enum LubaExpandTokens {
 /// }
 /// ```
 public struct LubaExpandable<Header: View, Content: View>: View {
+    @LubaEnvironment private var luba
     @Binding var isExpanded: Bool
     let showChevron: Bool
     let haptic: LubaHapticStyle?
     let header: () -> Header
     let content: () -> Content
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates an expandable view.
     ///
@@ -100,10 +100,10 @@ public struct LubaExpandable<Header: View, Content: View>: View {
 
                     if showChevron {
                         Image(systemName: LubaExpandTokens.chevronIcon)
-                            .font(LubaTypography.custom(size: 14, weight: .semibold))
-                            .foregroundStyle(LubaColors.textTertiary)
+                            .font(luba.fonts.custom(size: 14, weight: .semibold))
+                            .foregroundStyle(luba.colors.textTertiary)
                             .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                            .animation(LubaExpandTokens.chevronAnimation, value: isExpanded)
+                            .animation(luba.motion.decorative(LubaExpandTokens.chevronAnimation), value: isExpanded)
                     }
                 }
                 .contentShape(Rectangle())
@@ -113,15 +113,15 @@ public struct LubaExpandable<Header: View, Content: View>: View {
             // Content (expandable)
             if isExpanded {
                 content()
-                    .transition(.opacity)
+                    .transition(luba.motion.transition(.opacity))
             }
         }
         .clipped()
-        .animation(LubaExpandTokens.animation, value: isExpanded)
+        .animation(luba.motion.animation(LubaExpandTokens.animation), value: isExpanded)
     }
 
     private func toggle() {
-        if config.hapticsEnabled, let haptic = haptic {
+        if luba.hapticsEnabled, let haptic = haptic {
             haptic.trigger()
         }
         isExpanded.toggle()
@@ -132,6 +132,7 @@ public struct LubaExpandable<Header: View, Content: View>: View {
 
 /// A card with an expandable section.
 public struct LubaExpandableCard<Header: View, Content: View>: View {
+    @LubaEnvironment private var luba
     @Binding var isExpanded: Bool
     let elevation: LubaCardElevation
     let header: () -> Header
@@ -156,7 +157,7 @@ public struct LubaExpandableCard<Header: View, Content: View>: View {
             } content: {
                 VStack(spacing: 0) {
                     LubaDivider()
-                        .padding(.vertical, LubaSpacing.md)
+                        .padding(.vertical, luba.spacing.md)
 
                     content()
                 }
@@ -186,6 +187,7 @@ public struct LubaAccordionItem: Identifiable {
 
 /// A group of expandable items where only one can be open at a time.
 public struct LubaAccordion: View {
+    @LubaEnvironment private var luba
     let items: [LubaAccordionItem]
     let allowMultiple: Bool
 
@@ -197,7 +199,7 @@ public struct LubaAccordion: View {
     }
 
     public var body: some View {
-        VStack(spacing: LubaSpacing.sm) {
+        VStack(spacing: luba.spacing.sm) {
             ForEach(items) { item in
                 accordionRow(item: item)
             }
@@ -221,26 +223,26 @@ public struct LubaAccordion: View {
                     }
                 }
             )) {
-                HStack(spacing: LubaSpacing.md) {
+                HStack(spacing: luba.spacing.md) {
                     if let icon = item.icon {
                         Image(systemName: icon)
                             .font(.system(size: 16))
-                            .foregroundStyle(LubaColors.accent)
+                            .foregroundStyle(luba.colors.accent)
                             .frame(width: 24)
                     }
 
                     Text(item.title)
-                        .font(LubaTypography.headline)
-                        .foregroundStyle(LubaColors.textPrimary)
+                        .font(luba.fonts.headline)
+                        .foregroundStyle(luba.colors.textPrimary)
                 }
             } content: {
                 VStack(spacing: 0) {
                     LubaDivider()
-                        .padding(.vertical, LubaSpacing.sm)
+                        .padding(.vertical, luba.spacing.sm)
 
                     Text(item.content)
-                        .font(LubaTypography.body)
-                        .foregroundStyle(LubaColors.textSecondary)
+                        .font(luba.fonts.body)
+                        .foregroundStyle(luba.colors.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
@@ -252,6 +254,7 @@ public struct LubaAccordion: View {
 
 /// Makes any view expandable with a toggle binding.
 public struct LubaExpandableModifier<ExpandedContent: View>: ViewModifier {
+    @LubaEnvironment private var luba
     @Binding var isExpanded: Bool
     let expandedContent: () -> ExpandedContent
 
@@ -269,11 +272,11 @@ public struct LubaExpandableModifier<ExpandedContent: View>: ViewModifier {
 
             if isExpanded {
                 expandedContent()
-                    .transition(.opacity)
+                    .transition(luba.motion.transition(.opacity))
             }
         }
         .clipped()
-        .animation(LubaExpandTokens.animation, value: isExpanded)
+        .animation(luba.motion.animation(LubaExpandTokens.animation), value: isExpanded)
     }
 }
 

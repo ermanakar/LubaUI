@@ -61,8 +61,6 @@ final class ThemeConfigTests: XCTestCase {
         XCTAssertFalse(config.highContrastMode)
         XCTAssertTrue(config.useRoundedFont)
         XCTAssertNil(config.customFontFamily)
-        XCTAssertNil(config.accentColorLight)
-        XCTAssertNil(config.accentColorDark)
         XCTAssertFalse(config.showDebugOutlines)
         XCTAssertFalse(config.logA11yWarnings)
         XCTAssertEqual(config.animationSpeed, 1.0)
@@ -90,9 +88,6 @@ final class ThemeConfigTests: XCTestCase {
 
     func testConfigMutation() {
         var config = LubaConfig()
-        config.setAccentColor(light: .purple, dark: .pink)
-        XCTAssertNotNil(config.accentColorLight)
-        XCTAssertNotNil(config.accentColorDark)
 
         config.disableAnimations()
         XCTAssertFalse(config.animationsEnabled)
@@ -106,19 +101,62 @@ final class ThemeConfigTests: XCTestCase {
 
     // MARK: - Reduced Motion Tests
 
-    func testReducedMotionWithAnimationsEnabled() {
-        LubaConfig.shared.animationsEnabled = true
-        let animation = LubaReducedMotion.animation(.easeIn(duration: 0.3))
-        XCTAssertNotNil(animation)
-        XCTAssertNotNil(LubaReducedMotion.safe)
+    func testMotionPolicyWithAnimationsEnabled() {
+        var config = LubaConfig()
+        config.animationsEnabled = true
+
+        let policy = config.motionPolicy(systemReduceMotion: false)
+        XCTAssertNotNil(policy.animation(.easeIn(duration: 0.3)))
+        XCTAssertNotNil(policy.decorative(.easeIn(duration: 0.3)))
     }
 
-    func testReducedMotionWithAnimationsDisabled() {
-        let previousValue = LubaConfig.shared.animationsEnabled
-        LubaConfig.shared.animationsEnabled = false
-        let animation = LubaReducedMotion.animation(.easeIn(duration: 0.3))
-        XCTAssertNil(animation)
-        XCTAssertNil(LubaReducedMotion.safe)
-        LubaConfig.shared.animationsEnabled = previousValue
+    func testMotionPolicyWithAnimationsDisabled() {
+        var config = LubaConfig()
+        config.animationsEnabled = false
+
+        let policy = config.motionPolicy(systemReduceMotion: false)
+        XCTAssertNil(policy.animation(.easeIn(duration: 0.3)))
+        XCTAssertNil(policy.decorative(.easeIn(duration: 0.3)))
+    }
+
+    // MARK: - Environment Precedence
+
+    /// `LubaConfig.shared` is a *live* fallback, not a value frozen at first
+    /// environment access. Mutating it must still affect views with no
+    /// `.lubaConfig(…)` ancestor.
+    func testSharedConfigActsAsLiveFallback() {
+        let previous = LubaConfig.shared
+        defer { LubaConfig.shared = previous }
+
+        LubaConfig.shared.minimumTouchTarget = 60
+        XCTAssertEqual(EnvironmentValues().lubaConfig.minimumTouchTarget, 60)
+
+        LubaConfig.shared.minimumTouchTarget = 44
+        XCTAssertEqual(EnvironmentValues().lubaConfig.minimumTouchTarget, 44)
+    }
+
+    /// An explicit environment value must win over the singleton.
+    func testEnvironmentConfigOverridesShared() {
+        let previous = LubaConfig.shared
+        defer { LubaConfig.shared = previous }
+
+        LubaConfig.shared.minimumTouchTarget = 44
+
+        var values = EnvironmentValues()
+        var subtree = LubaConfig()
+        subtree.minimumTouchTarget = 52
+        values.lubaConfig = subtree
+
+        XCTAssertEqual(values.lubaConfig.minimumTouchTarget, 52)
+        XCTAssertEqual(LubaConfig.shared.minimumTouchTarget, 44)
+    }
+
+    /// The theme environment defaults to the stock theme and accepts overrides.
+    func testEnvironmentThemeOverride() {
+        var values = EnvironmentValues()
+        XCTAssertEqual(values.lubaTheme.colors.accent, LubaColors.accent)
+
+        values.lubaTheme = LubaThemeConfiguration(colors: .accented(.blue))
+        XCTAssertEqual(values.lubaTheme.colors.accent, .blue)
     }
 }

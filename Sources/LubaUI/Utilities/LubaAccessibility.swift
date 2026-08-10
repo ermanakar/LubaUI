@@ -47,7 +47,10 @@ public extension View {
         lubaAccessible(label: label, traits: .isHeader)
     }
     
-    /// Ensure minimum touch target size.
+    /// Ensure minimum touch target size, using the global configuration.
+    ///
+    /// - Note: Inside a LubaUI component, prefer `lubaMinTouchTarget(luba)` so
+    ///   the subtree's `.lubaConfig(…)` is honored.
     func lubaMinTouchTarget() -> some View {
         self.frame(
             minWidth: LubaConfig.shared.minimumTouchTarget,
@@ -60,17 +63,18 @@ public extension View {
 
 /// Utilities for respecting the user's reduced motion preference.
 ///
-/// For SwiftUI views, prefer reading `@Environment(\.accessibilityReduceMotion)` directly.
-/// Use these helpers in non-View contexts or when you need a quick config check.
+/// - Important: These only see `LubaConfig.shared.animationsEnabled` — they are
+///   blind to the system Reduce Motion setting and to subtree configuration.
+///   Use ``LubaMotionPolicy`` (via `@LubaEnvironment`) in views instead.
 public enum LubaReducedMotion {
-    /// Returns the animation if animations are enabled in LubaConfig, otherwise nil.
-    /// Components should also check `@Environment(\.accessibilityReduceMotion)` in views.
+    /// Returns the animation if animations are enabled in `LubaConfig.shared`, otherwise nil.
+    @available(*, deprecated, message: "Use LubaMotionPolicy via @LubaEnvironment; it also honors system Reduce Motion.")
     public static func animation(_ animation: Animation) -> Animation? {
         LubaConfig.shared.animationsEnabled ? animation : nil
     }
 
     /// A safe, minimal animation that respects config settings.
-    /// Falls back to a quick ease-out when animations are enabled, nil otherwise.
+    @available(*, deprecated, message: "Use LubaMotionPolicy via @LubaEnvironment; it also honors system Reduce Motion.")
     public static var safe: Animation? {
         LubaConfig.shared.animationsEnabled ? .easeOut(duration: 0.2) : nil
     }

@@ -21,11 +21,11 @@ import SwiftUI
 /// LubaToggle(isOn: $darkMode, label: "Dark Mode")
 /// ```
 public struct LubaToggle: View {
+    @LubaEnvironment private var luba
     @Binding private var isOn: Bool
     private let label: String?
     private let isDisabled: Bool
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a toggle switch.
     ///
@@ -55,10 +55,10 @@ public struct LubaToggle: View {
         .buttonStyle(.plain)
         .disabled(isDisabled)
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
-        .animation(LubaMotion.micro, value: isOn)
+        .animation(luba.motion.animation(LubaMotion.micro), value: isOn)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(label ?? "Toggle")
-        .accessibilityValue(isOn ? "On" : "Off")
+        .accessibilityLabel(label ?? LubaStrings.toggle)
+        .accessibilityValue(isOn ? LubaStrings.on : LubaStrings.off)
         .accessibilityAddTraits(.isButton)
     }
 
@@ -68,8 +68,9 @@ public struct LubaToggle: View {
     private var labelView: some View {
         if let label = label {
             Text(label)
-                .font(LubaTypography.custom(size: LubaToggleTokens.labelFontSize, weight: .regular))
-                .foregroundStyle(LubaColors.textPrimary)
+                .font(luba.fonts.bodySmall)
+                .foregroundStyle(luba.colors.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
         }
@@ -79,7 +80,7 @@ public struct LubaToggle: View {
         ZStack(alignment: isOn ? .trailing : .leading) {
             // Track
             Capsule()
-                .fill(isOn ? LubaColors.accent : LubaColors.gray200)
+                .fill(isOn ? luba.colors.accent : luba.colors.fill)
                 .frame(width: LubaToggleTokens.trackWidth, height: LubaToggleTokens.trackHeight)
 
             // Thumb
@@ -98,7 +99,7 @@ public struct LubaToggle: View {
     // MARK: - Actions
 
     private func toggle() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
         isOn.toggle()

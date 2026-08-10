@@ -13,6 +13,29 @@
 
 import SwiftUI
 
+// MARK: - Styling Context
+
+/// Everything a button style needs to pick its colors.
+///
+/// Passed to the theme-aware members of ``LubaButtonStyling``, so a custom style
+/// can honor the active ``LubaThemeColors`` instead of hard-coding a palette.
+public struct LubaButtonStyleContext {
+    /// Whether the button is currently pressed.
+    public let isPressed: Bool
+
+    /// The active color scheme.
+    public let colorScheme: ColorScheme
+
+    /// The semantic colors for the button's view subtree.
+    public let colors: LubaThemeColors
+
+    public init(isPressed: Bool, colorScheme: ColorScheme, colors: LubaThemeColors = .default) {
+        self.isPressed = isPressed
+        self.colorScheme = colorScheme
+        self.colors = colors
+    }
+}
+
 // MARK: - Button Styling Protocol
 
 /// Defines the visual appearance of a button.
@@ -32,6 +55,24 @@ import SwiftUI
 /// LubaButton("Continue", styling: BrandStyle()) { }
 /// ```
 ///
+/// ## Theme-aware styles
+///
+/// The `in context:` members receive the active ``LubaThemeColors``. Implement
+/// those to follow the app's theme:
+///
+/// ```swift
+/// struct BrandStyle: LubaButtonStyling {
+///     func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
+///         foregroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
+///     }
+///     func foregroundColor(in context: LubaButtonStyleContext) -> Color { context.colors.textOnAccent }
+///     // …
+/// }
+/// ```
+///
+/// Styles that implement only the legacy members keep working unchanged — the
+/// context-based members default to forwarding to them.
+///
 /// See <doc:CustomizingButtonStyles> for a full guide.
 public protocol LubaButtonStyling {
     /// Foreground (text/icon) color
@@ -42,6 +83,15 @@ public protocol LubaButtonStyling {
 
     /// Border color, if any
     func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color?
+
+    /// Theme-aware foreground color. Defaults to the legacy member.
+    func foregroundColor(in context: LubaButtonStyleContext) -> Color
+
+    /// Theme-aware background color. Defaults to the legacy member.
+    func backgroundColor(in context: LubaButtonStyleContext) -> Color
+
+    /// Theme-aware border color. Defaults to the legacy member.
+    func borderColor(in context: LubaButtonStyleContext) -> Color?
 
     /// Border width (default: 1)
     var borderWidth: CGFloat { get }
@@ -58,6 +108,18 @@ public extension LubaButtonStyling {
     var borderWidth: CGFloat { 1 }
     var defaultsToFullWidth: Bool { false }
     var haptic: LubaHapticStyle { .light }
+
+    func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        foregroundColor(isPressed: context.isPressed, colorScheme: context.colorScheme)
+    }
+
+    func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        backgroundColor(isPressed: context.isPressed, colorScheme: context.colorScheme)
+    }
+
+    func borderColor(in context: LubaButtonStyleContext) -> Color? {
+        borderColor(isPressed: context.isPressed, colorScheme: context.colorScheme)
+    }
 }
 
 // MARK: - Built-in Styles
@@ -67,14 +129,26 @@ public struct LubaPrimaryStyle: LubaButtonStyling {
     public init() {}
 
     public func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        LubaColors.textOnAccent
+        foregroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? LubaColors.accentHover : LubaColors.accent
+        backgroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
+        nil
+    }
+
+    public func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.colors.textOnAccent
+    }
+
+    public func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.isPressed ? context.colors.accentHover : context.colors.accent
+    }
+
+    public func borderColor(in context: LubaButtonStyleContext) -> Color? {
         nil
     }
 
@@ -87,15 +161,27 @@ public struct LubaSecondaryStyle: LubaButtonStyling {
     public init() {}
 
     public func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        LubaColors.textPrimary
+        foregroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? LubaColors.gray100 : LubaColors.surface
+        backgroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
-        isPressed ? LubaColors.gray400 : LubaColors.border
+        borderColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
+    }
+
+    public func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.colors.textPrimary
+    }
+
+    public func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.isPressed ? context.colors.surfaceHover : context.colors.surface
+    }
+
+    public func borderColor(in context: LubaButtonStyleContext) -> Color? {
+        context.isPressed ? context.colors.borderStrong : context.colors.border
     }
 
     public var haptic: LubaHapticStyle { .light }
@@ -106,14 +192,26 @@ public struct LubaGhostStyle: LubaButtonStyling {
     public init() {}
 
     public func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? LubaColors.accentHover : LubaColors.accent
+        foregroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? LubaColors.accentSubtle : .clear
+        backgroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
+        nil
+    }
+
+    public func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.isPressed ? context.colors.accentHover : context.colors.accent
+    }
+
+    public func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.isPressed ? context.colors.accentSubtle : .clear
+    }
+
+    public func borderColor(in context: LubaButtonStyleContext) -> Color? {
         nil
     }
 
@@ -129,11 +227,23 @@ public struct LubaDestructiveStyle: LubaButtonStyling {
     }
 
     public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        let base = LubaColors.error
-        return isPressed ? base.opacity(0.85) : base
+        backgroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
+        nil
+    }
+
+    public func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        .white
+    }
+
+    public func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        let base = context.colors.error
+        return context.isPressed ? base.opacity(0.85) : base
+    }
+
+    public func borderColor(in context: LubaButtonStyleContext) -> Color? {
         nil
     }
 
@@ -146,14 +256,26 @@ public struct LubaSubtleStyle: LubaButtonStyling {
     public init() {}
 
     public func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? LubaColors.textPrimary : LubaColors.textSecondary
+        foregroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? LubaColors.gray100 : .clear
+        backgroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
+        nil
+    }
+
+    public func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.isPressed ? context.colors.textPrimary : context.colors.textSecondary
+    }
+
+    public func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.isPressed ? context.colors.surfaceHover : .clear
+    }
+
+    public func borderColor(in context: LubaButtonStyleContext) -> Color? {
         nil
     }
 
@@ -165,7 +287,7 @@ public struct LubaGlassButtonStyle: LubaButtonStyling {
     public init() {}
 
     public func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? LubaColors.white : LubaColors.textPrimary
+        foregroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
 
     public func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
@@ -174,6 +296,18 @@ public struct LubaGlassButtonStyle: LubaButtonStyling {
     }
 
     public func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? {
+        nil
+    }
+
+    public func foregroundColor(in context: LubaButtonStyleContext) -> Color {
+        context.colorScheme == .dark ? .white : context.colors.textPrimary
+    }
+
+    public func backgroundColor(in context: LubaButtonStyleContext) -> Color {
+        .clear
+    }
+
+    public func borderColor(in context: LubaButtonStyleContext) -> Color? {
         nil
     }
 

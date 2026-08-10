@@ -28,6 +28,7 @@ import Charts
 /// .lubaChartStyle()
 /// ```
 public struct LubaChartStyleModifier: ViewModifier {
+    @LubaEnvironment private var luba
     let height: CGFloat
     let showAxes: Bool
 
@@ -39,17 +40,17 @@ public struct LubaChartStyleModifier: ViewModifier {
             .chartYAxis {
                 AxisMarks { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: LubaChartTokens.gridLineWidth))
-                        .foregroundStyle(LubaColors.Chart.grid.opacity(LubaChartTokens.gridOpacity))
+                        .foregroundStyle(luba.colors.chartGrid.opacity(LubaChartTokens.gridOpacity))
                     AxisValueLabel()
-                        .font(LubaTypography.caption2)
-                        .foregroundStyle(LubaColors.Chart.axisLabel)
+                        .font(luba.fonts.caption2)
+                        .foregroundStyle(luba.colors.chartAxisLabel)
                 }
             }
             .chartXAxis {
                 AxisMarks { _ in
                     AxisValueLabel()
-                        .font(LubaTypography.caption2)
-                        .foregroundStyle(LubaColors.Chart.axisLabel)
+                        .font(luba.fonts.caption2)
+                        .foregroundStyle(luba.colors.chartAxisLabel)
                 }
             }
     }

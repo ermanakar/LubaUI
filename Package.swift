@@ -26,7 +26,11 @@ let package = Package(
         .target(
             name: "LubaUI",
             dependencies: [],
-            path: "Sources/LubaUI"
+            path: "Sources/LubaUI",
+            resources: [
+                // Built-in accessibility / UI strings (en, de).
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "LubaUITests",

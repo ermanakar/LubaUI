@@ -187,10 +187,15 @@ struct ContentView: View {
             Text("Radically composable · AI-native · Low-friction")
                 .font(LubaTypography.caption2)
                 .foregroundStyle(LubaColors.textTertiary)
+                .multilineTextAlignment(.center)
+                // Wrap and grow downward instead of overflowing the capsule
+                // at accessibility text sizes.
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, LubaSpacing.md)
                 .padding(.vertical, LubaSpacing.xs)
                 .background(LubaColors.surfaceSecondary)
                 .clipShape(Capsule())
+                .padding(.horizontal, LubaSpacing.lg)
         }
         .padding(.top, LubaSpacing.xxl)
     }

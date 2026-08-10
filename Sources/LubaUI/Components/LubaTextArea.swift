@@ -22,6 +22,7 @@ import SwiftUI
 /// LubaTextArea("Notes", text: $notes, characterLimit: 280)
 /// ```
 public struct LubaTextArea: View {
+    @LubaEnvironment private var luba
     private let label: String
     @Binding private var text: String
     private let placeholder: String
@@ -29,7 +30,6 @@ public struct LubaTextArea: View {
     private let minHeight: CGFloat
 
     @FocusState private var isFocused: Bool
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a multi-line text area.
     ///
@@ -54,33 +54,33 @@ public struct LubaTextArea: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+        VStack(alignment: .leading, spacing: luba.spacing.xs) {
             Text(label)
-                .font(LubaTypography.caption)
-                .foregroundStyle(LubaColors.textSecondary)
+                .font(luba.fonts.caption)
+                .foregroundStyle(luba.colors.textSecondary)
 
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $text)
-                    .font(LubaTypography.body)
+                    .font(luba.fonts.body)
                     .focused($isFocused)
                     .frame(minHeight: minHeight)
                     .scrollContentBackground(.hidden)
-                    .padding(LubaSpacing.sm)
+                    .padding(luba.spacing.sm)
 
                 if text.isEmpty {
                     Text(placeholder)
-                        .font(LubaTypography.body)
-                        .foregroundStyle(LubaColors.textTertiary)
-                        .padding(LubaSpacing.sm)
+                        .font(luba.fonts.body)
+                        .foregroundStyle(luba.colors.textTertiary)
+                        .padding(luba.spacing.sm)
                         .padding(.top, 8)
                         .padding(.leading, 4)
                         .allowsHitTesting(false)
                 }
             }
-            .background(LubaColors.surface)
-            .clipShape(RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous))
+            .background(luba.colors.surface)
+            .clipShape(RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous)
                     .strokeBorder(borderColor, lineWidth: isFocused ? 2 : 1)
             )
 
@@ -88,8 +88,8 @@ public struct LubaTextArea: View {
                 HStack {
                     Spacer()
                     Text("\(text.count)/\(limit)")
-                        .font(LubaTypography.caption2)
-                        .foregroundStyle(isOverLimit ? LubaColors.error : LubaColors.textTertiary)
+                        .font(luba.fonts.caption2)
+                        .foregroundStyle(isOverLimit ? luba.colors.error : luba.colors.textTertiary)
                 }
             }
         }
@@ -100,8 +100,8 @@ public struct LubaTextArea: View {
     // MARK: - Styling
 
     private var borderColor: Color {
-        if isOverLimit { return LubaColors.error }
-        return isFocused ? LubaColors.accent : LubaColors.border
+        if isOverLimit { return luba.colors.error }
+        return isFocused ? luba.colors.accent : luba.colors.border
     }
 
     private var isOverLimit: Bool {

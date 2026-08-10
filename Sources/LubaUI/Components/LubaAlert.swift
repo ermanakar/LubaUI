@@ -37,23 +37,24 @@ public enum LubaAlertStyle {
         }
     }
 
-    var color: Color {
+    /// The semantic status role this style maps to.
+    public var role: LubaStatusRole {
         switch self {
-        case .info: return LubaColors.accent
-        case .success: return LubaColors.success
-        case .warning: return LubaColors.warning
-        case .error: return LubaColors.error
+        case .info: return .info
+        case .success: return .success
+        case .warning: return .warning
+        case .error: return .error
         }
     }
 
-    var backgroundColor: Color {
-        switch self {
-        case .info: return LubaColors.accentSubtle
-        case .success: return LubaColors.successSubtle
-        case .warning: return LubaColors.warningSubtle
-        case .error: return LubaColors.errorSubtle
-        }
-    }
+    /// Icon/accent color, resolved against a theme palette.
+    func color(_ colors: LubaThemeColors) -> Color { colors.status(role) }
+
+    /// Banner background, resolved against a theme palette.
+    func backgroundColor(_ colors: LubaThemeColors) -> Color { colors.statusSubtle(role) }
+
+    var color: Color { color(.default) }
+    var backgroundColor: Color { backgroundColor(.default) }
 }
 
 // MARK: - LubaAlert
@@ -65,6 +66,7 @@ public enum LubaAlertStyle {
 /// LubaAlert("Please check your input", style: .error, isDismissible: true)
 /// ```
 public struct LubaAlert: View {
+    @LubaEnvironment private var luba
     private let message: String
     private let style: LubaAlertStyle
     private let title: String?
@@ -72,7 +74,6 @@ public struct LubaAlert: View {
     private let isDismissible: Bool
     private let onDismiss: (() -> Void)?
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates an inline alert banner.
     ///
@@ -100,22 +101,22 @@ public struct LubaAlert: View {
     }
 
     public var body: some View {
-        let content = HStack(alignment: .top, spacing: LubaAlertTokens.iconSpacing) {
+        let content = HStack(alignment: .top, spacing: LubaAlertTokens.iconSpacing(luba.spacing)) {
             Image(systemName: style.icon)
                 .font(.system(size: LubaAlertTokens.iconSize, weight: .medium))
-                .foregroundStyle(style.color)
+                .foregroundStyle(style.color(luba.colors))
                 .frame(width: LubaAlertTokens.iconFrameWidth)
 
             VStack(alignment: .leading, spacing: 2) {
                 if let title = title {
                     Text(title)
-                        .font(LubaTypography.subheadline)
-                        .foregroundStyle(LubaColors.textPrimary)
+                        .font(luba.fonts.subheadline)
+                        .foregroundStyle(luba.colors.textPrimary)
                 }
 
                 Text(message)
-                    .font(LubaTypography.bodySmall)
-                    .foregroundStyle(LubaColors.textSecondary)
+                    .font(luba.fonts.bodySmall)
+                    .foregroundStyle(luba.colors.textSecondary)
             }
 
             Spacer(minLength: 0)
@@ -124,39 +125,41 @@ public struct LubaAlert: View {
                 Button(action: dismiss) {
                     Image(systemName: "xmark")
                         .font(.system(size: LubaAlertTokens.dismissIconSize, weight: .semibold))
-                        .foregroundStyle(LubaColors.textTertiary)
+                        .foregroundStyle(luba.colors.textTertiary)
                         .frame(width: LubaAlertTokens.dismissButtonSize, height: LubaAlertTokens.dismissButtonSize)
+                        .frame(minWidth: luba.minimumTouchTarget, minHeight: luba.minimumTouchTarget)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Dismiss alert")
+                .accessibilityLabel(LubaStrings.dismissAlert)
                 .accessibilityAddTraits(.isButton)
             }
         }
-        .padding(.horizontal, LubaAlertTokens.horizontalPadding)
-        .padding(.vertical, LubaAlertTokens.verticalPadding)
+        .padding(.horizontal, LubaAlertTokens.horizontalPadding(luba.spacing))
+        .padding(.vertical, LubaAlertTokens.verticalPadding(luba.spacing))
 
         if useGlass {
             content
-                .lubaGlass(.regular, tint: style.color, cornerRadius: LubaRadius.md)
+                .lubaGlass(.regular, tint: style.color(luba.colors), cornerRadius: luba.radius.md)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityLabel(LubaStrings.statusMessage(style.role, message))
                 .accessibilityAddTraits(isDismissible ? .isButton : .isStaticText)
         } else {
             content
-                .background(style.backgroundColor)
-                .clipShape(RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous))
+                .background(style.backgroundColor(luba.colors))
+                .clipShape(RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous)
-                        .strokeBorder(style.color.opacity(0.2), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous)
+                        .strokeBorder(style.color(luba.colors).opacity(0.2), lineWidth: 1)
                 )
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityLabel(LubaStrings.statusMessage(style.role, message))
                 .accessibilityAddTraits(isDismissible ? .isButton : .isStaticText)
         }
     }
 
     private func dismiss() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
         onDismiss?()
@@ -167,12 +170,7 @@ public struct LubaAlert: View {
 
 private extension LubaAlertStyle {
     var accessibilityPrefix: String {
-        switch self {
-        case .info: return "Information"
-        case .success: return "Success"
-        case .warning: return "Warning"
-        case .error: return "Error"
-        }
+        LubaStrings.statusPrefix(role)
     }
 }
 

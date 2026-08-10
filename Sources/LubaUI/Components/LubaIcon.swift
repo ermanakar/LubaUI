@@ -45,6 +45,7 @@ public enum LubaIconSize: CaseIterable {
 
 /// A standardized icon with consistent sizing.
 public struct LubaIcon: View {
+    @LubaEnvironment private var luba
     private let name: String
     private let size: LubaIconSize
     private let color: Color?
@@ -54,7 +55,7 @@ public struct LubaIcon: View {
     /// - Parameters:
     ///   - name: The SF Symbol name (e.g. `"heart.fill"`).
     ///   - size: The icon size preset.
-    ///   - color: Optional override color; defaults to `LubaColors.textSecondary`.
+    ///   - color: Optional override color; defaults to `luba.colors.textSecondary`.
     public init(
         _ name: String,
         size: LubaIconSize = .md,
@@ -68,7 +69,7 @@ public struct LubaIcon: View {
     public var body: some View {
         Image(systemName: name)
             .font(.system(size: size.dimension, weight: size.weight))
-            .foregroundStyle(color ?? LubaColors.textSecondary)
+            .foregroundStyle(color ?? luba.colors.textSecondary)
     }
 }
 
@@ -81,7 +82,7 @@ public struct LubaIconButton: View {
     private let color: Color?
     private let action: () -> Void
 
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
     @State private var isPressed = false
 
     /// Creates an icon button.
@@ -119,7 +120,7 @@ public struct LubaIconButton: View {
 
     public var body: some View {
         Button {
-            if config.hapticsEnabled {
+            if luba.hapticsEnabled {
                 LubaHaptics.light()
             }
             action()
@@ -131,7 +132,7 @@ public struct LubaIconButton: View {
         .buttonStyle(IconPressStyle(isPressed: $isPressed))
         .scaleEffect(isPressed ? LubaIconTokens.pressScale : 1.0)
         .opacity(isPressed ? LubaIconTokens.pressOpacity : 1.0)
-        .animation(config.animationsEnabled ? LubaMotion.micro : nil, value: isPressed)
+        .animation(luba.motion.decorative(LubaMotion.micro), value: isPressed)
         .accessibilityLabel(icon.replacingOccurrences(of: ".", with: " "))
         .accessibilityAddTraits(.isButton)
     }
@@ -156,6 +157,7 @@ private struct IconPressKey: PreferenceKey {
 
 /// An icon with a circular background.
 public struct LubaCircledIcon: View {
+    @LubaEnvironment private var luba
     private let icon: String
     private let size: LubaIconSize
     private let style: Style
@@ -185,20 +187,20 @@ public struct LubaCircledIcon: View {
 
     private var backgroundColor: Color {
         switch style {
-        case .filled: return LubaColors.accent
-        case .subtle: return LubaColors.accentSubtle
-        case .neutral: return LubaColors.gray100
+        case .filled: return luba.colors.accent
+        case .subtle: return luba.colors.accentSubtle
+        case .neutral: return luba.colors.surfaceHover
         }
     }
 
     private var iconColor: Color {
         switch style {
         case .filled:
-            return LubaColors.textOnAccent
+            return luba.colors.textOnAccent
         case .subtle:
-            return LubaColors.accent
+            return luba.colors.accent
         case .neutral:
-            return LubaColors.textSecondary
+            return luba.colors.textSecondary
         }
     }
 

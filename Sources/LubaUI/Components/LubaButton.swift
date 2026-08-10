@@ -62,29 +62,33 @@ public enum LubaButtonSize {
     case medium
     case large
 
-    /// Vertical padding — all values on the 4pt grid
-    var verticalPadding: CGFloat {
+    /// Vertical padding, resolved against a theme's spacing scale.
+    /// All defaults land on the 4pt grid.
+    func verticalPadding(_ spacing: LubaThemeSpacing) -> CGFloat {
         switch self {
-        case .small: return LubaSpacing.sm   // 8
-        case .medium: return LubaSpacing.md  // 12
-        case .large: return LubaSpacing.lg   // 16
+        case .small: return spacing.sm   // 8
+        case .medium: return spacing.md  // 12
+        case .large: return spacing.lg   // 16
         }
     }
 
-    /// Horizontal padding — all values on the 4pt grid
-    var horizontalPadding: CGFloat {
+    /// Horizontal padding, resolved against a theme's spacing scale.
+    /// All defaults land on the 4pt grid.
+    func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat {
         switch self {
-        case .small: return LubaSpacing.md   // 12
-        case .medium: return LubaSpacing.custom(5)  // 20
-        case .large: return LubaSpacing.custom(7)   // 28
+        case .small: return spacing.md            // 12
+        case .medium: return spacing.custom(5)    // 20
+        case .large: return spacing.custom(7)     // 28
         }
     }
 
-    var font: Font {
+    /// The semantic text role for this size — resolved through the theme so
+    /// custom typography and Dynamic Type both apply.
+    var role: LubaTextRole {
         switch self {
-        case .small: return LubaTypography.buttonSmall
-        case .medium: return LubaTypography.button
-        case .large: return LubaTypography.buttonLarge
+        case .small: return .buttonSmall
+        case .medium: return .button
+        case .large: return .buttonLarge
         }
     }
 
@@ -97,10 +101,15 @@ public enum LubaButtonSize {
     }
 
     var cornerRadius: CGFloat {
+        cornerRadius(.default)
+    }
+
+    /// Corner radius resolved against a theme's radius scale.
+    func cornerRadius(_ radius: LubaThemeRadius) -> CGFloat {
         switch self {
-        case .small: return LubaRadius.sm    // 8
-        case .medium: return LubaRadius.md   // 12
-        case .large: return LubaRadius.md    // 12
+        case .small: return radius.sm    // 8
+        case .medium: return radius.md   // 12
+        case .large: return radius.md    // 12
         }
     }
 
@@ -150,7 +159,7 @@ public struct LubaButton: View {
     private let action: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     // MARK: - Classic Initializer (Backwards Compatible)
 
@@ -215,15 +224,22 @@ public struct LubaButton: View {
             size: size,
             useGlass: useGlass,
             fullWidth: resolvedFullWidth,
-            colorScheme: colorScheme
+            colorScheme: colorScheme,
+            colors: luba.colors,
+            font: luba.fonts.font(size.role),
+            radius: size.cornerRadius(luba.radius),
+            horizontalPadding: size.horizontalPadding(luba.spacing),
+            verticalPadding: size.verticalPadding(luba.spacing),
+            minHeight: max(size.minHeight, luba.minimumTouchTarget),
+            motion: luba.motion
         ))
         .disabled(isDisabled || isLoading)
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
-        .animation(LubaMotion.stateAnimation, value: isDisabled)
+        .animation(luba.motion.animation(LubaMotion.stateAnimation), value: isDisabled)
         .accessibilityLabel(title)
         .accessibilityAddTraits(.isButton)
         .accessibilityRemoveTraits(isDisabled ? .isButton : [])
-        .accessibilityValue(isLoading ? "Loading" : isDisabled ? "Disabled" : "")
+        .accessibilityValue(accessibilityValue)
     }
 
     @ViewBuilder
@@ -232,27 +248,35 @@ public struct LubaButton: View {
             // Leading icon
             if !isLoading, let icon = icon, iconPosition == .leading {
                 iconView(icon)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
             }
 
             // Loading state
             if isLoading {
                 LubaSpinner(size: size.spinnerSize, style: .arc)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
             }
 
-            // Title
+            // Title — wraps rather than truncating at large Dynamic Type sizes.
             Text(title)
-                .font(size.font)
+                .font(luba.fonts.font(size.role))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .opacity(isLoading ? LubaMotion.loadingContentOpacity : 1)
-                .animation(LubaMotion.stateAnimation, value: isLoading)
+                .animation(luba.motion.animation(LubaMotion.stateAnimation), value: isLoading)
 
             // Trailing icon
             if !isLoading, let icon = icon, iconPosition == .trailing {
                 iconView(icon)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
             }
         }
+    }
+
+    private var accessibilityValue: String {
+        if isLoading { return LubaStrings.loading }
+        if isDisabled { return LubaStrings.disabled }
+        return ""
     }
 
     @ViewBuilder
@@ -264,7 +288,7 @@ public struct LubaButton: View {
     private func performAction() {
         guard !isLoading && !isDisabled else { return }
 
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             styling.haptic.trigger()
         }
 
@@ -288,46 +312,59 @@ private struct LubaCoreButtonStyle: ButtonStyle {
     let useGlass: Bool
     let fullWidth: Bool
     let colorScheme: ColorScheme
+    let colors: LubaThemeColors
+    let font: Font
+    let radius: CGFloat
+    let horizontalPadding: CGFloat
+    let verticalPadding: CGFloat
+    let minHeight: CGFloat
+    let motion: LubaMotionPolicy
 
     func makeBody(configuration: Configuration) -> some View {
         let isPressed = configuration.isPressed
-        let fgColor = styling.foregroundColor(isPressed: isPressed, colorScheme: colorScheme)
-        let bgColor = styling.backgroundColor(isPressed: isPressed, colorScheme: colorScheme)
+        let context = LubaButtonStyleContext(
+            isPressed: isPressed,
+            colorScheme: colorScheme,
+            colors: colors
+        )
+        let fgColor = styling.foregroundColor(in: context)
+        let bgColor = styling.backgroundColor(in: context)
 
         let label = configuration.label
-            .padding(.horizontal, size.horizontalPadding)
-            .padding(.vertical, size.verticalPadding)
-            .frame(minHeight: size.minHeight)
+            .font(font)
+            .padding(.horizontal, horizontalPadding)
+            .padding(.vertical, verticalPadding)
+            .frame(minHeight: minHeight)
             .frame(maxWidth: fullWidth ? .infinity : nil)
             .foregroundStyle(fgColor)
 
         Group {
             if useGlass {
                 label
-                    .lubaGlass(.regular, cornerRadius: size.cornerRadius)
+                    .lubaGlass(.regular, cornerRadius: radius)
             } else {
                 label
                     .background(bgColor)
                     .overlay(
                         Group {
-                            if let borderColor = styling.borderColor(isPressed: isPressed, colorScheme: colorScheme) {
-                                RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
+                            if let borderColor = styling.borderColor(in: context) {
+                                RoundedRectangle(cornerRadius: radius, style: .continuous)
                                     .strokeBorder(borderColor, lineWidth: styling.borderWidth)
                             }
                         }
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
             }
         }
         // Expand touch target invisibly to meet accessibility guidelines
         .background(
             Color.clear
-                .frame(minWidth: 44, minHeight: 44)
+                .frame(minWidth: minHeight, minHeight: minHeight)
                 .contentShape(Rectangle())
         )
-        .scaleEffect(isPressed ? LubaMotion.pressScale : 1.0)
-        .animation(LubaMotion.colorAnimation, value: isPressed)
-        .animation(LubaMotion.pressAnimation, value: isPressed)
+        .scaleEffect(motion.pressScale(isPressed ? LubaMotion.pressScale : 1.0))
+        .animation(motion.interaction(LubaMotion.colorAnimation), value: isPressed)
+        .animation(motion.decorative(LubaMotion.pressAnimation), value: isPressed)
     }
 }
 

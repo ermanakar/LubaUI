@@ -1,0 +1,77 @@
+/*
+  Localizable.strings (English — development language)
+  LubaUI
+
+  Built-in user-facing and accessibility strings.
+  Keys are namespaced `luba.<area>.<name>`.
+*/
+
+/* State */
+"luba.state.loading" = "Loading";
+"luba.state.disabled" = "Disabled";
+"luba.state.progress" = "Progress";
+"luba.state.percent" = "%d percent";
+
+/* Actions */
+"luba.action.close" = "Close";
+"luba.action.cancel" = "Cancel";
+"luba.action.dismiss" = "Dismiss";
+"luba.action.delete" = "Delete";
+"luba.action.archive" = "Archive";
+"luba.action.pin" = "Pin";
+"luba.action.unread" = "Unread";
+"luba.action.flag" = "Flag";
+"luba.action.share" = "Share";
+"luba.action.remove" = "Remove %@";
+"luba.alert.dismiss" = "Dismiss alert";
+
+/* Search */
+"luba.search.placeholder" = "Search";
+"luba.search.clear" = "Clear search";
+"luba.search.cancel" = "Cancel search";
+
+/* Menu & tooltip */
+"luba.menu.label" = "Menu";
+"luba.menu.hint" = "Shows menu options";
+"luba.tooltip.hint" = "Tap for more information";
+
+/* Rating */
+"luba.rating.value" = "%1$d of %2$d stars";
+
+/* Expandable */
+"luba.expandable.expand" = "Expand";
+"luba.expandable.collapse" = "Collapse";
+"luba.expandable.expanded" = "Expanded";
+"luba.expandable.collapsed" = "Collapsed";
+
+/* Charts */
+"luba.chart.empty" = "No data";
+
+/* Status */
+"luba.status.info" = "Information";
+"luba.status.success" = "Success";
+"luba.status.warning" = "Warning";
+"luba.status.error" = "Error";
+"luba.status.message" = "%1$@: %2$@";
+
+/* Fields */
+"luba.field.email" = "Email";
+"luba.field.password" = "Password";
+"luba.field.required" = "Required";
+
+/* Control names */
+"luba.control.checkbox" = "Checkbox";
+"luba.control.toggle" = "Toggle";
+"luba.control.slider" = "Slider";
+"luba.control.stepper" = "Stepper";
+"luba.control.rating" = "Rating";
+"luba.control.avatar" = "Avatar";
+"luba.control.avatarInitials" = "Avatar, %@";
+
+/* Control values */
+"luba.value.checked" = "Checked";
+"luba.value.unchecked" = "Unchecked";
+"luba.value.on" = "On";
+"luba.value.off" = "Off";
+"luba.value.selected" = "Selected";
+"luba.value.notSelected" = "Not selected";

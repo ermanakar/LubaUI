@@ -5,7 +5,7 @@
 > MCP server: `claude mcp add lubaui -- npx lubaui-mcp` (npm: lubaui-mcp)
 > Website: https://shopofluba.de/lubaui
 > Repository: https://github.com/ermanakar/LubaUI
-> Last updated: 2026-03-01
+> Last updated: 2026-08-10 (0.2.0, unreleased)
 
 ---
 
@@ -25,8 +25,14 @@ LubaUI is built on three pillars:
 
 1. **Never hardcode values** — Use tokens (LubaColors, LubaSpacing, LubaMotion)
 2. **Never hardcode animations** — Use LubaMotion for values, LubaAnimations for applied presets
-3. **Always read LubaConfig** — Check `@Environment(\.lubaConfig)` for haptics/animations
-4. **Preserve backwards compatibility** — Old APIs must continue to work
+3. **Inside a component, read the environment, not the statics** — `@LubaEnvironment private var luba`,
+   then `luba.colors.*` and `luba.fonts.*`. Reading `LubaColors` / `LubaTypography` directly inside a
+   component body is what stops `.lubaTheme(…)` from reaching the pixels. App code may use the statics.
+4. **Route every animation through `luba.motion`** — never `withAnimation` or a bare
+   `.animation(_:value:)` in a component. The policy is what honors Reduce Motion.
+5. **Localize built-in strings** — put user-facing/accessibility text in `LubaStrings` plus both
+   `.lproj` files. Never hardcode English in a component.
+6. **Preserve backwards compatibility** — Old APIs must continue to work
 
 ---
 
@@ -430,29 +436,45 @@ LubaSheetHeader("Settings", subtitle: "Customize") { dismiss() }
 
 ## Key Patterns
 
-### Pattern 1: Config-Aware Components
+### Pattern 1: Environment-Aware Components
 ```swift
-@Environment(\.lubaConfig) private var config
+struct MyRow: View {
+    @LubaEnvironment private var luba   // theme + config + Reduce Motion, resolved
 
-// Haptics
-if config.hapticsEnabled {
-    LubaHaptics.light()
+    var body: some View {
+        Text("Hello")
+            .font(luba.fonts.body)                       // theme typography + Dynamic Type
+            .foregroundStyle(luba.colors.textPrimary)    // theme colors
+            .padding(luba.spacing.md)
+    }
+
+    private func tap() {
+        if luba.hapticsEnabled { LubaHaptics.light() }   // haptics stay independent of motion
+    }
 }
-
-// Animations
-.animation(config.animationsEnabled ? LubaMotion.stateAnimation : nil, value: state)
 ```
 
-### Pattern 2: Using Motion Tokens
+`@LubaEnvironment` works in `View`, `ViewModifier`, and `ButtonStyle`.
+
+### Pattern 2: Motion Through the Policy
 ```swift
-// ✅ CORRECT
-.animation(LubaMotion.pressAnimation, value: isPressed)
-.scaleEffect(isPressed ? LubaMotion.pressScale : 1.0)
+// ✅ CORRECT — the policy sees LubaConfig *and* system Reduce Motion
+.animation(luba.motion.animation(LubaMotion.stateAnimation), value: state)   // essential
+.animation(luba.motion.decorative(LubaMotion.pressAnimation), value: isPressed)  // decorative
+.scaleEffect(luba.motion.pressScale(isPressed ? LubaMotion.pressScale : 1.0))
+.transition(luba.motion.transition(.move(edge: .top)))
+luba.motion.run(LubaMotion.micro) { isOpen.toggle() }
 
-// ❌ WRONG
-.animation(.spring(response: 0.25), value: isPressed)
-.scaleEffect(isPressed ? 0.97 : 1.0)
+// ❌ WRONG — blind to Reduce Motion
+.animation(LubaMotion.pressAnimation, value: isPressed)
+.animation(config.animationsEnabled ? LubaMotion.stateAnimation : nil, value: state)
+withAnimation(.spring(response: 0.25)) { isOpen.toggle() }
 ```
+
+Policy methods: `animation` (essential → cross-fade), `decorative` (→ nil),
+`interaction`, `repeating` (→ nil), `repeatingOpacity` (survives), `continuous`
+(survives — progress that carries information), `pressScale` / `motionAmount`
+(→ neutral), `stagger` (delay → 0), `transition` (→ `.opacity`).
 
 ### Pattern 3: Composable Press Behavior
 ```swift
@@ -467,11 +489,20 @@ Image(systemName: "heart")
 ### Pattern 4: Custom Button Styling
 ```swift
 struct BrandStyle: LubaButtonStyling {
+    // Legacy members stay required; forward them to the theme-aware ones.
     func backgroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color {
-        isPressed ? .purple.opacity(0.8) : .purple
+        backgroundColor(in: LubaButtonStyleContext(isPressed: isPressed, colorScheme: colorScheme))
     }
     func foregroundColor(isPressed: Bool, colorScheme: ColorScheme) -> Color { .white }
     func borderColor(isPressed: Bool, colorScheme: ColorScheme) -> Color? { nil }
+
+    // Theme-aware members receive the active LubaThemeColors.
+    func backgroundColor(in c: LubaButtonStyleContext) -> Color {
+        c.isPressed ? c.colors.accentHover : c.colors.accent
+    }
+    func foregroundColor(in c: LubaButtonStyleContext) -> Color { c.colors.textOnAccent }
+    func borderColor(in c: LubaButtonStyleContext) -> Color? { nil }
+
     var borderWidth: CGFloat { 0 }
     var defaultsToFullWidth: Bool { false }
     var haptic: LubaHapticStyle { .medium }
@@ -480,17 +511,38 @@ struct BrandStyle: LubaButtonStyling {
 LubaButton("Custom", styling: BrandStyle()) { }
 ```
 
+A style that implements only the legacy members still works — the context-based
+members default to forwarding to them.
+
+### Pattern 4b: Theming an App
+```swift
+// One brand color derives the accent ramp, focus border, info color, chart lead.
+RootView().lubaTheme(LubaThemeConfiguration(colors: .accented(Color(hex: 0x2F5FD0))))
+
+// Palette-only override for a subtree; typography/spacing/radius are inherited.
+PromoBanner().lubaTheme(colors: .accented(.orange))
+```
+
+Semantic roles: `accent`/`accentHover`/`accentSubtle`/`textOnAccent`,
+`background`/`surface`/`surfaceSecondary`/`surfaceTertiary`/`surfaceHover`,
+`textPrimary`/`textSecondary`/`textTertiary`/`textDisabled`,
+`border`/`borderStrong`/`borderFocused`/`divider`/`fill`,
+`success`/`warning`/`error`/`info` (+ `…Subtle`),
+`chartPalette`/`chartGrid`/`chartAxisLabel`, `glassBorder`/`glassShadow`.
+
 ### Pattern 5: Semantic Token Usage
 ```swift
-// ✅ CORRECT
+// ✅ CORRECT — app code
 Text("Hello").foregroundStyle(LubaColors.textPrimary)
 VStack(spacing: LubaSpacing.lg) { }
-.animation(LubaMotion.stateAnimation, value: state)
+
+// ✅ CORRECT — inside a LubaUI component (theme-aware)
+Text("Hello").foregroundStyle(luba.colors.textPrimary)
+VStack(spacing: luba.spacing.lg) { }
 
 // ❌ WRONG
 Text("Hello").foregroundStyle(Color(hex: 0x1A1A1A))
 VStack(spacing: 16) { }
-.animation(.spring(response: 0.35), value: state)
 ```
 
 ### Pattern 6: Using Animation Presets
@@ -516,13 +568,14 @@ ForEach(items.indices) { i in
 When creating a component:
 
 - [ ] Create `LubaFooTokens` if component has magic numbers
-- [ ] Add `@Environment(\.lubaConfig) private var config`
-- [ ] Use `LubaMotion` for ALL animation values
-- [ ] Use `LubaAnimations` for applied `Animation` objects when needed
-- [ ] Check `config.hapticsEnabled` before haptics
-- [ ] Check `config.animationsEnabled` before animations
-- [ ] Use `LubaColors` semantic colors
-- [ ] Use `LubaSpacing` for padding/spacing
+- [ ] Add `@LubaEnvironment private var luba`
+- [ ] Take colors from `luba.colors`, fonts from `luba.fonts`, spacing from `luba.spacing`
+- [ ] Route every animation through `luba.motion` — never bare `withAnimation`
+- [ ] Use `LubaMotion` / `LubaAnimations` for the animation *values* you hand the policy
+- [ ] Check `luba.hapticsEnabled` before haptics
+- [ ] Put user-facing and accessibility strings in `LubaStrings` + `en.lproj` + `de.lproj`
+- [ ] Use `minHeight`, not `height`, on anything containing text
+- [ ] Honor `luba.minimumTouchTarget` on interactive elements
 - [ ] Add #Preview with multiple states
 - [ ] Preserve backwards compatibility
 
@@ -533,6 +586,9 @@ When creating a component:
 ```bash
 swift build    # Build package
 swift test     # Run tests
+
+# Library-only iOS Simulator build (what CI runs)
+xcodebuild build -scheme LubaUI -destination 'generic/platform=iOS Simulator'
 ```
 
 ---
@@ -550,8 +606,9 @@ When generating LubaUI code:
 7. Use `.lubaShimmerable()` for loading shimmer on any view
 8. Wrap content in LubaCard for elevation
 9. Use LubaButton for buttons — never custom Button styling
-10. Check LubaConfig for haptics/animations in custom components
-11. Prefer composition (`.lubaPressable()`, `.lubaToast()`) over inheritance
+10. In custom components, use `@LubaEnvironment` for colors/fonts/motion/haptics
+11. Apply `.lubaTheme(…)` to rebrand — do not pass colors into every component
+12. Prefer composition (`.lubaPressable()`, `.lubaToast()`) over inheritance
 
 ---
 

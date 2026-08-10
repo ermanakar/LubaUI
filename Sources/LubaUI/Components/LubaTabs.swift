@@ -12,6 +12,30 @@
 
 import SwiftUI
 
+// MARK: - Selection Indicator
+
+/// Applies the sliding-indicator geometry only when decorative motion is allowed.
+///
+/// `matchedGeometryEffect` animates position by construction, so a Reduce Motion
+/// user still sees the indicator travel no matter how gentle the animation is.
+/// The only way to hold it still is not to use it — under Reduce Motion the
+/// indicator cross-fades in place instead, which reads as the same state change
+/// without the movement.
+private struct LubaTabIndicator: ViewModifier {
+    let namespace: Namespace.ID
+    let id: String
+    let slides: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if slides {
+            content.matchedGeometryEffect(id: id, in: namespace)
+        } else {
+            content.transition(.opacity)
+        }
+    }
+}
+
 // MARK: - LubaTabs (Segmented)
 
 /// A segmented tab bar with animated selection indicator.
@@ -28,11 +52,11 @@ import SwiftUI
 ///
 /// Pass `useGlass: true` for a frosted glass background.
 public struct LubaTabs<T: Hashable>: View {
+    @LubaEnvironment private var luba
     @Binding private var selection: T
     private let tabs: [(value: T, label: String, icon: String?)]
     private let useGlass: Bool
 
-    @Environment(\.lubaConfig) private var config
     @Namespace private var namespace
 
     public init(
@@ -88,54 +112,61 @@ public struct LubaTabs<T: Hashable>: View {
 
         if useGlass {
             container
-                .lubaGlass(.subtle, cornerRadius: LubaTabsTokens.segmentedContainerRadius)
+                .lubaGlass(.subtle, cornerRadius: LubaTabsTokens.segmentedContainerRadius(luba.radius))
         } else {
             container
-                .background(LubaColors.gray100)
-                .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius, style: .continuous))
+                .background(luba.colors.surfaceHover)
+                .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius(luba.radius), style: .continuous))
         }
     }
 
     private func tabButton(for tab: (value: T, label: String, icon: String?)) -> some View {
         Button {
             guard selection != tab.value else { return }
-            if config.hapticsEnabled {
+            if luba.hapticsEnabled {
                 LubaHaptics.selection()
             }
-            withAnimation(config.animationsEnabled ? LubaMotion.stateAnimation : nil) {
+            luba.motion.run(LubaMotion.stateAnimation) {
                 selection = tab.value
             }
         } label: {
-            HStack(spacing: LubaTabsTokens.iconLabelSpacing) {
+            HStack(spacing: LubaTabsTokens.iconLabelSpacing(luba.spacing)) {
                 if let icon = tab.icon {
                     Image(systemName: icon)
                         .font(.system(size: LubaTabsTokens.iconSize, weight: .medium))
                 }
 
                 Text(tab.label)
-                    .font(LubaTypography.buttonSmall)
+                    .font(luba.fonts.buttonSmall)
+                    .lineLimit(1)
+                    .minimumScaleFactor(LubaTabsTokens.minimumScaleFactor)
+                    .truncationMode(.tail)
             }
-            .foregroundStyle(selection == tab.value ? LubaColors.textPrimary : LubaColors.textSecondary)
-            .padding(.horizontal, LubaTabsTokens.tabHorizontalPadding)
-            .frame(height: LubaTabsTokens.tabHeight)
+            .foregroundStyle(selection == tab.value ? luba.colors.textPrimary : luba.colors.textSecondary)
+            .padding(.horizontal, LubaTabsTokens.tabHorizontalPadding(luba.spacing))
+            .frame(minHeight: LubaTabsTokens.tabHeight)
             .frame(maxWidth: .infinity)
             .background {
                 if selection == tab.value {
-                    RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedTabRadius, style: .continuous)
-                        .fill(LubaColors.surface)
+                    RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedTabRadius(luba.radius), style: .continuous)
+                        .fill(luba.colors.surface)
                         .shadow(
                             color: Color.black.opacity(LubaTabsTokens.shadowOpacity),
                             radius: LubaTabsTokens.shadowRadius,
                             y: LubaTabsTokens.shadowY
                         )
-                        .matchedGeometryEffect(id: "tab", in: namespace)
+                        .modifier(LubaTabIndicator(
+                                namespace: namespace,
+                                id: "tab",
+                                slides: luba.motion.allowsDecorativeMotion
+                            ))
                 }
             }
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tab.label)
-        .accessibilityValue(selection == tab.value ? "Selected" : "")
+        .accessibilityValue(selection == tab.value ? LubaStrings.selected : "")
         .accessibilityAddTraits(selection == tab.value ? [.isButton, .isSelected] : .isButton)
     }
 }
@@ -151,10 +182,10 @@ public struct LubaTabs<T: Hashable>: View {
 /// ])
 /// ```
 public struct LubaUnderlineTabs<T: Hashable>: View {
+    @LubaEnvironment private var luba
     @Binding private var selection: T
     private let tabs: [(value: T, label: String)]
 
-    @Environment(\.lubaConfig) private var config
     @Namespace private var namespace
 
     public init(
@@ -186,17 +217,20 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
     private func underlineTabButton(for tab: (value: T, label: String)) -> some View {
         Button {
             guard selection != tab.value else { return }
-            if config.hapticsEnabled {
+            if luba.hapticsEnabled {
                 LubaHaptics.selection()
             }
-            withAnimation(config.animationsEnabled ? LubaMotion.stateAnimation : nil) {
+            luba.motion.run(LubaMotion.stateAnimation) {
                 selection = tab.value
             }
         } label: {
             VStack(spacing: LubaTabsTokens.underlineSpacing) {
                 Text(tab.label)
-                    .font(LubaTypography.custom(size: LubaTabsTokens.underlineFontSize, weight: selection == tab.value ? .bold : .medium))
-                    .foregroundStyle(selection == tab.value ? LubaColors.accent : LubaColors.textTertiary)
+                    .font(luba.fonts.subheadline.weight(selection == tab.value ? .bold : .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(LubaTabsTokens.minimumScaleFactor)
+                    .truncationMode(.tail)
+                    .foregroundStyle(selection == tab.value ? luba.colors.accent : luba.colors.textTertiary)
 
                 ZStack(alignment: .bottom) {
                     Rectangle()
@@ -205,19 +239,23 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
 
                     if selection == tab.value {
                         Rectangle()
-                            .fill(LubaColors.accent)
+                            .fill(luba.colors.accent)
                             .frame(height: LubaTabsTokens.underlineIndicatorHeight)
-                            .matchedGeometryEffect(id: "underline", in: namespace)
+                            .modifier(LubaTabIndicator(
+                                namespace: namespace,
+                                id: "underline",
+                                slides: luba.motion.allowsDecorativeMotion
+                            ))
                     }
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: LubaTabsTokens.underlineHeight)
+            .frame(minHeight: LubaTabsTokens.underlineHeight)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tab.label)
-        .accessibilityValue(selection == tab.value ? "Selected" : "")
+        .accessibilityValue(selection == tab.value ? LubaStrings.selected : "")
         .accessibilityAddTraits(selection == tab.value ? [.isButton, .isSelected] : .isButton)
     }
 }

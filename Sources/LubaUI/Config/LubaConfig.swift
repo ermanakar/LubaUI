@@ -23,11 +23,19 @@ public struct LubaConfig: Equatable {
     
     /// Your brand name (used in accessibility labels)
     public var brandName: String = "LubaUI"
-    
-    /// Primary accent color override (nil uses default sage green)
+
+    /// Primary accent color override (nil uses default sage green).
+    ///
+    /// - Warning: Superseded by ``LubaThemeColors``. These fields were never
+    ///   consumed by components; set the accent on the theme instead:
+    ///   `.lubaTheme(LubaThemeConfiguration(colors: .accented(myAccent)))`.
+    @available(*, deprecated, message: "Use .lubaTheme(LubaThemeConfiguration(colors: .accented(color))) instead. This value is not read by components.")
     public var accentColorLight: Color? = nil
+
+    /// See ``accentColorLight``.
+    @available(*, deprecated, message: "Use .lubaTheme(LubaThemeConfiguration(colors: .accented(color))) instead. This value is not read by components.")
     public var accentColorDark: Color? = nil
-    
+
     // MARK: - Haptics
     
     /// Enable haptic feedback globally
@@ -73,10 +81,14 @@ public struct LubaConfig: Equatable {
     
     /// Default card elevation
     public var defaultCardElevation: LubaCardElevation = .low
-    
-    /// Default corner radius
+
+    /// Default corner radius.
+    ///
+    /// - Warning: Superseded by ``LubaThemeRadius``. Set radii on the theme:
+    ///   `LubaThemeConfiguration(radius: LubaThemeRadius(md: 16))`.
+    @available(*, deprecated, message: "Use LubaThemeRadius on the theme instead. This value is not read by components.")
     public var defaultCornerRadius: CGFloat = 12
-    
+
     // MARK: - Debug
     
     /// Show component outlines for debugging
@@ -91,17 +103,28 @@ public struct LubaConfig: Equatable {
     
     // MARK: - Convenience Methods
     
-    /// Apply a custom accent color
+    /// Apply a custom accent color.
+    ///
+    /// - Warning: Superseded by ``LubaThemeColors/accented(_:hover:subtle:onAccent:)``.
+    @available(*, deprecated, message: "Use .lubaTheme(LubaThemeConfiguration(colors: .accented(color))) instead.")
     public mutating func setAccentColor(light: Color, dark: Color) {
         accentColorLight = light
         accentColorDark = dark
     }
-    
+
     /// Apply animation speed multiplier to any animation.
     /// Returns nil when animations are disabled.
+    ///
+    /// - Note: This does not know about the system Reduce Motion setting.
+    ///   Inside a view, prefer ``LubaContext/motion``, which does.
     public func animation(_ base: Animation = LubaAnimations.standard) -> Animation? {
         guard animationsEnabled else { return nil }
         return animationSpeed == 1.0 ? base : base.speed(1.0 / animationSpeed)
+    }
+
+    /// The motion policy implied by this configuration and a system Reduce Motion value.
+    public func motionPolicy(systemReduceMotion: Bool) -> LubaMotionPolicy {
+        LubaMotionPolicy(config: self, systemReduceMotion: systemReduceMotion)
     }
 
     /// Disable all animations
@@ -121,10 +144,17 @@ public struct LubaConfig: Equatable {
 // MARK: - Environment Key
 
 private struct LubaConfigKey: EnvironmentKey {
-    static let defaultValue = LubaConfig.shared
+    /// Computed, not stored: `LubaConfig.shared` is the *global fallback*, and a
+    /// stored default would freeze whatever value existed at first environment
+    /// access. Any `.lubaConfig(…)` in the hierarchy overrides this.
+    static var defaultValue: LubaConfig { LubaConfig.shared }
 }
 
 public extension EnvironmentValues {
+    /// The configuration in effect for this view subtree.
+    ///
+    /// Precedence: the nearest `.lubaConfig(…)` ancestor wins; with no ancestor,
+    /// the value falls back to `LubaConfig.shared`.
     var lubaConfig: LubaConfig {
         get { self[LubaConfigKey.self] }
         set { self[LubaConfigKey.self] = newValue }
@@ -140,10 +170,14 @@ public extension View {
     }
     
     /// Customize LubaUI configuration inline.
-    func lubaConfig(_ configure: (inout LubaConfig) -> Void) -> some View {
-        var config = LubaConfig.shared
-        configure(&config)
-        return environment(\.lubaConfig, config)
+    ///
+    /// The closure receives the configuration *inherited from the enclosing
+    /// subtree*, so nested calls compose instead of resetting to the global
+    /// defaults.
+    func lubaConfig(_ configure: @escaping (inout LubaConfig) -> Void) -> some View {
+        transformEnvironment(\.lubaConfig) { config in
+            configure(&config)
+        }
     }
 }
 
