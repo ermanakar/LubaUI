@@ -18,7 +18,7 @@ jobs:
       matrix:
         xcode: ['16.2']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
@@ -36,7 +36,7 @@ jobs:
     name: iOS Simulator (library only)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Deliberately uses the runner's *default* Xcode instead of pinning a
       # version. GitHub installs simulator runtimes only for the default
