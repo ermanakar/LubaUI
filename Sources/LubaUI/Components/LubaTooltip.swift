@@ -223,7 +223,7 @@ private struct LubaTooltipHostModifier: ViewModifier {
 
         let measuredWidth = bubbleSize.width > 0 ? bubbleSize.width : LubaTooltipTokens.maxWidth
         let measuredHeight = bubbleSize.height > 0 ? bubbleSize.height : 44
-        let edgePadding = LubaTooltipTokens.screenEdgePadding
+        let edgePadding = LubaTooltipTokens.screenEdgePadding(luba.spacing)
         let gap = LubaTooltipTokens.offsetFromAnchor
 
         let minCenterX = edgePadding + measuredWidth / 2
@@ -287,7 +287,7 @@ private struct TooltipBubble: View {
         Text(message)
             .font(luba.fonts.footnote)
             .foregroundStyle(luba.colors.textPrimary)
-            .padding(LubaTooltipTokens.padding)
+            .padding(LubaTooltipTokens.padding(luba.spacing))
             .frame(maxWidth: LubaTooltipTokens.maxWidth, alignment: .leading)
             .background(luba.colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: LubaTooltipTokens.cornerRadius, style: .continuous))

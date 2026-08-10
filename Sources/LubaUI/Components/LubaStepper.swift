@@ -49,7 +49,7 @@ public struct LubaStepper: View {
     }
 
     public var body: some View {
-        HStack(spacing: LubaSpacing.md) {
+        HStack(spacing: luba.spacing.md) {
             if let label = label {
                 Text(label)
                     .font(luba.fonts.body)

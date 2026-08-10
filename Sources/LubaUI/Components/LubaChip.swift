@@ -30,6 +30,8 @@ public enum LubaChipTokens {
 
     /// Horizontal content inset.
     public static let horizontalPadding: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Visual chip height.
     public static let height: CGFloat = 32
@@ -103,6 +105,11 @@ public struct LubaChip: View {
 
             Text(label)
                 .font(luba.fonts.subheadline)
+                // A chip is a compact token, not a paragraph. Wrapping makes it
+                // outgrow its own shape at accessibility sizes, so it stays on
+                // one line and truncates; VoiceOver still reads the full label.
+                .lineLimit(1)
+                .truncationMode(.tail)
 
             if isDismissible {
                 Button(action: dismiss) {
@@ -111,16 +118,23 @@ public struct LubaChip: View {
                         .frame(width: LubaChipTokens.dismissButtonSize, height: LubaChipTokens.dismissButtonSize)
                         .background(dismissBackground)
                         .clipShape(Circle())
+                        // The visible glyph stays small, but the tappable area
+                        // fills the chip's full height. A chip is 32pt tall, so
+                        // it cannot host a 44pt target without changing the
+                        // component's proportions — this takes the affordance
+                        // as far as the geometry allows, at no layout cost.
+                        .frame(height: LubaChipTokens.height)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(LubaStrings.remove(label))
             }
         }
-        .padding(.horizontal, LubaChipTokens.horizontalPadding)
+        .padding(.horizontal, LubaChipTokens.horizontalPadding(luba.spacing))
         .frame(minHeight: LubaChipTokens.height)
         .foregroundStyle(foregroundColor)
         .background(backgroundColor)
-        .clipShape(Capsule())
+        .clipShape(chipShape)
         .overlay(borderOverlay)
         .if(onTap != nil) { view in
             view.lubaPressable { onTap?() }
@@ -153,10 +167,14 @@ public struct LubaChip: View {
     @ViewBuilder
     private var borderOverlay: some View {
         if style == .outlined {
-            Capsule()
+            chipShape
                 .strokeBorder(isSelected ? luba.colors.accent : luba.colors.border, lineWidth: LubaChipTokens.borderWidth)
         }
     }
+
+    /// A capsule. Kept as one property so the fill and the outlined border
+    /// can never drift apart.
+    private var chipShape: Capsule { Capsule() }
 
     private var dismissBackground: Color {
         switch style {

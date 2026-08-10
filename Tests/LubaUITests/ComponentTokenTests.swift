@@ -56,8 +56,12 @@ final class ComponentTokenTests: XCTestCase {
 
         // Monotonic progression
         for i in 0..<(sizes.count - 1) {
-            XCTAssertLessThanOrEqual(sizes[i].verticalPadding, sizes[i + 1].verticalPadding)
-            XCTAssertLessThanOrEqual(sizes[i].horizontalPadding, sizes[i + 1].horizontalPadding)
+            XCTAssertLessThanOrEqual(
+                sizes[i].verticalPadding(.default), sizes[i + 1].verticalPadding(.default)
+            )
+            XCTAssertLessThanOrEqual(
+                sizes[i].horizontalPadding(.default), sizes[i + 1].horizontalPadding(.default)
+            )
             XCTAssertLessThanOrEqual(sizes[i].minHeight, sizes[i + 1].minHeight)
             XCTAssertLessThanOrEqual(sizes[i].iconSize, sizes[i + 1].iconSize)
             XCTAssertLessThanOrEqual(sizes[i].cornerRadius, sizes[i + 1].cornerRadius)
@@ -69,9 +73,9 @@ final class ComponentTokenTests: XCTestCase {
 
         // Padding on 4pt grid
         for size in sizes {
-            XCTAssertEqual(size.verticalPadding.truncatingRemainder(dividingBy: 4), 0,
+            XCTAssertEqual(size.verticalPadding(.default).truncatingRemainder(dividingBy: 4), 0,
                            "\(size) vertical padding should be on the 4pt grid")
-            XCTAssertEqual(size.horizontalPadding.truncatingRemainder(dividingBy: 4), 0,
+            XCTAssertEqual(size.horizontalPadding(.default).truncatingRemainder(dividingBy: 4), 0,
                            "\(size) horizontal padding should be on the 4pt grid")
         }
     }

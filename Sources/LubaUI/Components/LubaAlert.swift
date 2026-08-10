@@ -101,7 +101,7 @@ public struct LubaAlert: View {
     }
 
     public var body: some View {
-        let content = HStack(alignment: .top, spacing: LubaAlertTokens.iconSpacing) {
+        let content = HStack(alignment: .top, spacing: LubaAlertTokens.iconSpacing(luba.spacing)) {
             Image(systemName: style.icon)
                 .font(.system(size: LubaAlertTokens.iconSize, weight: .medium))
                 .foregroundStyle(style.color(luba.colors))
@@ -135,21 +135,21 @@ public struct LubaAlert: View {
                 .accessibilityAddTraits(.isButton)
             }
         }
-        .padding(.horizontal, LubaAlertTokens.horizontalPadding)
-        .padding(.vertical, LubaAlertTokens.verticalPadding)
+        .padding(.horizontal, LubaAlertTokens.horizontalPadding(luba.spacing))
+        .padding(.vertical, LubaAlertTokens.verticalPadding(luba.spacing))
 
         if useGlass {
             content
-                .lubaGlass(.regular, tint: style.color(luba.colors), cornerRadius: LubaRadius.md)
+                .lubaGlass(.regular, tint: style.color(luba.colors), cornerRadius: luba.radius.md)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(LubaStrings.statusMessage(style.role, message))
                 .accessibilityAddTraits(isDismissible ? .isButton : .isStaticText)
         } else {
             content
                 .background(style.backgroundColor(luba.colors))
-                .clipShape(RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous)
+                    RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous)
                         .strokeBorder(style.color(luba.colors).opacity(0.2), lineWidth: 1)
                 )
                 .accessibilityElement(children: .ignore)

@@ -400,6 +400,10 @@ public struct LubaThemeSpacing {
     public let xxxl: CGFloat
     public let huge: CGFloat
 
+    /// An off-scale step, expressed in grid units like `LubaSpacing.custom(_:)`.
+    /// Derived from ``xs`` so a rescaled theme carries custom steps with it.
+    public func custom(_ multiplier: Int) -> CGFloat { xs * CGFloat(multiplier) }
+
     public init(
         xs: CGFloat = LubaSpacing.xs,
         sm: CGFloat = LubaSpacing.sm,

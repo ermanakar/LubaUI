@@ -103,7 +103,10 @@ should use a ``LubaTextRole``.
 
 - Controls holding text (``LubaChip``, ``LubaSearchBar``, ``LubaTabs``,
   ``LubaButton``) use `minHeight`, so they grow instead of clipping.
-- Important labels wrap rather than truncate.
+- Multi-word labels — button titles, control labels, helper text — wrap.
+- Compact tokens whose silhouette carries meaning — chips, segmented tab labels
+  — stay on one line and truncate. Wrapping makes a chip outgrow its capsule;
+  the full text remains available to VoiceOver.
 - Interactive targets honor `minimumTouchTarget` (44pt by default) even when the
   visible glyph is smaller — ``LubaRating`` stars, the alert dismiss button, and
   the sheet close button all expand their hit area without growing visually.

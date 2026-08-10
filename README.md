@@ -545,8 +545,10 @@ diameter. It honors the size you pass and does not scale, because
 role for anything that is running text.
 
 Controls that contain text (`LubaChip`, `LubaSearchBar`, `LubaTabs`, buttons)
-use `minHeight` rather than a fixed height, and important labels wrap instead of
-truncating. Interactive targets honor `minimumTouchTarget` (44pt by default) even
+use `minHeight` rather than a fixed height, so they grow with the type scale.
+Multi-word labels wrap; compact tokens (chips, segmented tab labels) stay on one
+line and truncate rather than outgrow their own shape, with the full text still
+exposed to VoiceOver. Interactive targets honor `minimumTouchTarget` (44pt by default) even
 when their visible glyph is smaller.
 
 ### Localized strings

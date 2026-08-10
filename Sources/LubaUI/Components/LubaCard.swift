@@ -96,15 +96,23 @@ public enum LubaCardStyle {
 public enum LubaCardTokens {
     /// Default corner radius (on the LubaRadius grid)
     public static let cornerRadius: CGFloat = LubaRadius.lg
+    /// Resolved against a theme's radius scale.
+    public static func cornerRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.lg }
 
     /// Default content padding
     public static let padding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func padding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Compact padding for dense layouts
     public static let paddingCompact: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func paddingCompact(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Large padding for hero cards
     public static let paddingLarge: CGFloat = LubaSpacing.xl
+    /// Resolved against a theme's spacing scale.
+    public static func paddingLarge(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.xl }
 
     /// Border width
     public static let borderWidth: CGFloat = 1
@@ -140,8 +148,8 @@ public struct LubaCard<Content: View>: View {
     @LubaEnvironment private var luba
     private let elevation: LubaCardElevation
     private let style: LubaCardStyle
-    private let cornerRadius: CGFloat
-    private let padding: CGFloat
+    private let explicitCornerRadius: CGFloat?
+    private let explicitPadding: CGFloat?
     private let clipsContent: Bool
     private let content: Content
 
@@ -150,17 +158,27 @@ public struct LubaCard<Content: View>: View {
     public init(
         elevation: LubaCardElevation = .low,
         style: LubaCardStyle = .filled,
-        cornerRadius: CGFloat = LubaCardTokens.cornerRadius,
-        padding: CGFloat = LubaCardTokens.padding,
+        cornerRadius: CGFloat? = nil,
+        padding: CGFloat? = nil,
         clipsContent: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.elevation = elevation
         self.style = style
-        self.cornerRadius = cornerRadius
-        self.padding = padding
+        self.explicitCornerRadius = cornerRadius
+        self.explicitPadding = padding
         self.clipsContent = clipsContent
         self.content = content()
+    }
+
+    /// An explicit override, else the theme's card radius.
+    private var cornerRadius: CGFloat {
+        explicitCornerRadius ?? LubaCardTokens.cornerRadius(luba.radius)
+    }
+
+    /// An explicit override, else the theme's card padding.
+    private var padding: CGFloat {
+        explicitPadding ?? LubaCardTokens.padding(luba.spacing)
     }
 
     public var body: some View {

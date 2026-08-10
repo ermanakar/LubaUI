@@ -31,7 +31,7 @@ public struct LubaProgressBar: View {
     }
 
     public var body: some View {
-        VStack(alignment: .trailing, spacing: LubaSpacing.xs) {
+        VStack(alignment: .trailing, spacing: luba.spacing.xs) {
             if showLabel {
                 Text("\(Int(value * 100))%")
                     .font(luba.fonts.caption)

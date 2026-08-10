@@ -18,10 +18,11 @@ English.
   semantic role set — accent ramp, surface hierarchy (including an elevated
   surface), four text levels, borders/dividers/fills, four status colors with
   subtle variants, chart palette, and glass roles. Every public component now
-  resolves its colors and fonts from the theme in the environment. Spacing and
-  radius scales remain on the theme and are exposed via `luba.spacing` /
-  `luba.radius`; inside LubaUI, dimensions still come from the Tier-3 component
-  tokens, with `LubaButton` honoring `theme.radius`.
+  resolves its colors, fonts, **spacing, and radii** from the theme in the
+  environment. Tier-3 component tokens keep their defaults and gain a resolver
+  form — `LubaCardTokens.padding(luba.spacing)`,
+  `LubaFieldTokens.cornerRadius(luba.radius)` — so a component still says
+  "card padding" while the value follows the theme.
 - **`@LubaEnvironment`** — one property wrapper giving a component the resolved
   `colors`, `fonts`, `spacing`, `radius`, `motion`, and `config` for its subtree.
   Works in `View`, `ViewModifier`, and `ButtonStyle`.
@@ -46,8 +47,11 @@ English.
   the built-in presets follow the theme.
 - iOS Simulator library build in CI, using a generic destination and the package
   scheme so it never depends on the showcase app or a named device.
-- 55 new tests covering theme resolution, motion policy, typography,
-  localization, and environment precedence (97 total).
+- 57 new tests covering theme resolution, motion policy, typography,
+  localization, and environment precedence (104 total). Two are structural
+  guards: they fail if a theme color role is declared but never read by a
+  component, or if component code reads the Tier-1 dimension scale directly
+  instead of resolving through the theme.
 
 ### Changed
 
@@ -78,11 +82,21 @@ English.
   the enclosing subtree rather than a fresh copy of `LubaConfig.shared`, so
   nested calls compose.
 - **`LubaSpinner` under Reduce Motion** stops rotating and breathes in opacity.
+- **The tab selection indicator no longer slides under Reduce Motion.**
+  `matchedGeometryEffect` animates position by construction, so it is skipped
+  entirely in that mode and the indicator cross-fades in place instead.
+- **Shimmer honors `animationSpeed`**, having previously animated directly
+  rather than through the motion policy.
+- **A dismissible chip's tap target fills the chip's height** rather than only
+  the 16pt glyph circle. A 32pt chip cannot host a 44pt target without changing
+  its proportions, so this takes it as far as the geometry allows.
 - **Long-press progress rings keep their real duration** under Reduce Motion —
   the fill is the countdown, so shortening it would remove information.
-- Controls that hold text (`LubaChip`, `LubaSearchBar`, `LubaTabs`, buttons) use
-  `minHeight` instead of a fixed height, and important labels wrap rather than
-  truncate.
+- Controls that hold text use `minHeight` instead of a fixed height, so they
+  grow with the type scale. Multi-word labels — button titles, toggle and
+  checkbox labels, helper text — wrap. Compact tokens whose shape is the point
+  — chips and segmented tab labels — stay on one line and truncate, because
+  wrapping makes them outgrow their own silhouette.
 - `LubaRating` stars, the `LubaAlert` dismiss button, and the `LubaSheet` close
   button now expand to the configured minimum touch target (44pt by default)
   while keeping their smaller visible glyphs.
@@ -106,6 +120,12 @@ English.
   fonts**, resolving every call to the same text style. An 11pt badge and a 32pt
   avatar initial rendered identically, and a 9pt chip glyph overflowed its 16pt
   frame. The size is now always honored, and a regression test pins it.
+- **Chips and segmented tabs broke at accessibility text sizes.** Found by
+  running the components at AX5 rather than by reading the code: a chip's label
+  overflowed its own capsule and the capsule rendered as a circle once the text
+  wrapped, and segmented tab labels clipped mid-word. Both are compact tokens,
+  so they now stay on one line and truncate, growing in height with the type
+  scale. VoiceOver still reads the full label.
 - **Spinners froze in a half-finished state when animations were switched off.**
   `LubaSpinner` chose its Reduce Motion fallback whenever motion was disallowed,
   including via `animationsEnabled = false` — where no animation exists to drive

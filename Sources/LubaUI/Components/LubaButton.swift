@@ -62,21 +62,23 @@ public enum LubaButtonSize {
     case medium
     case large
 
-    /// Vertical padding — all values on the 4pt grid
-    var verticalPadding: CGFloat {
+    /// Vertical padding, resolved against a theme's spacing scale.
+    /// All defaults land on the 4pt grid.
+    func verticalPadding(_ spacing: LubaThemeSpacing) -> CGFloat {
         switch self {
-        case .small: return LubaSpacing.sm   // 8
-        case .medium: return LubaSpacing.md  // 12
-        case .large: return LubaSpacing.lg   // 16
+        case .small: return spacing.sm   // 8
+        case .medium: return spacing.md  // 12
+        case .large: return spacing.lg   // 16
         }
     }
 
-    /// Horizontal padding — all values on the 4pt grid
-    var horizontalPadding: CGFloat {
+    /// Horizontal padding, resolved against a theme's spacing scale.
+    /// All defaults land on the 4pt grid.
+    func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat {
         switch self {
-        case .small: return LubaSpacing.md   // 12
-        case .medium: return LubaSpacing.custom(5)  // 20
-        case .large: return LubaSpacing.custom(7)   // 28
+        case .small: return spacing.md            // 12
+        case .medium: return spacing.custom(5)    // 20
+        case .large: return spacing.custom(7)     // 28
         }
     }
 
@@ -230,6 +232,8 @@ public struct LubaButton: View {
             colors: luba.colors,
             font: luba.fonts.font(size.role),
             radius: size.cornerRadius(luba.radius),
+            horizontalPadding: size.horizontalPadding(luba.spacing),
+            verticalPadding: size.verticalPadding(luba.spacing),
             minHeight: max(size.minHeight, luba.minimumTouchTarget),
             motion: luba.motion
         ))
@@ -315,6 +319,8 @@ private struct LubaCoreButtonStyle: ButtonStyle {
     let colors: LubaThemeColors
     let font: Font
     let radius: CGFloat
+    let horizontalPadding: CGFloat
+    let verticalPadding: CGFloat
     let minHeight: CGFloat
     let motion: LubaMotionPolicy
 
@@ -330,8 +336,8 @@ private struct LubaCoreButtonStyle: ButtonStyle {
 
         let label = configuration.label
             .font(font)
-            .padding(.horizontal, size.horizontalPadding)
-            .padding(.vertical, size.verticalPadding)
+            .padding(.horizontal, horizontalPadding)
+            .padding(.vertical, verticalPadding)
             .frame(minHeight: minHeight)
             .frame(maxWidth: fullWidth ? .infinity : nil)
             .foregroundStyle(fgColor)

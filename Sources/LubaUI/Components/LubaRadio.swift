@@ -102,7 +102,7 @@ public struct LubaRadioButton: View {
 
     public var body: some View {
         Button(action: performAction) {
-            HStack(spacing: LubaSelectionTokens.labelSpacing) {
+            HStack(spacing: LubaSelectionTokens.labelSpacing(luba.spacing)) {
                 radioControl
                 labelView
                 Spacer(minLength: 0)

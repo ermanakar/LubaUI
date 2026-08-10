@@ -101,7 +101,7 @@ public struct LubaToast: View {
     }
 
     public var body: some View {
-        let content = HStack(spacing: LubaToastTokens.iconSpacing) {
+        let content = HStack(spacing: LubaToastTokens.iconSpacing(luba.spacing)) {
             // Icon
             Image(systemName: style.icon)
                 .font(.system(size: LubaToastTokens.iconSize, weight: .medium))
@@ -128,7 +128,7 @@ public struct LubaToast: View {
                 }
             }
         }
-        .padding(.horizontal, LubaToastTokens.horizontalPadding)
+        .padding(.horizontal, LubaToastTokens.horizontalPadding(luba.spacing))
         .padding(.vertical, LubaToastTokens.verticalPadding)
 
         if useGlass {

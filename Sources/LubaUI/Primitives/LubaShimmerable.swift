@@ -95,9 +95,13 @@ public struct LubaShimmerableModifier: ViewModifier {
     }
 
     private func startShimmer() {
-        guard luba.motion.allowsRepeatingMotion else { return }
+        // Route through the policy rather than animating directly, so the
+        // shimmer honors `animationSpeed` as well as Reduce Motion.
+        guard let shimmer = luba.motion.repeating(
+            .linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)
+        ) else { return }
         shimmerOffset = LubaShimmerTokens.startOffset
-        withAnimation(.linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)) {
+        withAnimation(shimmer) {
             shimmerOffset = LubaShimmerTokens.endOffset
         }
     }
@@ -160,9 +164,13 @@ public struct LubaRedactedShimmerModifier: ViewModifier {
     }
 
     private func startShimmer() {
-        guard luba.motion.allowsRepeatingMotion else { return }
+        // Route through the policy rather than animating directly, so the
+        // shimmer honors `animationSpeed` as well as Reduce Motion.
+        guard let shimmer = luba.motion.repeating(
+            .linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)
+        ) else { return }
         shimmerOffset = LubaShimmerTokens.startOffset
-        withAnimation(.linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)) {
+        withAnimation(shimmer) {
             shimmerOffset = LubaShimmerTokens.endOffset
         }
     }

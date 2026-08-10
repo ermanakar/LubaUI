@@ -22,12 +22,18 @@ public enum LubaFieldTokens {
 
     /// Corner radius (matches buttons, on the LubaRadius grid)
     public static let cornerRadius: CGFloat = LubaRadius.md
+    /// Resolved against a theme's radius scale.
+    public static func cornerRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.md }
 
     /// Horizontal padding inside field
     public static let horizontalPadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Spacing between icon and text
     public static let iconSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func iconSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 
     /// Icon size
     public static let iconSize: CGFloat = 18
@@ -188,7 +194,7 @@ public struct LubaTextField: View {
     }
 
     private var fieldView: some View {
-        HStack(spacing: LubaFieldTokens.iconSpacing) {
+        HStack(spacing: LubaFieldTokens.iconSpacing(luba.spacing)) {
             // Leading icon
             if let icon = leadingIcon {
                 icon
@@ -213,10 +219,10 @@ public struct LubaTextField: View {
                     .frame(width: LubaFieldTokens.iconFrameWidth)
             }
         }
-        .padding(.horizontal, LubaFieldTokens.horizontalPadding)
+        .padding(.horizontal, LubaFieldTokens.horizontalPadding(luba.spacing))
         .frame(minHeight: LubaFieldTokens.minHeight)
         .background(luba.colors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius(luba.radius), style: .continuous))
         .overlay(borderOverlay)
         .animation(luba.motion.interaction(LubaMotion.colorAnimation), value: isFocused)
         .animation(luba.motion.interaction(LubaMotion.colorAnimation), value: error != nil)
@@ -264,7 +270,7 @@ public struct LubaTextField: View {
     }
 
     private var borderOverlay: some View {
-        RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius, style: .continuous)
+        RoundedRectangle(cornerRadius: LubaFieldTokens.cornerRadius(luba.radius), style: .continuous)
             .strokeBorder(
                 currentState.borderColor(luba.colors),
                 lineWidth: isFocused ? LubaFieldTokens.borderWidthFocused : LubaFieldTokens.borderWidth

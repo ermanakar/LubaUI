@@ -45,7 +45,7 @@ public struct LubaCheckbox: View {
 
     public var body: some View {
         Button(action: toggle) {
-            HStack(spacing: LubaSelectionTokens.labelSpacing) {
+            HStack(spacing: LubaSelectionTokens.labelSpacing(luba.spacing)) {
                 checkboxControl
                 labelView
                 Spacer(minLength: 0)
@@ -68,12 +68,12 @@ public struct LubaCheckbox: View {
     private var checkboxControl: some View {
         ZStack {
             // Background
-            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius(luba.radius), style: .continuous)
                 .fill(isChecked ? luba.colors.accent : luba.colors.surface)
                 .frame(width: LubaSelectionTokens.controlSize, height: LubaSelectionTokens.controlSize)
 
             // Border
-            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LubaSelectionTokens.checkboxRadius(luba.radius), style: .continuous)
                 .strokeBorder(
                     isChecked ? luba.colors.accent : luba.colors.borderStrong,
                     lineWidth: LubaSelectionTokens.borderWidth

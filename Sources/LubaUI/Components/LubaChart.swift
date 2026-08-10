@@ -113,14 +113,14 @@ public struct LubaBarChart<D: LubaChartData>: View {
                     y: .value("Category", item.label)
                 )
                 .foregroundStyle(barColor(for: item))
-                .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius(luba.radius), style: .continuous))
             } else {
                 BarMark(
                     x: .value("Category", item.label),
                     y: .value("Value", item.value)
                 )
                 .foregroundStyle(barColor(for: item))
-                .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius(luba.radius), style: .continuous))
                 .annotation(position: .top) {
                     if showAnnotations {
                         Text(formattedValue(item.value))
@@ -220,7 +220,7 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
                     y: .value("Value", item.value)
                 )
                 .foregroundStyle(by: .value("Series", item.series))
-                .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius(luba.radius), style: .continuous))
                 .annotation(position: .top) {
                     if showAnnotations {
                         Text(formattedValue(item.value))
@@ -361,10 +361,10 @@ public struct LubaLineChart<D: LubaChartData>: View {
                         Text(formattedValue(item.value))
                             .font(luba.fonts.caption2.weight(.medium))
                             .foregroundStyle(luba.colors.textPrimary)
-                            .padding(.horizontal, LubaSpacing.xs)
-                            .padding(.vertical, LubaSpacing.xxs)
+                            .padding(.horizontal, luba.spacing.xs)
+                            .padding(.vertical, luba.spacing.xxs)
                             .background(luba.colors.surface)
-                            .lubaCornerRadius(LubaRadius.xs)
+                            .lubaCornerRadius(luba.radius.xs)
                             .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
                     }
             }
@@ -535,14 +535,14 @@ public struct LubaPieChart<D: LubaChartData>: View {
                     angularInset: LubaChartTokens.sectorAngularInset
                 )
                 .foregroundStyle(by: .value("Category", item.label))
-                .cornerRadius(LubaChartTokens.barCornerRadius)
+                .cornerRadius(LubaChartTokens.barCornerRadius(luba.radius))
             }
             .chartForegroundStyleScale(range: chartColorRange)
             .frame(height: height)
-            .chartLegend(position: .bottom, spacing: LubaChartTokens.legendSpacing)
+            .chartLegend(position: .bottom, spacing: LubaChartTokens.legendSpacing(luba.spacing))
 
             if let centerLabel {
-                VStack(spacing: LubaSpacing.xxs) {
+                VStack(spacing: luba.spacing.xxs) {
                     Text(centerLabel)
                         .font(luba.fonts.caption)
                         .foregroundStyle(luba.colors.textTertiary)
@@ -744,16 +744,16 @@ public struct LubaChartSkeleton: View {
     }
 
     private var barSkeleton: some View {
-        HStack(alignment: .bottom, spacing: LubaSpacing.sm) {
+        HStack(alignment: .bottom, spacing: luba.spacing.sm) {
             ForEach(0..<LubaChartTokens.skeletonBarCount, id: \.self) { index in
                 let ratio = barRatio(for: index)
-                RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius(luba.radius), style: .continuous)
                     .fill(luba.colors.fill)
                     .frame(height: height * ratio)
                     .opacity(isAnimating ? 0.4 : 0.8)
             }
         }
-        .padding(.horizontal, LubaSpacing.xs)
+        .padding(.horizontal, luba.spacing.xs)
     }
 
     private var lineSkeleton: some View {
@@ -820,7 +820,7 @@ public struct LubaChartEmptyState: View {
     }
 
     public var body: some View {
-        VStack(spacing: LubaSpacing.sm) {
+        VStack(spacing: luba.spacing.sm) {
             Image(systemName: icon)
                 .font(luba.fonts.title)
                 .foregroundStyle(luba.colors.textDisabled)
@@ -832,7 +832,7 @@ public struct LubaChartEmptyState: View {
         .frame(maxWidth: .infinity)
         .frame(height: height)
         .background(luba.colors.surfaceSecondary)
-        .lubaCornerRadius(LubaRadius.md)
+        .lubaCornerRadius(luba.radius.md)
     }
 }
 
@@ -876,11 +876,11 @@ public struct LubaChartLegend: View {
     public var body: some View {
         switch layout {
         case .horizontal:
-            HStack(spacing: LubaChartTokens.legendSpacing) {
+            HStack(spacing: LubaChartTokens.legendSpacing(luba.spacing)) {
                 legendItems
             }
         case .vertical:
-            VStack(alignment: .leading, spacing: LubaChartTokens.legendRowSpacing) {
+            VStack(alignment: .leading, spacing: LubaChartTokens.legendRowSpacing(luba.spacing)) {
                 legendItems
             }
         }
@@ -889,7 +889,7 @@ public struct LubaChartLegend: View {
     @ViewBuilder
     private var legendItems: some View {
         ForEach(Array(items.enumerated()), id: \.offset) { _, item in
-            HStack(spacing: LubaSpacing.xs) {
+            HStack(spacing: luba.spacing.xs) {
                 Circle()
                     .fill(item.color)
                     .frame(width: LubaChartTokens.legendDotSize, height: LubaChartTokens.legendDotSize)

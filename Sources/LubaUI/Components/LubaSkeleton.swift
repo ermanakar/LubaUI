@@ -185,7 +185,7 @@ public struct LubaSkeletonCard: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LubaSkeletonTokens.sectionSpacing) {
+        VStack(alignment: .leading, spacing: LubaSkeletonTokens.sectionSpacing(luba.spacing)) {
             // Header row
             HStack(spacing: LubaSkeletonTokens.headerSpacing) {
                 LubaSkeletonCircle(size: avatarSize)

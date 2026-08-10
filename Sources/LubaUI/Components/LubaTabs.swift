@@ -12,6 +12,30 @@
 
 import SwiftUI
 
+// MARK: - Selection Indicator
+
+/// Applies the sliding-indicator geometry only when decorative motion is allowed.
+///
+/// `matchedGeometryEffect` animates position by construction, so a Reduce Motion
+/// user still sees the indicator travel no matter how gentle the animation is.
+/// The only way to hold it still is not to use it — under Reduce Motion the
+/// indicator cross-fades in place instead, which reads as the same state change
+/// without the movement.
+private struct LubaTabIndicator: ViewModifier {
+    let namespace: Namespace.ID
+    let id: String
+    let slides: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if slides {
+            content.matchedGeometryEffect(id: id, in: namespace)
+        } else {
+            content.transition(.opacity)
+        }
+    }
+}
+
 // MARK: - LubaTabs (Segmented)
 
 /// A segmented tab bar with animated selection indicator.
@@ -88,11 +112,11 @@ public struct LubaTabs<T: Hashable>: View {
 
         if useGlass {
             container
-                .lubaGlass(.subtle, cornerRadius: LubaTabsTokens.segmentedContainerRadius)
+                .lubaGlass(.subtle, cornerRadius: LubaTabsTokens.segmentedContainerRadius(luba.radius))
         } else {
             container
                 .background(luba.colors.surfaceHover)
-                .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius(luba.radius), style: .continuous))
         }
     }
 
@@ -106,7 +130,7 @@ public struct LubaTabs<T: Hashable>: View {
                 selection = tab.value
             }
         } label: {
-            HStack(spacing: LubaTabsTokens.iconLabelSpacing) {
+            HStack(spacing: LubaTabsTokens.iconLabelSpacing(luba.spacing)) {
                 if let icon = tab.icon {
                     Image(systemName: icon)
                         .font(.system(size: LubaTabsTokens.iconSize, weight: .medium))
@@ -114,21 +138,28 @@ public struct LubaTabs<T: Hashable>: View {
 
                 Text(tab.label)
                     .font(luba.fonts.buttonSmall)
+                    .lineLimit(1)
+                    .minimumScaleFactor(LubaTabsTokens.minimumScaleFactor)
+                    .truncationMode(.tail)
             }
             .foregroundStyle(selection == tab.value ? luba.colors.textPrimary : luba.colors.textSecondary)
-            .padding(.horizontal, LubaTabsTokens.tabHorizontalPadding)
+            .padding(.horizontal, LubaTabsTokens.tabHorizontalPadding(luba.spacing))
             .frame(minHeight: LubaTabsTokens.tabHeight)
             .frame(maxWidth: .infinity)
             .background {
                 if selection == tab.value {
-                    RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedTabRadius, style: .continuous)
+                    RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedTabRadius(luba.radius), style: .continuous)
                         .fill(luba.colors.surface)
                         .shadow(
                             color: Color.black.opacity(LubaTabsTokens.shadowOpacity),
                             radius: LubaTabsTokens.shadowRadius,
                             y: LubaTabsTokens.shadowY
                         )
-                        .matchedGeometryEffect(id: "tab", in: namespace)
+                        .modifier(LubaTabIndicator(
+                                namespace: namespace,
+                                id: "tab",
+                                slides: luba.motion.allowsDecorativeMotion
+                            ))
                 }
             }
         }
@@ -196,6 +227,9 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
             VStack(spacing: LubaTabsTokens.underlineSpacing) {
                 Text(tab.label)
                     .font(luba.fonts.subheadline.weight(selection == tab.value ? .bold : .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(LubaTabsTokens.minimumScaleFactor)
+                    .truncationMode(.tail)
                     .foregroundStyle(selection == tab.value ? luba.colors.accent : luba.colors.textTertiary)
 
                 ZStack(alignment: .bottom) {
@@ -207,12 +241,16 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
                         Rectangle()
                             .fill(luba.colors.accent)
                             .frame(height: LubaTabsTokens.underlineIndicatorHeight)
-                            .matchedGeometryEffect(id: "underline", in: namespace)
+                            .modifier(LubaTabIndicator(
+                                namespace: namespace,
+                                id: "underline",
+                                slides: luba.motion.allowsDecorativeMotion
+                            ))
                     }
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: LubaTabsTokens.underlineHeight)
+            .frame(minHeight: LubaTabsTokens.underlineHeight)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)

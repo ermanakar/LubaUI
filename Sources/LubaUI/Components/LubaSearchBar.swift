@@ -54,8 +54,8 @@ public struct LubaSearchBar: View {
     }
 
     public var body: some View {
-        HStack(spacing: LubaSpacing.sm) {
-            HStack(spacing: LubaSpacing.sm) {
+        HStack(spacing: luba.spacing.sm) {
+            HStack(spacing: luba.spacing.sm) {
                 Image(systemName: "magnifyingglass")
                     .font(luba.fonts.body)
                     .foregroundStyle(luba.colors.textTertiary)
@@ -77,7 +77,7 @@ public struct LubaSearchBar: View {
                     .accessibilityLabel(LubaStrings.clearSearch)
                 }
             }
-            .padding(.horizontal, LubaSearchBarTokens.horizontalPadding)
+            .padding(.horizontal, LubaSearchBarTokens.horizontalPadding(luba.spacing))
             .frame(minHeight: LubaSearchBarTokens.height)
             .background(luba.colors.surfaceSecondary)
             .clipShape(Capsule())

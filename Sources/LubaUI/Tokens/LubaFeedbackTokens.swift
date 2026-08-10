@@ -17,6 +17,8 @@ public enum LubaToastTokens {
 
     /// Horizontal padding - 14pt provides comfortable breathing room
     public static let horizontalPadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Vertical padding - 12pt (slightly less than horizontal for visual balance)
     public static let verticalPadding: CGFloat = 12
@@ -38,6 +40,8 @@ public enum LubaToastTokens {
 
     /// Spacing between icon and message
     public static let iconSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func iconSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 
     /// Message font size
     public static let messageFontSize: CGFloat = 14
@@ -152,6 +156,8 @@ public enum LubaSkeletonTokens {
 
     /// Text skeleton line spacing
     public static let lineSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func lineSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 
     /// Card skeleton avatar size
     public static let cardAvatarSize: CGFloat = 40
@@ -167,6 +173,8 @@ public enum LubaSkeletonTokens {
 
     /// Card skeleton section spacing
     public static let sectionSpacing: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func sectionSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Row skeleton height
     public static let rowHeight: CGFloat = 60
@@ -184,6 +192,8 @@ public enum LubaSearchBarTokens {
 
     /// Horizontal padding inside the bar
     public static let horizontalPadding: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Search icon size
     public static let iconSize: CGFloat = 16
@@ -198,12 +208,18 @@ public enum LubaSearchBarTokens {
 public enum LubaAlertTokens {
     /// Corner radius — on the LubaRadius grid
     public static let cornerRadius: CGFloat = LubaRadius.md
+    /// Resolved against a theme's radius scale.
+    public static func cornerRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.md }
 
     /// Horizontal padding
     public static let horizontalPadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func horizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Vertical padding
     public static let verticalPadding: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func verticalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Status icon size
     public static let iconSize: CGFloat = 18
@@ -213,6 +229,8 @@ public enum LubaAlertTokens {
 
     /// Spacing between icon and text content
     public static let iconSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func iconSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 
     /// Dismiss button icon size
     public static let dismissIconSize: CGFloat = 12
@@ -233,18 +251,26 @@ public enum LubaTabsTokens {
 
     /// Segmented container corner radius
     public static let segmentedContainerRadius: CGFloat = LubaRadius.md
+    /// Resolved against a theme's radius scale.
+    public static func segmentedContainerRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.md }
 
     /// Segmented tab corner radius
     public static let segmentedTabRadius: CGFloat = LubaRadius.sm
+    /// Resolved against a theme's radius scale.
+    public static func segmentedTabRadius(_ radius: LubaThemeRadius) -> CGFloat { radius.sm }
 
     /// Tab height
     public static let tabHeight: CGFloat = 32
 
     /// Tab horizontal padding
     public static let tabHorizontalPadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func tabHorizontalPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Tab icon-label spacing
     public static let iconLabelSpacing: CGFloat = LubaSpacing.xs
+    /// Resolved against a theme's spacing scale.
+    public static func iconLabelSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.xs }
 
     /// Tab font size
     @available(*, deprecated, message: "Superseded by LubaTextRole.footnote, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
@@ -270,6 +296,10 @@ public enum LubaTabsTokens {
 
     /// Underline spacing from text
     public static let underlineSpacing: CGFloat = 8
+
+    /// How far a tab label may shrink before it wraps, so segmented tabs
+    /// stay readable at accessibility text sizes instead of clipping.
+    public static let minimumScaleFactor: CGFloat = 0.8
 
     /// Underline font size
     @available(*, deprecated, message: "Superseded by LubaTextRole.subheadline, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
@@ -329,6 +359,8 @@ public enum LubaMenuTokens {
 
     /// Item horizontal padding
     public static let itemPadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func itemPadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 
     /// Corner radius — matches card aesthetic
     public static let cornerRadius: CGFloat = 12
@@ -347,6 +379,8 @@ public enum LubaMenuTokens {
 
     /// Spacing between icon and label
     public static let iconSpacing: CGFloat = LubaSpacing.sm
+    /// Resolved against a theme's spacing scale.
+    public static func iconSpacing(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.sm }
 }
 
 // MARK: - Tooltip Tokens
@@ -358,6 +392,8 @@ public enum LubaTooltipTokens {
 
     /// Internal padding
     public static let padding: CGFloat = LubaSpacing.md
+    /// Resolved against a theme's spacing scale.
+    public static func padding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.md }
 
     /// Corner radius — smaller than cards for a tight feel
     public static let cornerRadius: CGFloat = 8
@@ -386,4 +422,6 @@ public enum LubaTooltipTokens {
 
     /// Minimum horizontal distance from screen edge
     public static let screenEdgePadding: CGFloat = LubaSpacing.lg
+    /// Resolved against a theme's spacing scale.
+    public static func screenEdgePadding(_ spacing: LubaThemeSpacing) -> CGFloat { spacing.lg }
 }

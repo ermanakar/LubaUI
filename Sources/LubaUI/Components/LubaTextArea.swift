@@ -54,7 +54,7 @@ public struct LubaTextArea: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+        VStack(alignment: .leading, spacing: luba.spacing.xs) {
             Text(label)
                 .font(luba.fonts.caption)
                 .foregroundStyle(luba.colors.textSecondary)
@@ -65,22 +65,22 @@ public struct LubaTextArea: View {
                     .focused($isFocused)
                     .frame(minHeight: minHeight)
                     .scrollContentBackground(.hidden)
-                    .padding(LubaSpacing.sm)
+                    .padding(luba.spacing.sm)
 
                 if text.isEmpty {
                     Text(placeholder)
                         .font(luba.fonts.body)
                         .foregroundStyle(luba.colors.textTertiary)
-                        .padding(LubaSpacing.sm)
+                        .padding(luba.spacing.sm)
                         .padding(.top, 8)
                         .padding(.leading, 4)
                         .allowsHitTesting(false)
                 }
             }
             .background(luba.colors.surface)
-            .clipShape(RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: LubaRadius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: luba.radius.md, style: .continuous)
                     .strokeBorder(borderColor, lineWidth: isFocused ? 2 : 1)
             )
 

@@ -299,4 +299,77 @@ final class ThemeSystemTests: XCTestCase {
             """
         )
     }
+
+    /// A theme that rescales dimensions must actually move them, and the
+    /// default scale must reproduce the Tier-1 values exactly so an unthemed
+    /// app looks identical.
+    func testDimensionResolversFollowTheThemeScale() {
+        XCTAssertEqual(LubaCardTokens.cornerRadius(.default), LubaRadius.lg)
+        XCTAssertEqual(LubaCardTokens.padding(.default), LubaSpacing.lg)
+        XCTAssertEqual(LubaFieldTokens.cornerRadius(.default), LubaRadius.md)
+        XCTAssertEqual(LubaButtonSize.medium.horizontalPadding(.default), LubaSpacing.custom(5))
+
+        let squared = LubaThemeRadius(sm: 0, md: 0, lg: 0)
+        XCTAssertEqual(LubaCardTokens.cornerRadius(squared), 0)
+        XCTAssertEqual(LubaFieldTokens.cornerRadius(squared), 0)
+
+        // Custom steps derive from `xs`, so a rescaled theme carries them too.
+        let roomy = LubaThemeSpacing(xs: 8, md: 24, lg: 32)
+        XCTAssertEqual(LubaCardTokens.padding(roomy), 32)
+        XCTAssertEqual(LubaButtonSize.medium.horizontalPadding(roomy), 40)
+    }
+
+    /// The same promise applies to dimensions: `.lubaTheme(spacing:)` and
+    /// `(radius:)` only mean something if components resolve through
+    /// `luba.spacing` / `luba.radius` rather than reading the Tier-1 scales.
+    ///
+    /// A component may still *declare* a Tier-3 default as `= LubaSpacing.md`;
+    /// what it must not do is read that scale while drawing.
+    func testComponentsResolveDimensionsThroughTheTheme() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/LubaUI")
+
+        var offenders: [String] = []
+
+        for directory in ["Components", "Primitives"] {
+            let root = sources.appendingPathComponent(directory)
+            let files = try FileManager.default
+                .contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
+                .filter { $0.pathExtension == "swift" }
+
+            for file in files {
+                let lines = try String(contentsOf: file, encoding: .utf8).split(
+                    separator: "\n", omittingEmptySubsequences: false
+                )
+                for (offset, raw) in lines.enumerated() {
+                    let line = String(raw)
+                    // Previews may use the authoring tier directly.
+                    if line.hasPrefix("#Preview") || line.contains("MARK: - Preview") { break }
+                    guard line.contains("LubaSpacing.") || line.contains("LubaRadius.") else { continue }
+                    let trimmed = line.trimmingCharacters(in: .whitespaces)
+                    // Prose may name the scale it documents.
+                    if trimmed.hasPrefix("//") { continue }
+                    // A Tier-3 token declaring its default is the one legitimate use.
+                    if trimmed.hasPrefix("public static let") || trimmed.hasPrefix("static let") { continue }
+                    offenders.append(
+                        "\(file.lastPathComponent):\(offset + 1): \(trimmed)"
+                    )
+                }
+            }
+        }
+
+        XCTAssertTrue(
+            offenders.isEmpty,
+            """
+            Component code reads the Tier-1 dimension scale directly, so \
+            `.lubaTheme(spacing:)` / `(radius:)` cannot reach it. Use \
+            `luba.spacing` / `luba.radius`, or a Tier-3 resolver such as \
+            `LubaCardTokens.padding(luba.spacing)`:
+            \(offenders.joined(separator: "\n"))
+            """
+        )
+    }
 }

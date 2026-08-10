@@ -132,6 +132,7 @@ public struct LubaExpandable<Header: View, Content: View>: View {
 
 /// A card with an expandable section.
 public struct LubaExpandableCard<Header: View, Content: View>: View {
+    @LubaEnvironment private var luba
     @Binding var isExpanded: Bool
     let elevation: LubaCardElevation
     let header: () -> Header
@@ -156,7 +157,7 @@ public struct LubaExpandableCard<Header: View, Content: View>: View {
             } content: {
                 VStack(spacing: 0) {
                     LubaDivider()
-                        .padding(.vertical, LubaSpacing.md)
+                        .padding(.vertical, luba.spacing.md)
 
                     content()
                 }
@@ -198,7 +199,7 @@ public struct LubaAccordion: View {
     }
 
     public var body: some View {
-        VStack(spacing: LubaSpacing.sm) {
+        VStack(spacing: luba.spacing.sm) {
             ForEach(items) { item in
                 accordionRow(item: item)
             }
@@ -222,7 +223,7 @@ public struct LubaAccordion: View {
                     }
                 }
             )) {
-                HStack(spacing: LubaSpacing.md) {
+                HStack(spacing: luba.spacing.md) {
                     if let icon = item.icon {
                         Image(systemName: icon)
                             .font(.system(size: 16))
@@ -237,7 +238,7 @@ public struct LubaAccordion: View {
             } content: {
                 VStack(spacing: 0) {
                     LubaDivider()
-                        .padding(.vertical, LubaSpacing.sm)
+                        .padding(.vertical, luba.spacing.sm)
 
                     Text(item.content)
                         .font(luba.fonts.body)
