@@ -92,10 +92,6 @@ public enum LubaButtonSize {
         }
     }
 
-    var font: Font {
-        LubaTypography.font(role)
-    }
-
     var iconSize: CGFloat {
         switch self {
         case .small: return 14
