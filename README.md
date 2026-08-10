@@ -69,9 +69,17 @@ https://github.com/ermanakar/LubaUI
 **Package.swift:**
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ermanakar/LubaUI", from: "0.1.0")
+    .package(url: "https://github.com/ermanakar/LubaUI", from: "0.2.0")
 ]
 ```
+
+> **0.2.0 is prepared but not yet tagged.** Until the tag is published, point at
+> the branch to get the theming, Reduce Motion, Dynamic Type, and localization
+> work described below — `from: "0.1.0"` resolves to the pre-theming release:
+>
+> ```swift
+> .package(url: "https://github.com/ermanakar/LubaUI", branch: "main")
+> ```
 
 ---
 
@@ -279,7 +287,7 @@ LubaTypography.title
 LubaTypography.headline
 LubaTypography.body
 LubaTypography.caption
-// ... 13 presets total
+// ... 15 roles total, every one Dynamic Type-aware
 ```
 
 ---
@@ -315,22 +323,117 @@ LubaButton("Custom", styling: BrandStyle()) { }
 
 ---
 
+## Theming
+
+`LubaColors` is the *authoring* source of truth. `LubaThemeColors` is the
+*runtime* one. Every public component resolves its **colors and fonts** from the
+theme in the environment — so applying a theme to a subtree actually repaints it.
+
+`LubaThemeSpacing` and `LubaThemeRadius` are also carried on the theme and
+available to your own views via `luba.spacing` / `luba.radius`. Inside LubaUI,
+dimensions still come from the Tier-3 component tokens (`LubaCardTokens`,
+`LubaFieldTokens`, …); `LubaButton` is the exception and honors `theme.radius`.
+
+```swift
+@LubaEnvironment private var luba   // inside any View / ViewModifier / ButtonStyle
+
+Text("Hello")
+    .font(luba.fonts.body)
+    .foregroundStyle(luba.colors.textPrimary)
+    .background(luba.colors.surface)
+```
+
+### Applying a theme
+
+```swift
+ContentView()
+    .lubaTheme(LubaThemeConfiguration(colors: .accented(Color(hex: 0x2F5FD0))))
+```
+
+`.accented(_:)` derives a coherent set from one brand color: the pressed accent,
+the subtle wash, the focus border, the informational color, and the lead chart
+series. Everything you do not name keeps LubaUI's defaults, so rebranding the
+accent does not silently repaint your surfaces or text.
+
+### A complete custom theme
+
+```swift
+import SwiftUI
+import LubaUI
+
+extension LubaThemeConfiguration {
+    static let studio = LubaThemeConfiguration(
+        colors: LubaThemeColors(
+            accent:           LubaColors.adaptive(light: Color(hex: 0x2F5FD0), dark: Color(hex: 0x7FA8F5)),
+            background:       LubaColors.adaptive(light: Color(hex: 0xFBFBFD), dark: Color(hex: 0x0B0C10)),
+            surface:          LubaColors.adaptive(light: .white,               dark: Color(hex: 0x15171C)),
+            textPrimary:      LubaColors.adaptive(light: Color(hex: 0x14161B), dark: Color(hex: 0xF2F3F7)),
+            textSecondary:    LubaColors.adaptive(light: Color(hex: 0x545A66), dark: Color(hex: 0xB0B6C2)),
+            accentHover:      LubaColors.adaptive(light: Color(hex: 0x254CAE), dark: Color(hex: 0x9CBEFA)),
+            accentSubtle:     LubaColors.adaptive(light: Color(hex: 0xEAF0FD), dark: Color(hex: 0x161C2B)),
+            surfaceSecondary: LubaColors.adaptive(light: Color(hex: 0xF3F4F8), dark: Color(hex: 0x1D2027)),
+            border:           LubaColors.adaptive(light: Color(hex: 0xE2E4EB), dark: Color(hex: 0x2C3038)),
+            chartPalette:     [Color(hex: 0x2F5FD0), Color(hex: 0x4CA6A8),
+                               Color(hex: 0xC77D4A), Color(hex: 0x8A6FC4)]
+        ),
+        typography: LubaThemeTypography(
+            // Anchor overrides to a text style so they keep scaling.
+            title: .system(.title, design: .serif, weight: .bold),
+            body:  .custom("Charter", size: 16, relativeTo: .callout)
+        ),
+        radius: LubaThemeRadius(md: 14, lg: 20)
+    )
+}
+
+@main
+struct StudioApp: App {
+    var body: some Scene {
+        WindowGroup {
+            RootView()
+                .lubaTheme(.studio)
+        }
+    }
+}
+```
+
+Themes nest. A subtree can override just the palette and keep the inherited
+typography, spacing, and radii:
+
+```swift
+PromoBanner()
+    .lubaTheme(colors: .accented(.orange))
+```
+
+### Semantic roles
+
+| Group | Roles |
+|-------|-------|
+| Brand | `accent`, `accentHover`, `accentSubtle`, `textOnAccent` |
+| Surfaces | `background`, `surface`, `surfaceSecondary` (`surfaceElevated`), `surfaceTertiary`, `surfaceHover` |
+| Text | `textPrimary`, `textSecondary`, `textTertiary`, `textDisabled` |
+| Lines | `border`, `borderStrong`, `borderFocused`, `divider`, `fill` |
+| Status | `success`, `warning`, `error`, `info` (+ each `…Subtle`) |
+| Charts | `chartPalette`, `chartGrid`, `chartAxisLabel` |
+| Glass | `glassBorder`, `glassShadow` |
+
+Status roles are also addressable programmatically: `colors.status(.error)`,
+`colors.statusSubtle(.warning)`, `colors.chartColor(at: 3)`.
+
+---
+
 ## Configuration
 
-Control the system globally via SwiftUI's environment:
+Configuration is the *behavioral* half of the environment — haptics, motion,
+accessibility, and font family. Theme handles looks; config handles conduct.
 
 ```swift
 // Use a preset
-ContentView()
-    .lubaConfig(.accessible)    // High contrast, bold text, larger touch targets
+ContentView().lubaConfig(.accessible)   // High contrast, bold text, larger touch targets
+ContentView().lubaConfig(.minimal)      // No animations, no haptics
+ContentView().lubaConfig(.debug)        // Debug outlines and a11y logging
 
-ContentView()
-    .lubaConfig(.minimal)       // No animations, no haptics
-
-ContentView()
-    .lubaConfig(.debug)         // Debug outlines and a11y logging
-
-// Customize inline
+// Customize inline — the closure receives the *inherited* configuration,
+// so nested calls compose instead of resetting to the global defaults.
 ContentView()
     .lubaConfig { config in
         config.hapticsEnabled = false
@@ -339,7 +442,10 @@ ContentView()
     }
 ```
 
-Components automatically respect these settings via `@Environment(\.lubaConfig)`.
+**Precedence:** the nearest `.lubaConfig(…)` ancestor wins. With no ancestor,
+components fall back to `LubaConfig.shared`. Mutating `LubaConfig.shared` at any
+point changes that fallback for views that have not been given their own value —
+in 0.1.0 the fallback was frozen at first access.
 
 ### Available Settings
 
@@ -348,18 +454,119 @@ Components automatically respect these settings via `@Environment(\.lubaConfig)`
 | `hapticsEnabled` | `true` | Enable haptic feedback globally |
 | `hapticIntensity` | `1.0` | Haptic feedback intensity (0.0 - 1.0) |
 | `animationsEnabled` | `true` | Enable animations globally |
-| `respectReducedMotion` | `true` | Respect system reduced motion setting |
+| `respectReducedMotion` | `true` | Honor the system Reduce Motion setting |
 | `animationSpeed` | `1.0` | Animation duration multiplier |
 | `minimumTouchTarget` | `44` | Minimum touch target size in points |
 | `useBoldText` | `false` | Bold text for readability |
-| `highContrastMode` | `false` | Increased contrast for semantic colors |
+| `highContrastMode` | `false` | Increased contrast; forces solid glass fallbacks |
 | `useRoundedFont` | `true` | SF Rounded (true) or SF Pro (false) |
 | `customFontFamily` | `nil` | Custom font family override |
 | `defaultButtonStyle` | `.primary` | Default button style |
 | `defaultCardElevation` | `.low` | Default card elevation |
-| `defaultCornerRadius` | `12` | Default corner radius |
 | `showDebugOutlines` | `false` | Show component outlines for debugging |
 | `logA11yWarnings` | `false` | Log accessibility warnings |
+
+Deprecated in 0.2.0: `accentColorLight`, `accentColorDark`, `setAccentColor(light:dark:)`,
+and `defaultCornerRadius`. They were never read by components; use the theme instead.
+
+---
+
+## Accessibility
+
+### Reduce Motion
+
+One policy decides whether anything moves, and every animated component routes
+through it. It reads two inputs: `LubaConfig` (`animationsEnabled`,
+`respectReducedMotion`, `animationSpeed`) and the system
+`accessibilityReduceMotion` environment value.
+
+| Situation | Behavior |
+|-----------|----------|
+| `animationsEnabled == false` | Nothing animates. State changes still apply, instantly. |
+| Reduce Motion on, `respectReducedMotion == true` | Springs, press scale, slide/scale transitions, shimmer, and stagger are removed. Essential state changes become a short cross-fade. |
+| Reduce Motion on, `respectReducedMotion == false` | Full motion — the app has explicitly opted out. |
+
+Two things deliberately survive Reduce Motion, because removing them would
+remove *meaning* rather than decoration:
+
+- **Progress that fills over time** — the long-press confirmation ring keeps its
+  real duration instead of snapping.
+- **Opacity-only busy indicators** — `LubaSpinner` stops rotating and breathes in
+  opacity instead, so "working…" is still legible without movement.
+
+Custom components can use the same policy:
+
+```swift
+struct MyRow: View {
+    @LubaEnvironment private var luba
+    @State private var isOpen = false
+
+    var body: some View {
+        content
+            .scaleEffect(luba.motion.pressScale(isOpen ? 0.97 : 1))
+            .animation(luba.motion.animation(LubaMotion.stateAnimation), value: isOpen)
+            .transition(luba.motion.transition(.move(edge: .bottom)))
+    }
+}
+```
+
+| Policy method | Use for | Under Reduce Motion |
+|---------------|---------|---------------------|
+| `animation(_:)` | Essential state changes | Short cross-fade |
+| `decorative(_:)` | Springs, bounce, press scale | `nil` |
+| `interaction(_:)` | Press/hover color shifts | Short cross-fade |
+| `repeating(_:)` | Shimmer, rotation | `nil` |
+| `repeatingOpacity(_:)` | Opacity-only busy loops | Preserved |
+| `continuous(_:)` | Progress that carries information | Preserved |
+| `pressScale(_:)` / `motionAmount(_:)` | Transform amounts | Neutralized to 1.0 / 0 |
+| `stagger(index:)` | List entrances | Delay collapses to 0 |
+
+Haptics stay separately configurable via `hapticsEnabled` — a user who dislikes
+animation may still want tactile confirmation.
+
+### Dynamic Type
+
+Every type role is anchored to an Apple text style, so the whole scale grows
+with the user's setting:
+
+```swift
+LubaTypography.font(.body)   // scales from .callout
+luba.fonts.title             // theme + config aware
+luba.fonts(.caption)         // any role, resolved for the subtree
+```
+
+Custom font families use `Font.custom(_:size:relativeTo:)`, which keeps the
+authored point size at the default content size and still scales.
+
+`LubaTypography.custom(size:weight:)` is the escape hatch for **glyph-locked**
+decoration — an SF Symbol in a fixed frame, initials sized from an avatar's
+diameter. It honors the size you pass and does not scale, because
+`Font.system(size:)` cannot be both exactly sized and Dynamic Type-aware. Use a
+role for anything that is running text.
+
+Controls that contain text (`LubaChip`, `LubaSearchBar`, `LubaTabs`, buttons)
+use `minHeight` rather than a fixed height, and important labels wrap instead of
+truncating. Interactive targets honor `minimumTouchTarget` (44pt by default) even
+when their visible glyph is smaller.
+
+### Localized strings
+
+LubaUI ships its own accessibility and UI strings in **English and German**,
+resolved through `Bundle.module`. A German app gets German VoiceOver output from
+LubaUI's own controls without doing anything:
+
+```swift
+LubaButton("Speichern", isLoading: true) { }   // a11y value: "Wird geladen"
+LubaSwipeAction.delete { }.label               // "Löschen"
+LubaStrings.close                              // "Schließen"
+```
+
+Caller-provided labels always win — nothing built in overrides an explicit
+`label:` or `.accessibilityLabel(…)`.
+
+Adding a language: drop `<lang>.lproj/Localizable.strings` into
+`Sources/LubaUI/Resources/` with the same keys as `en.lproj`. A test enforces key
+parity between the shipped languages.
 
 ---
 
@@ -426,11 +633,13 @@ See [mcp-server/README.md](mcp-server/README.md) for all 10 tools and 4 resource
 LubaUI welcomes contributions. When adding new components:
 
 1. Create component-specific tokens (e.g., `LubaFooTokens`)
-2. Use `LubaMotion` for all animations — never hardcode values
-3. Read `@Environment(\.lubaConfig)` for haptics and animations
-4. Use `LubaColors` semantic colors (never raw hex values)
-5. Extract reusable behavior to primitives
-6. Maintain backwards compatibility
+2. Read the environment with `@LubaEnvironment private var luba`
+3. Take colors from `luba.colors`, fonts from `luba.fonts` — never `LubaColors` /
+   `LubaTypography` statics inside a component body, or the theme stops reaching it
+4. Route every animation through `luba.motion`, never `withAnimation` directly
+5. Put user-facing and accessibility strings in `LubaStrings` + both `.lproj` files
+6. Extract reusable behavior to primitives
+7. Maintain backwards compatibility
 
 See [llms.txt](llms.txt) for detailed architecture documentation.
 
