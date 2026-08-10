@@ -23,12 +23,12 @@ import SwiftUI
 /// LubaRating(value: .constant(4), maxStars: 5, isReadOnly: true)
 /// ```
 public struct LubaRating: View {
+    @LubaEnvironment private var luba
     @Binding private var value: Int
     private let maxStars: Int
     private let isReadOnly: Bool
     private let label: String?
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a rating control.
     ///
@@ -53,8 +53,8 @@ public struct LubaRating: View {
         HStack(spacing: LubaSpacing.md) {
             if let label = label {
                 Text(label)
-                    .font(LubaTypography.body)
-                    .foregroundStyle(LubaColors.textPrimary)
+                    .font(luba.fonts.body)
+                    .foregroundStyle(luba.colors.textPrimary)
 
                 Spacer()
             }
@@ -66,8 +66,8 @@ public struct LubaRating: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(label ?? "Rating")
-        .accessibilityValue("\(value) of \(maxStars) stars")
+        .accessibilityLabel(label ?? LubaStrings.ratingControl)
+        .accessibilityValue(LubaStrings.rating(value, of: maxStars))
         .accessibilityAdjustableAction { direction in
             guard !isReadOnly else { return }
             switch direction {
@@ -85,8 +85,11 @@ public struct LubaRating: View {
     private func starView(for star: Int) -> some View {
         Image(systemName: star <= value ? "star.fill" : "star")
             .font(.system(size: 28))
-            .foregroundStyle(star <= value ? LubaColors.accent : LubaColors.gray200)
-            .frame(width: 36, height: 36)
+            .foregroundStyle(star <= value ? luba.colors.accent : luba.colors.fill)
+            .frame(
+                minWidth: luba.minimumTouchTarget,
+                minHeight: luba.minimumTouchTarget
+            )
             .contentShape(Rectangle())
             .onTapGesture {
                 guard !isReadOnly else { return }
@@ -99,10 +102,10 @@ public struct LubaRating: View {
     private func setRating(_ newValue: Int) {
         let clamped = max(0, min(newValue, maxStars))
         guard clamped != value else { return }
-        withAnimation(LubaMotion.micro) {
+        luba.motion.run(LubaMotion.micro) {
             value = clamped
         }
-        if config.hapticsEnabled { LubaHaptics.light() }
+        if luba.hapticsEnabled { LubaHaptics.light() }
     }
 }
 

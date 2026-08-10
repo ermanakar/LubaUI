@@ -50,6 +50,7 @@ public enum LubaAvatarSize {
 /// LubaAvatar(initials: "LU", showBorder: true)
 /// ```
 public struct LubaAvatar: View {
+    @LubaEnvironment private var luba
     private let image: Image?
     private let initials: String?
     private let size: LubaAvatarSize
@@ -101,27 +102,27 @@ public struct LubaAvatar: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             } else if let initials = initials {
-                LubaColors.accentSubtle
+                luba.colors.accentSubtle
                 
                 Text(initials)
-                    .font(LubaTypography.custom(size: size.fontSize, weight: .semibold))
-                    .foregroundStyle(LubaColors.accent)
+                    .font(luba.fonts.custom(size: size.fontSize, weight: .semibold))
+                    .foregroundStyle(luba.colors.accent)
             } else {
-                LubaColors.gray100
+                luba.colors.surfaceHover
                 
                 Image(systemName: "person.fill")
                     .font(.system(size: size.iconSize))
-                    .foregroundStyle(LubaColors.textTertiary)
+                    .foregroundStyle(luba.colors.textTertiary)
             }
         }
         .frame(width: size.dimension, height: size.dimension)
         .clipShape(Circle())
-        .accessibilityLabel(initials.map { "Avatar, \($0)" } ?? "Avatar")
+        .accessibilityLabel(initials.map { LubaStrings.avatar(initials: $0) } ?? LubaStrings.avatar)
         .accessibilityAddTraits(.isImage)
         .overlay {
             if showBorder {
                 Circle()
-                    .strokeBorder(LubaColors.border, lineWidth: 1.5)
+                    .strokeBorder(luba.colors.border, lineWidth: 1.5)
             }
         }
     }
@@ -135,6 +136,7 @@ public struct LubaAvatar: View {
 /// LubaAvatarGroup(avatars: avatars, maxVisible: 3, size: .small)
 /// ```
 public struct LubaAvatarGroup: View {
+    @LubaEnvironment private var luba
     private let avatars: [LubaAvatar]
     private let maxVisible: Int
     private let size: LubaAvatarSize
@@ -161,23 +163,23 @@ public struct LubaAvatarGroup: View {
                 avatars[index]
                     .overlay(
                         Circle()
-                            .strokeBorder(LubaColors.surface, lineWidth: 2)
+                            .strokeBorder(luba.colors.surface, lineWidth: 2)
                     )
             }
             
             if avatars.count > maxVisible {
                 ZStack {
                     Circle()
-                        .fill(LubaColors.gray200)
+                        .fill(luba.colors.fill)
                     
                     Text("+\(avatars.count - maxVisible)")
-                        .font(LubaTypography.custom(size: size.fontSize, weight: .semibold))
-                        .foregroundStyle(LubaColors.textSecondary)
+                        .font(luba.fonts.custom(size: size.fontSize, weight: .semibold))
+                        .foregroundStyle(luba.colors.textSecondary)
                 }
                 .frame(width: size.dimension, height: size.dimension)
                 .overlay(
                     Circle()
-                        .strokeBorder(LubaColors.surface, lineWidth: 2)
+                        .strokeBorder(luba.colors.surface, lineWidth: 2)
                 )
             }
         }

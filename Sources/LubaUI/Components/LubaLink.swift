@@ -31,11 +31,11 @@ public enum LubaLinkStyle {
 /// LubaLink("Visit site", style: .external) { openURL() }
 /// ```
 public struct LubaLink: View {
+    @LubaEnvironment private var luba
     private let label: String
     private let style: LubaLinkStyle
     private let action: () -> Void
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates an inline link.
     ///
@@ -77,23 +77,23 @@ public struct LubaLink: View {
     private var labelFont: Font {
         switch style {
         case .default, .external:
-            return LubaTypography.custom(size: 16, weight: .medium)
+            return luba.fonts.body.weight(.medium)
         case .subtle:
-            return LubaTypography.bodySmall
+            return luba.fonts.bodySmall
         }
     }
 
     private var labelColor: Color {
         switch style {
         case .default, .external:
-            return LubaColors.accent
+            return luba.colors.accent
         case .subtle:
-            return LubaColors.textSecondary
+            return luba.colors.textSecondary
         }
     }
 
     private func performAction() {
-        if config.hapticsEnabled { LubaHaptics.light() }
+        if luba.hapticsEnabled { LubaHaptics.light() }
         action()
     }
 }

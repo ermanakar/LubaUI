@@ -247,6 +247,7 @@ public enum LubaTabsTokens {
     public static let iconLabelSpacing: CGFloat = LubaSpacing.xs
 
     /// Tab font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.footnote, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let fontSize: CGFloat = 13
 
     /// Tab icon size
@@ -271,6 +272,7 @@ public enum LubaTabsTokens {
     public static let underlineSpacing: CGFloat = 8
 
     /// Underline font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.subheadline, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let underlineFontSize: CGFloat = 14
 }
 
@@ -288,6 +290,7 @@ public enum LubaSheetTokens {
     public static let closeIconSize: CGFloat = 12
 
     /// Title font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.title3, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let titleFontSize: CGFloat = 18
 
     /// Subtitle font size
@@ -369,6 +372,7 @@ public enum LubaTooltipTokens {
     public static let shadowOpacity: CGFloat = 0.10
 
     /// Text font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.footnote, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let fontSize: CGFloat = 13
 
     /// Arrow size (triangle pointer)

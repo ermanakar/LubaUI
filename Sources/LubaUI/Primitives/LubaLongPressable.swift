@@ -41,10 +41,10 @@ public enum LubaLongPressTokens {
     public static let defaultProgressSize: CGFloat = 48
 
     /// Progress ring color
-    public static var progressColor: Color { LubaColors.accent }
+    public static var progressColor: Color { LubaThemeColors.default.accent }
 
     /// Progress ring background color
-    public static var progressBackgroundColor: Color { LubaColors.gray200 }
+    public static var progressBackgroundColor: Color { LubaThemeColors.default.fill }
 }
 
 // MARK: - Long Pressable Modifier
@@ -60,7 +60,7 @@ public struct LubaLongPressableModifier: ViewModifier {
 
     @State private var isPressed = false
     @State private var progress: CGFloat = 0
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public init(
         duration: Double = LubaLongPressTokens.defaultDuration,
@@ -80,14 +80,14 @@ public struct LubaLongPressableModifier: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .scaleEffect(isPressed ? LubaLongPressTokens.pressScale : 1.0)
-            .animation(LubaMotion.pressAnimation, value: isPressed)
+            .scaleEffect(luba.motion.pressScale(isPressed ? LubaLongPressTokens.pressScale : 1.0))
+            .animation(luba.motion.decorative(LubaMotion.pressAnimation), value: isPressed)
             .overlay(
                 Group {
                     if showProgress {
                         progressRing
                             .opacity(isPressed ? 1 : 0)
-                            .animation(.easeOut(duration: 0.15), value: isPressed)
+                            .animation(luba.motion.animation(.easeOut(duration: 0.15)), value: isPressed)
                     }
                 }
             )
@@ -136,26 +136,29 @@ public struct LubaLongPressableModifier: ViewModifier {
         progress = 0
 
         // Start haptic
-        if config.hapticsEnabled, let haptic = hapticOnStart {
+        if luba.hapticsEnabled, let haptic = hapticOnStart {
             haptic.trigger()
         }
 
         // Animate progress smoothly
-        withAnimation(.linear(duration: duration)) {
+        // The ring's fill *is* the countdown, so it survives Reduce Motion.
+        if let fill = luba.motion.continuous(.linear(duration: duration)) {
+            withAnimation(fill) { progress = 1.0 }
+        } else {
             progress = 1.0
         }
     }
 
     private func cancelPress() {
         isPressed = false
-        withAnimation(.easeOut(duration: 0.15)) {
+        luba.motion.run(.easeOut(duration: 0.15)) {
             progress = 0
         }
     }
 
     private func completePress() {
         // Completion haptic
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             hapticOnComplete.trigger()
         }
 
@@ -164,7 +167,7 @@ public struct LubaLongPressableModifier: ViewModifier {
         
         // Reset state instantly upon completion
         isPressed = false
-        withAnimation(.easeOut(duration: 0.15)) {
+        luba.motion.run(.easeOut(duration: 0.15)) {
             progress = 0
         }
     }
@@ -208,6 +211,7 @@ public extension View {
 
 /// A standalone long press button with built-in progress visualization.
 public struct LubaLongPressButton: View {
+    @LubaEnvironment private var luba
     let icon: String
     let label: String?
     let duration: Double
@@ -217,7 +221,6 @@ public struct LubaLongPressButton: View {
 
     @State private var isPressed = false
     @State private var progress: CGFloat = 0
-    @Environment(\.lubaConfig) private var config
 
     public init(
         icon: String,
@@ -240,7 +243,7 @@ public struct LubaLongPressButton: View {
             ZStack {
                 // Background
                 Circle()
-                    .fill(isPressed ? color.opacity(0.15) : LubaColors.gray100)
+                    .fill(isPressed ? color.opacity(0.15) : luba.colors.surfaceHover)
                     .frame(width: size, height: size)
 
                 // Progress ring
@@ -256,15 +259,15 @@ public struct LubaLongPressButton: View {
                     .frame(width: size - 8, height: size - 8)
                     .rotationEffect(.degrees(-90))
                     .opacity(isPressed ? 1 : 0)
-                    .animation(.easeOut(duration: 0.15), value: isPressed)
+                    .animation(luba.motion.animation(.easeOut(duration: 0.15)), value: isPressed)
 
                 // Icon
                 Image(systemName: icon)
                     .font(.system(size: size * 0.35))
-                    .foregroundStyle(isPressed ? color : LubaColors.textSecondary)
+                    .foregroundStyle(isPressed ? color : luba.colors.textSecondary)
             }
-            .scaleEffect(isPressed ? 0.95 : 1.0)
-            .animation(LubaMotion.pressAnimation, value: isPressed)
+            .scaleEffect(luba.motion.pressScale(isPressed ? 0.95 : 1.0))
+            .animation(luba.motion.decorative(LubaMotion.pressAnimation), value: isPressed)
             .onLongPressGesture(
                 minimumDuration: duration,
                 maximumDistance: 50,
@@ -282,8 +285,8 @@ public struct LubaLongPressButton: View {
 
             if let label = label {
                 Text(label)
-                    .font(LubaTypography.caption)
-                    .foregroundStyle(LubaColors.textSecondary)
+                    .font(luba.fonts.caption)
+                    .foregroundStyle(luba.colors.textSecondary)
             }
         }
     }
@@ -292,31 +295,34 @@ public struct LubaLongPressButton: View {
         isPressed = true
         progress = 0
 
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
 
-        withAnimation(.linear(duration: duration)) {
+        // The ring's fill *is* the countdown, so it survives Reduce Motion.
+        if let fill = luba.motion.continuous(.linear(duration: duration)) {
+            withAnimation(fill) { progress = 1.0 }
+        } else {
             progress = 1.0
         }
     }
 
     private func cancelPress() {
         isPressed = false
-        withAnimation(.easeOut(duration: 0.15)) {
+        luba.motion.run(.easeOut(duration: 0.15)) {
             progress = 0
         }
     }
 
     private func completePress() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.success()
         }
 
         action()
         
         isPressed = false
-        withAnimation(.easeOut(duration: 0.15)) {
+        luba.motion.run(.easeOut(duration: 0.15)) {
             progress = 0
         }
     }

@@ -56,6 +56,7 @@ public enum LubaChipTokens {
 /// LubaChip("Design", style: .outlined, isDismissible: true) { print("removed") }
 /// ```
 public struct LubaChip: View {
+    @LubaEnvironment private var luba
     private let label: String
     private let style: LubaChipStyle
     private let icon: Image?
@@ -64,7 +65,6 @@ public struct LubaChip: View {
     private let onDismiss: (() -> Void)?
     private let onTap: (() -> Void)?
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a chip.
     ///
@@ -98,26 +98,26 @@ public struct LubaChip: View {
         HStack(spacing: LubaChipTokens.contentSpacing) {
             if let icon = icon {
                 icon
-                    .font(LubaTypography.custom(size: LubaChipTokens.iconFontSize, weight: .medium))
+                    .font(luba.fonts.custom(size: LubaChipTokens.iconFontSize, weight: .medium))
             }
 
             Text(label)
-                .font(LubaTypography.subheadline)
+                .font(luba.fonts.subheadline)
 
             if isDismissible {
                 Button(action: dismiss) {
                     Image(systemName: "xmark")
-                        .font(LubaTypography.custom(size: LubaChipTokens.dismissIconFontSize, weight: .bold))
+                        .font(luba.fonts.custom(size: LubaChipTokens.dismissIconFontSize, weight: .bold))
                         .frame(width: LubaChipTokens.dismissButtonSize, height: LubaChipTokens.dismissButtonSize)
                         .background(dismissBackground)
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Remove \(label)")
+                .accessibilityLabel(LubaStrings.remove(label))
             }
         }
         .padding(.horizontal, LubaChipTokens.horizontalPadding)
-        .frame(height: LubaChipTokens.height)
+        .frame(minHeight: LubaChipTokens.height)
         .foregroundStyle(foregroundColor)
         .background(backgroundColor)
         .clipShape(Capsule())
@@ -127,7 +127,7 @@ public struct LubaChip: View {
         }
         .accessibilityLabel(label)
         .accessibilityAddTraits(onTap != nil ? .isButton : .isStaticText)
-        .accessibilityValue(isSelected ? "Selected" : "")
+        .accessibilityValue(isSelected ? LubaStrings.selected : "")
     }
 
     // MARK: - Styling
@@ -135,18 +135,18 @@ public struct LubaChip: View {
     private var foregroundColor: Color {
         switch style {
         case .filled:
-            return isSelected ? LubaColors.textOnAccent : LubaColors.accent
+            return isSelected ? luba.colors.textOnAccent : luba.colors.accent
         case .outlined:
-            return isSelected ? LubaColors.accent : LubaColors.textSecondary
+            return isSelected ? luba.colors.accent : luba.colors.textSecondary
         }
     }
 
     private var backgroundColor: Color {
         switch style {
         case .filled:
-            return isSelected ? LubaColors.accent : LubaColors.accentSubtle
+            return isSelected ? luba.colors.accent : luba.colors.accentSubtle
         case .outlined:
-            return isSelected ? LubaColors.accentSubtle : Color.clear
+            return isSelected ? luba.colors.accentSubtle : Color.clear
         }
     }
 
@@ -154,21 +154,21 @@ public struct LubaChip: View {
     private var borderOverlay: some View {
         if style == .outlined {
             Capsule()
-                .strokeBorder(isSelected ? LubaColors.accent : LubaColors.border, lineWidth: LubaChipTokens.borderWidth)
+                .strokeBorder(isSelected ? luba.colors.accent : luba.colors.border, lineWidth: LubaChipTokens.borderWidth)
         }
     }
 
     private var dismissBackground: Color {
         switch style {
         case .filled:
-            return isSelected ? LubaColors.textOnAccent.opacity(0.2) : LubaColors.accent.opacity(0.15)
+            return isSelected ? luba.colors.textOnAccent.opacity(0.2) : luba.colors.accent.opacity(0.15)
         case .outlined:
-            return LubaColors.textTertiary.opacity(0.15)
+            return luba.colors.textTertiary.opacity(0.15)
         }
     }
 
     private func dismiss() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.soft()
         }
         onDismiss?()

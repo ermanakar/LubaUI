@@ -40,14 +40,20 @@ public enum LubaToastStyle {
         }
     }
 
-    var color: Color {
+    /// The semantic status role this style maps to.
+    public var role: LubaStatusRole {
         switch self {
-        case .info: return LubaColors.accent
-        case .success: return LubaColors.success
-        case .warning: return LubaColors.warning
-        case .error: return LubaColors.error
+        case .info: return .info
+        case .success: return .success
+        case .warning: return .warning
+        case .error: return .error
         }
     }
+
+    /// Icon color, resolved against a theme palette.
+    func color(_ colors: LubaThemeColors) -> Color { colors.status(role) }
+
+    var color: Color { color(.default) }
 }
 
 // MARK: - Toast View
@@ -63,6 +69,7 @@ public enum LubaToastStyle {
 /// LubaToast("Connection lost", style: .error, action: { retry() }, actionLabel: "Retry")
 /// ```
 public struct LubaToast: View {
+    @LubaEnvironment private var luba
     private let message: String
     private let style: LubaToastStyle
     private let useGlass: Bool
@@ -70,7 +77,6 @@ public struct LubaToast: View {
     private let actionLabel: String?
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a toast notification.
     ///
@@ -99,26 +105,26 @@ public struct LubaToast: View {
             // Icon
             Image(systemName: style.icon)
                 .font(.system(size: LubaToastTokens.iconSize, weight: .medium))
-                .foregroundStyle(style.color)
+                .foregroundStyle(style.color(luba.colors))
 
             // Message
             Text(message)
-                .font(LubaTypography.subheadline)
-                .foregroundStyle(LubaColors.textPrimary)
+                .font(luba.fonts.subheadline)
+                .foregroundStyle(luba.colors.textPrimary)
 
             Spacer(minLength: 4)
 
             // Action button
             if let action = action, let label = actionLabel {
                 Button {
-                    if config.hapticsEnabled {
+                    if luba.hapticsEnabled {
                         LubaHaptics.light()
                     }
                     action()
                 } label: {
                     Text(label)
-                        .font(LubaTypography.buttonSmall)
-                        .foregroundStyle(style.color)
+                        .font(luba.fonts.buttonSmall)
+                        .foregroundStyle(style.color(luba.colors))
                 }
             }
         }
@@ -127,17 +133,17 @@ public struct LubaToast: View {
 
         if useGlass {
             content
-                .lubaGlass(.regular, tint: style.color, cornerRadius: LubaToastTokens.cornerRadius)
+                .lubaGlass(.regular, tint: style.color(luba.colors), cornerRadius: LubaToastTokens.cornerRadius)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityLabel(LubaStrings.statusMessage(style.role, message))
                 .accessibilityAddTraits(.isStaticText)
         } else {
             content
-                .background(LubaColors.surface)
+                .background(luba.colors.surface)
                 .clipShape(RoundedRectangle(cornerRadius: LubaToastTokens.cornerRadius, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: LubaToastTokens.cornerRadius, style: .continuous)
-                        .strokeBorder(LubaColors.border.opacity(colorScheme == .dark ? 0.5 : 1), lineWidth: 1)
+                        .strokeBorder(luba.colors.border.opacity(colorScheme == .dark ? 0.5 : 1), lineWidth: 1)
                 )
                 .shadow(
                     color: Color.black.opacity(LubaToastTokens.shadowOpacity),
@@ -145,7 +151,7 @@ public struct LubaToast: View {
                     y: LubaToastTokens.shadowY
                 )
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(style.accessibilityPrefix): \(message)")
+                .accessibilityLabel(LubaStrings.statusMessage(style.role, message))
                 .accessibilityAddTraits(.isStaticText)
         }
     }
@@ -174,7 +180,7 @@ public struct LubaToastModifier: ViewModifier {
     let style: LubaToastStyle
     let duration: Double
 
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public func body(content: Content) -> some View {
         ZStack {
@@ -184,10 +190,10 @@ public struct LubaToastModifier: ViewModifier {
                 if isPresented {
                     LubaToast(message, style: style)
                         .padding(.horizontal, LubaToastTokens.horizontalMargin)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .transition(luba.motion.transition(.move(edge: .top).combined(with: .opacity)))
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                                withAnimation(config.animationsEnabled ? LubaMotion.stateAnimation : nil) {
+                                luba.motion.run(LubaMotion.stateAnimation) {
                                     isPresented = false
                                 }
                             }
@@ -197,7 +203,7 @@ public struct LubaToastModifier: ViewModifier {
                 Spacer()
             }
             .padding(.top, LubaToastTokens.topPadding)
-            .animation(config.animationsEnabled ? LubaMotion.stateAnimation : nil, value: isPresented)
+            .animation(luba.motion.animation(LubaMotion.stateAnimation), value: isPresented)
         }
     }
 }

@@ -15,11 +15,11 @@ import SwiftUI
 
 /// A skeleton placeholder with shimmer animation.
 public struct LubaSkeleton: View {
+    @LubaEnvironment private var luba
     private let width: CGFloat?
     private let height: CGFloat
     private let cornerRadius: CGFloat
 
-    @Environment(\.lubaConfig) private var config
     @State private var shimmerOffset: CGFloat = LubaSkeletonTokens.shimmerStart
 
     /// Creates a skeleton placeholder.
@@ -40,7 +40,7 @@ public struct LubaSkeleton: View {
 
     public var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .fill(LubaColors.gray200)
+            .fill(luba.colors.fill)
             .frame(width: width, height: height)
             .overlay(
                 GeometryReader { geo in
@@ -52,8 +52,10 @@ public struct LubaSkeleton: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .accessibilityHidden(true)
             .onAppear {
-                guard config.animationsEnabled else { return }
-                withAnimation(.easeInOut(duration: LubaSkeletonTokens.shimmerDuration).repeatForever(autoreverses: false)) {
+                guard let shimmer = luba.motion.repeating(
+                    .easeInOut(duration: LubaSkeletonTokens.shimmerDuration).repeatForever(autoreverses: false)
+                ) else { return }
+                withAnimation(shimmer) {
                     shimmerOffset = LubaSkeletonTokens.shimmerEndRect
                 }
             }
@@ -63,7 +65,7 @@ public struct LubaSkeleton: View {
         LinearGradient(
             colors: [
                 Color.clear,
-                LubaColors.surface.opacity(LubaSkeletonTokens.shimmerOpacity),
+                luba.colors.surface.opacity(LubaSkeletonTokens.shimmerOpacity),
                 Color.clear
             ],
             startPoint: .leading,
@@ -76,9 +78,9 @@ public struct LubaSkeleton: View {
 
 /// A circular skeleton placeholder.
 public struct LubaSkeletonCircle: View {
+    @LubaEnvironment private var luba
     private let size: CGFloat
 
-    @Environment(\.lubaConfig) private var config
     @State private var shimmerOffset: CGFloat = LubaSkeletonTokens.shimmerStart
 
     /// Creates a circular skeleton placeholder.
@@ -91,13 +93,13 @@ public struct LubaSkeletonCircle: View {
 
     public var body: some View {
         Circle()
-            .fill(LubaColors.gray200)
+            .fill(luba.colors.fill)
             .frame(width: size, height: size)
             .overlay(
                 LinearGradient(
                     colors: [
                         Color.clear,
-                        LubaColors.surface.opacity(LubaSkeletonTokens.shimmerOpacity),
+                        luba.colors.surface.opacity(LubaSkeletonTokens.shimmerOpacity),
                         Color.clear
                     ],
                     startPoint: .leading,
@@ -109,8 +111,10 @@ public struct LubaSkeletonCircle: View {
             .clipShape(Circle())
             .accessibilityHidden(true)
             .onAppear {
-                guard config.animationsEnabled else { return }
-                withAnimation(.easeInOut(duration: LubaSkeletonTokens.shimmerDuration).repeatForever(autoreverses: false)) {
+                guard let shimmer = luba.motion.repeating(
+                    .easeInOut(duration: LubaSkeletonTokens.shimmerDuration).repeatForever(autoreverses: false)
+                ) else { return }
+                withAnimation(shimmer) {
                     shimmerOffset = LubaSkeletonTokens.shimmerEndCircle
                 }
             }
@@ -166,6 +170,7 @@ public struct LubaSkeletonText: View {
 
 /// A skeleton placeholder for a card with avatar + text pattern.
 public struct LubaSkeletonCard: View {
+    @LubaEnvironment private var luba
     private let avatarSize: CGFloat
     private let showBody: Bool
 
@@ -199,11 +204,11 @@ public struct LubaSkeletonCard: View {
             }
         }
         .padding(LubaSkeletonTokens.cardPadding)
-        .background(LubaColors.surface)
+        .background(luba.colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: LubaSkeletonTokens.cardCornerRadius, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: LubaSkeletonTokens.cardCornerRadius, style: .continuous)
-                .strokeBorder(LubaColors.border, lineWidth: 1)
+                .strokeBorder(luba.colors.border, lineWidth: 1)
         )
     }
 }

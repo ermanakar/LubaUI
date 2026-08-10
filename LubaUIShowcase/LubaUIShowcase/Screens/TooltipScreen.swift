@@ -145,7 +145,7 @@ struct TooltipScreen: View {
                         VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                             HStack(spacing: LubaSpacing.xs) {
                                 Text("API Key")
-                                    .font(LubaTypography.custom(size: LubaFieldTokens.labelFontSize, weight: .medium))
+                                    .font(LubaTypography.font(.footnote).weight(.medium))
                                     .foregroundStyle(LubaColors.textSecondary)
 
                                 LubaTooltip("Your API key can be found in Settings > Developer > API Keys. Keep it secret!") {
@@ -161,7 +161,7 @@ struct TooltipScreen: View {
                         VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                             HStack(spacing: LubaSpacing.xs) {
                                 Text("Webhook URL")
-                                    .font(LubaTypography.custom(size: LubaFieldTokens.labelFontSize, weight: .medium))
+                                    .font(LubaTypography.font(.footnote).weight(.medium))
                                     .foregroundStyle(LubaColors.textSecondary)
 
                                 LubaTooltip("We'll send POST requests to this URL when events occur.", position: .top) {

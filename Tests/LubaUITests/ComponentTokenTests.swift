@@ -254,7 +254,10 @@ final class ComponentTokenTests: XCTestCase {
     }
 
     func testBadgeSizes() {
-        XCTAssertLessThan(LubaBadgeSize.small.fontSize, LubaBadgeSize.medium.fontSize)
+        XCTAssertLessThan(
+            LubaBadgeSize.small.role.nominalSize,
+            LubaBadgeSize.medium.role.nominalSize
+        )
         XCTAssertLessThan(LubaBadgeSize.small.iconSize, LubaBadgeSize.medium.iconSize)
         XCTAssertLessThan(LubaBadgeSize.small.verticalPadding, LubaBadgeSize.medium.verticalPadding)
         XCTAssertLessThan(LubaBadgeSize.small.horizontalPadding, LubaBadgeSize.medium.horizontalPadding)

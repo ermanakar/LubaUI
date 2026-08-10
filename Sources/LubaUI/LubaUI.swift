@@ -22,11 +22,11 @@ import SwiftUI
 /// import LubaUI
 ///
 /// Text(LubaUI.name)       // "LubaUI"
-/// Text(LubaUI.version)    // "0.1.0"
+/// Text(LubaUI.version)    // "0.2.0"
 /// ```
 public enum LubaUI {
     /// The current library version.
-    public static let version = "0.1.0"
+    public static let version = "0.2.0"
 
     /// The library name.
     public static let name = "LubaUI"

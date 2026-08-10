@@ -28,11 +28,11 @@ import SwiftUI
 ///
 /// Pass `useGlass: true` for a frosted glass background.
 public struct LubaTabs<T: Hashable>: View {
+    @LubaEnvironment private var luba
     @Binding private var selection: T
     private let tabs: [(value: T, label: String, icon: String?)]
     private let useGlass: Bool
 
-    @Environment(\.lubaConfig) private var config
     @Namespace private var namespace
 
     public init(
@@ -91,7 +91,7 @@ public struct LubaTabs<T: Hashable>: View {
                 .lubaGlass(.subtle, cornerRadius: LubaTabsTokens.segmentedContainerRadius)
         } else {
             container
-                .background(LubaColors.gray100)
+                .background(luba.colors.surfaceHover)
                 .clipShape(RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedContainerRadius, style: .continuous))
         }
     }
@@ -99,10 +99,10 @@ public struct LubaTabs<T: Hashable>: View {
     private func tabButton(for tab: (value: T, label: String, icon: String?)) -> some View {
         Button {
             guard selection != tab.value else { return }
-            if config.hapticsEnabled {
+            if luba.hapticsEnabled {
                 LubaHaptics.selection()
             }
-            withAnimation(config.animationsEnabled ? LubaMotion.stateAnimation : nil) {
+            luba.motion.run(LubaMotion.stateAnimation) {
                 selection = tab.value
             }
         } label: {
@@ -113,16 +113,16 @@ public struct LubaTabs<T: Hashable>: View {
                 }
 
                 Text(tab.label)
-                    .font(LubaTypography.buttonSmall)
+                    .font(luba.fonts.buttonSmall)
             }
-            .foregroundStyle(selection == tab.value ? LubaColors.textPrimary : LubaColors.textSecondary)
+            .foregroundStyle(selection == tab.value ? luba.colors.textPrimary : luba.colors.textSecondary)
             .padding(.horizontal, LubaTabsTokens.tabHorizontalPadding)
-            .frame(height: LubaTabsTokens.tabHeight)
+            .frame(minHeight: LubaTabsTokens.tabHeight)
             .frame(maxWidth: .infinity)
             .background {
                 if selection == tab.value {
                     RoundedRectangle(cornerRadius: LubaTabsTokens.segmentedTabRadius, style: .continuous)
-                        .fill(LubaColors.surface)
+                        .fill(luba.colors.surface)
                         .shadow(
                             color: Color.black.opacity(LubaTabsTokens.shadowOpacity),
                             radius: LubaTabsTokens.shadowRadius,
@@ -135,7 +135,7 @@ public struct LubaTabs<T: Hashable>: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tab.label)
-        .accessibilityValue(selection == tab.value ? "Selected" : "")
+        .accessibilityValue(selection == tab.value ? LubaStrings.selected : "")
         .accessibilityAddTraits(selection == tab.value ? [.isButton, .isSelected] : .isButton)
     }
 }
@@ -151,10 +151,10 @@ public struct LubaTabs<T: Hashable>: View {
 /// ])
 /// ```
 public struct LubaUnderlineTabs<T: Hashable>: View {
+    @LubaEnvironment private var luba
     @Binding private var selection: T
     private let tabs: [(value: T, label: String)]
 
-    @Environment(\.lubaConfig) private var config
     @Namespace private var namespace
 
     public init(
@@ -186,17 +186,17 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
     private func underlineTabButton(for tab: (value: T, label: String)) -> some View {
         Button {
             guard selection != tab.value else { return }
-            if config.hapticsEnabled {
+            if luba.hapticsEnabled {
                 LubaHaptics.selection()
             }
-            withAnimation(config.animationsEnabled ? LubaMotion.stateAnimation : nil) {
+            luba.motion.run(LubaMotion.stateAnimation) {
                 selection = tab.value
             }
         } label: {
             VStack(spacing: LubaTabsTokens.underlineSpacing) {
                 Text(tab.label)
-                    .font(LubaTypography.custom(size: LubaTabsTokens.underlineFontSize, weight: selection == tab.value ? .bold : .medium))
-                    .foregroundStyle(selection == tab.value ? LubaColors.accent : LubaColors.textTertiary)
+                    .font(luba.fonts.subheadline.weight(selection == tab.value ? .bold : .medium))
+                    .foregroundStyle(selection == tab.value ? luba.colors.accent : luba.colors.textTertiary)
 
                 ZStack(alignment: .bottom) {
                     Rectangle()
@@ -205,7 +205,7 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
 
                     if selection == tab.value {
                         Rectangle()
-                            .fill(LubaColors.accent)
+                            .fill(luba.colors.accent)
                             .frame(height: LubaTabsTokens.underlineIndicatorHeight)
                             .matchedGeometryEffect(id: "underline", in: namespace)
                     }
@@ -217,7 +217,7 @@ public struct LubaUnderlineTabs<T: Hashable>: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tab.label)
-        .accessibilityValue(selection == tab.value ? "Selected" : "")
+        .accessibilityValue(selection == tab.value ? LubaStrings.selected : "")
         .accessibilityAddTraits(selection == tab.value ? [.isButton, .isSelected] : .isButton)
     }
 }

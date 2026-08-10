@@ -47,7 +47,7 @@ public struct LubaShimmerableModifier: ViewModifier {
     let intensity: CGFloat
 
     @State private var shimmerOffset: CGFloat = LubaShimmerTokens.startOffset
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public init(isLoading: Bool, intensity: CGFloat = LubaShimmerTokens.defaultIntensity) {
         self.isLoading = isLoading
@@ -95,7 +95,7 @@ public struct LubaShimmerableModifier: ViewModifier {
     }
 
     private func startShimmer() {
-        guard config.animationsEnabled else { return }
+        guard luba.motion.allowsRepeatingMotion else { return }
         shimmerOffset = LubaShimmerTokens.startOffset
         withAnimation(.linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)) {
             shimmerOffset = LubaShimmerTokens.endOffset
@@ -111,7 +111,7 @@ public struct LubaRedactedShimmerModifier: ViewModifier {
     let intensity: CGFloat
 
     @State private var shimmerOffset: CGFloat = LubaShimmerTokens.startOffset
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public init(isLoading: Bool, intensity: CGFloat = LubaShimmerTokens.defaultIntensity) {
         self.isLoading = isLoading
@@ -160,7 +160,7 @@ public struct LubaRedactedShimmerModifier: ViewModifier {
     }
 
     private func startShimmer() {
-        guard config.animationsEnabled else { return }
+        guard luba.motion.allowsRepeatingMotion else { return }
         shimmerOffset = LubaShimmerTokens.startOffset
         withAnimation(.linear(duration: LubaShimmerTokens.duration).repeatForever(autoreverses: false)) {
             shimmerOffset = LubaShimmerTokens.endOffset

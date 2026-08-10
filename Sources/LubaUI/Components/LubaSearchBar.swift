@@ -22,6 +22,7 @@ import SwiftUI
 /// LubaSearchBar(text: $query, placeholder: "Find recipes...")
 /// ```
 public struct LubaSearchBar: View {
+    @LubaEnvironment private var luba
     @Binding private var text: String
     private let placeholder: String
     private let showCancelButton: Bool
@@ -29,7 +30,6 @@ public struct LubaSearchBar: View {
     private let onCancel: (() -> Void)?
 
     @FocusState private var isFocused: Bool
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a search bar.
     ///
@@ -41,7 +41,7 @@ public struct LubaSearchBar: View {
     ///   - onCancel: Optional closure invoked when the user cancels.
     public init(
         text: Binding<String>,
-        placeholder: String = "Search",
+        placeholder: String = LubaStrings.search,
         showCancelButton: Bool = true,
         onSubmit: (() -> Void)? = nil,
         onCancel: (() -> Void)? = nil
@@ -57,11 +57,11 @@ public struct LubaSearchBar: View {
         HStack(spacing: LubaSpacing.sm) {
             HStack(spacing: LubaSpacing.sm) {
                 Image(systemName: "magnifyingglass")
-                    .font(LubaTypography.body)
-                    .foregroundStyle(LubaColors.textTertiary)
+                    .font(luba.fonts.body)
+                    .foregroundStyle(luba.colors.textTertiary)
 
                 TextField(placeholder, text: $text)
-                    .font(LubaTypography.body)
+                    .font(luba.fonts.body)
                     .focused($isFocused)
                     .submitLabel(.search)
                     .onSubmit { onSubmit?() }
@@ -69,52 +69,52 @@ public struct LubaSearchBar: View {
                 if !text.isEmpty {
                     Button(action: clearText) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(LubaTypography.bodySmall)
-                            .foregroundStyle(LubaColors.textTertiary)
+                            .font(luba.fonts.bodySmall)
+                            .foregroundStyle(luba.colors.textTertiary)
                     }
                     .buttonStyle(.plain)
-                    .transition(.scale.combined(with: .opacity))
-                    .accessibilityLabel("Clear search")
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
+                    .accessibilityLabel(LubaStrings.clearSearch)
                 }
             }
             .padding(.horizontal, LubaSearchBarTokens.horizontalPadding)
-            .frame(height: LubaSearchBarTokens.height)
-            .background(LubaColors.surfaceSecondary)
+            .frame(minHeight: LubaSearchBarTokens.height)
+            .background(luba.colors.surfaceSecondary)
             .clipShape(Capsule())
 
             if showCancelButton && isFocused {
                 Button(action: cancel) {
-                    Text("Cancel")
-                        .font(LubaTypography.body)
-                        .foregroundStyle(LubaColors.accent)
+                    Text(LubaStrings.cancel)
+                        .font(luba.fonts.body)
+                        .foregroundStyle(luba.colors.accent)
                 }
                 .buttonStyle(.plain)
-                .transition(.move(edge: .trailing).combined(with: .opacity))
-                .accessibilityLabel("Cancel search")
+                .transition(luba.motion.transition(.move(edge: .trailing).combined(with: .opacity)))
+                .accessibilityLabel(LubaStrings.cancelSearch)
             }
         }
-        .animation(LubaMotion.stateAnimation, value: isFocused)
-        .animation(LubaMotion.micro, value: text.isEmpty)
+        .animation(luba.motion.animation(LubaMotion.stateAnimation), value: isFocused)
+        .animation(luba.motion.animation(LubaMotion.micro), value: text.isEmpty)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Search")
+        .accessibilityLabel(LubaStrings.search)
     }
 
     // MARK: - Actions
 
     private func clearText() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
-        withAnimation(LubaMotion.micro) {
+        luba.motion.run(LubaMotion.micro) {
             text = ""
         }
     }
 
     private func cancel() {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.light()
         }
-        withAnimation(LubaMotion.stateAnimation) {
+        luba.motion.run(LubaMotion.stateAnimation) {
             text = ""
             isFocused = false
         }

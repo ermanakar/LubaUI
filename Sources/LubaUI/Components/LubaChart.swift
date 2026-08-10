@@ -50,14 +50,17 @@ public protocol LubaSeriesChartData: LubaChartData {
 /// ], showAnnotations: true)
 /// ```
 public struct LubaBarChart<D: LubaChartData>: View {
+    @LubaEnvironment private var luba
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
     private let horizontal: Bool
     private let showAnnotations: Bool
-    private let color: Color
+    private let explicitColor: Color?
 
-    @Environment(\.lubaConfig) private var config
+    /// The resolved mark color — the caller's override, or the theme accent.
+    private var color: Color { explicitColor ?? luba.colors.accent }
+
     @State private var selectedLabel: String?
     @State private var animatedData: [D] = []
 
@@ -68,21 +71,21 @@ public struct LubaBarChart<D: LubaChartData>: View {
     ///   - showAxes: Show axis labels. Defaults to `true`.
     ///   - horizontal: Horizontal bars. Defaults to `false`.
     ///   - showAnnotations: Show value labels above bars. Defaults to `false`.
-    ///   - color: Bar fill color. Defaults to ``LubaColors/accent``.
+    ///   - color: Bar fill color. Defaults to the theme accent.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
         showAxes: Bool = true,
         horizontal: Bool = false,
         showAnnotations: Bool = false,
-        color: Color = LubaColors.accent
+        color: Color? = nil
     ) {
         self.data = data
         self.height = height
         self.showAxes = showAxes
         self.horizontal = horizontal
         self.showAnnotations = showAnnotations
-        self.color = color
+        self.explicitColor = color
     }
 
     public var body: some View {
@@ -92,11 +95,7 @@ public struct LubaBarChart<D: LubaChartData>: View {
             chartContent
                 .onAppear {
                     guard animatedData.isEmpty else { return }
-                    if config.animationsEnabled {
-                        withAnimation(.easeOut(duration: LubaChartTokens.revealDuration)) {
-                            animatedData = data
-                        }
-                    } else {
+                    luba.motion.run(.easeOut(duration: LubaChartTokens.revealDuration)) {
                         animatedData = data
                     }
                 }
@@ -125,8 +124,8 @@ public struct LubaBarChart<D: LubaChartData>: View {
                 .annotation(position: .top) {
                     if showAnnotations {
                         Text(formattedValue(item.value))
-                            .font(LubaTypography.caption2)
-                            .foregroundStyle(LubaColors.textSecondary)
+                            .font(luba.fonts.caption2)
+                            .foregroundStyle(luba.colors.textSecondary)
                             .offset(y: LubaChartTokens.annotationOffset)
                     }
                 }
@@ -186,12 +185,12 @@ public struct LubaBarChart<D: LubaChartData>: View {
 /// LubaGroupedBarChart(data: revenues)
 /// ```
 public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
+    @LubaEnvironment private var luba
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
     private let showAnnotations: Bool
 
-    @Environment(\.lubaConfig) private var config
 
     /// Create a grouped bar chart.
     /// - Parameters:
@@ -225,8 +224,8 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
                 .annotation(position: .top) {
                     if showAnnotations {
                         Text(formattedValue(item.value))
-                            .font(LubaTypography.caption2)
-                            .foregroundStyle(LubaColors.textTertiary)
+                            .font(luba.fonts.caption2)
+                            .foregroundStyle(luba.colors.textTertiary)
                             .offset(y: LubaChartTokens.annotationOffset)
                     }
                 }
@@ -238,7 +237,7 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
 
     private var chartColorRange: [Color] {
         let seriesCount = Set(data.map(\.series)).count
-        return Array(LubaColors.Chart.palette.prefix(max(seriesCount, 1)))
+        return Array(luba.colors.chartPalette.prefix(max(seriesCount, 1)))
     }
 
     private func formattedValue(_ value: Double) -> String {
@@ -266,14 +265,17 @@ public struct LubaGroupedBarChart<D: LubaSeriesChartData>: View {
 /// LubaLineChart(data: points, showArea: true, showPoints: true)
 /// ```
 public struct LubaLineChart<D: LubaChartData>: View {
+    @LubaEnvironment private var luba
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
     private let showArea: Bool
     private let showPoints: Bool
-    private let color: Color
+    private let explicitColor: Color?
 
-    @Environment(\.lubaConfig) private var config
+    /// The resolved mark color — the caller's override, or the theme accent.
+    private var color: Color { explicitColor ?? luba.colors.accent }
+
     @State private var selectedLabel: String?
 
     /// Create a line chart.
@@ -283,21 +285,21 @@ public struct LubaLineChart<D: LubaChartData>: View {
     ///   - showAxes: Show axis labels.
     ///   - showArea: Fill area under the line.
     ///   - showPoints: Show point markers on data points.
-    ///   - color: Line and area color. Defaults to ``LubaColors/accent``.
+    ///   - color: Line and area color. Defaults to the theme accent.
     public init(
         data: [D],
         height: CGFloat = LubaChartTokens.defaultHeight,
         showAxes: Bool = true,
         showArea: Bool = false,
         showPoints: Bool = false,
-        color: Color = LubaColors.accent
+        color: Color? = nil
     ) {
         self.data = data
         self.height = height
         self.showAxes = showAxes
         self.showArea = showArea
         self.showPoints = showPoints
-        self.color = color
+        self.explicitColor = color
     }
 
     public var body: some View {
@@ -350,18 +352,18 @@ public struct LubaLineChart<D: LubaChartData>: View {
             // Selection rule mark
             if let selected = selectedLabel, selected == item.label {
                 RuleMark(x: .value("Selected", item.label))
-                    .foregroundStyle(LubaColors.textTertiary)
+                    .foregroundStyle(luba.colors.textTertiary)
                     .lineStyle(StrokeStyle(
                         lineWidth: LubaChartTokens.selectionLineWidth,
                         dash: LubaChartTokens.selectionDashPattern
                     ))
                     .annotation(position: .top, alignment: .center) {
                         Text(formattedValue(item.value))
-                            .font(LubaTypography.caption2.weight(.medium))
-                            .foregroundStyle(LubaColors.textPrimary)
+                            .font(luba.fonts.caption2.weight(.medium))
+                            .foregroundStyle(luba.colors.textPrimary)
                             .padding(.horizontal, LubaSpacing.xs)
                             .padding(.vertical, LubaSpacing.xxs)
-                            .background(LubaColors.surface)
+                            .background(luba.colors.surface)
                             .lubaCornerRadius(LubaRadius.xs)
                             .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
                     }
@@ -405,13 +407,13 @@ public struct LubaLineChart<D: LubaChartData>: View {
 /// LubaMultiLineChart(data: seriesData, showArea: true, showPoints: true)
 /// ```
 public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
+    @LubaEnvironment private var luba
     private let data: [D]
     private let height: CGFloat
     private let showAxes: Bool
     private let showArea: Bool
     private let showPoints: Bool
 
-    @Environment(\.lubaConfig) private var config
 
     /// Create a multi-series line chart.
     /// - Parameters:
@@ -474,7 +476,7 @@ public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
 
     private var chartColorRange: [Color] {
         let seriesCount = Set(data.map(\.series)).count
-        return Array(LubaColors.Chart.palette.prefix(max(seriesCount, 1)))
+        return Array(luba.colors.chartPalette.prefix(max(seriesCount, 1)))
     }
 }
 
@@ -491,12 +493,12 @@ public struct LubaMultiLineChart<D: LubaSeriesChartData>: View {
 /// ```
 @available(iOS 17, macOS 14, watchOS 10, tvOS 17, *)
 public struct LubaPieChart<D: LubaChartData>: View {
+    @LubaEnvironment private var luba
     private let data: [D]
     private let height: CGFloat
     private let innerRadius: MarkDimension
     private let centerLabel: String?
 
-    @Environment(\.lubaConfig) private var config
 
     /// Create a pie or donut chart.
     /// - Parameters:
@@ -542,11 +544,11 @@ public struct LubaPieChart<D: LubaChartData>: View {
             if let centerLabel {
                 VStack(spacing: LubaSpacing.xxs) {
                     Text(centerLabel)
-                        .font(LubaTypography.caption)
-                        .foregroundStyle(LubaColors.textTertiary)
+                        .font(luba.fonts.caption)
+                        .foregroundStyle(luba.colors.textTertiary)
                     Text(formattedTotal)
-                        .font(LubaTypography.title3.weight(.semibold))
-                        .foregroundStyle(LubaColors.textPrimary)
+                        .font(luba.fonts.title3.weight(.semibold))
+                        .foregroundStyle(luba.colors.textPrimary)
                 }
             }
         }
@@ -562,7 +564,7 @@ public struct LubaPieChart<D: LubaChartData>: View {
 
     private var chartColorRange: [Color] {
         let categoryCount = Set(data.map(\.label)).count
-        return Array(LubaColors.Chart.palette.prefix(max(categoryCount, 1)))
+        return Array(luba.colors.chartPalette.prefix(max(categoryCount, 1)))
     }
 }
 
@@ -582,23 +584,27 @@ public struct LubaPieChart<D: LubaChartData>: View {
 /// }
 /// ```
 public struct LubaSparkline: View {
+    @LubaEnvironment private var luba
     private let values: [Double]
     private let showArea: Bool
-    private let color: Color
+    private let explicitColor: Color?
+
+    /// The resolved mark color — the caller's override, or the theme accent.
+    private var color: Color { explicitColor ?? luba.colors.accent }
 
     /// Create a sparkline.
     /// - Parameters:
     ///   - values: Array of numeric values to plot.
     ///   - showArea: Fill area under the line. Defaults to `true`.
-    ///   - color: Line color. Defaults to ``LubaColors/accent``.
+    ///   - color: Line color. Defaults to the theme accent.
     public init(
         values: [Double],
         showArea: Bool = true,
-        color: Color = LubaColors.accent
+        color: Color? = nil
     ) {
         self.values = values
         self.showArea = showArea
-        self.color = color
+        self.explicitColor = color
     }
 
     /// The trend direction based on the first and last values.
@@ -665,14 +671,23 @@ public enum LubaSparklineTrend {
         }
     }
 
-    /// Semantic color for the trend direction.
-    public var color: Color {
+    /// Semantic color for the trend direction, resolved against a theme palette.
+    ///
+    /// Inside a view, pass the active palette:
+    /// ```swift
+    /// @LubaEnvironment private var luba
+    /// Image(systemName: trend.iconName).foregroundStyle(trend.color(luba.colors))
+    /// ```
+    public func color(_ colors: LubaThemeColors) -> Color {
         switch self {
-        case .up: return LubaColors.success
-        case .down: return LubaColors.error
-        case .flat: return LubaColors.textTertiary
+        case .up: return colors.success
+        case .down: return colors.error
+        case .flat: return colors.textTertiary
         }
     }
+
+    /// Semantic color using the default palette.
+    public var color: Color { color(.default) }
 }
 
 // MARK: - LubaChartSkeleton
@@ -684,6 +699,7 @@ public enum LubaSparklineTrend {
 /// LubaChartSkeleton(style: .line)
 /// ```
 public struct LubaChartSkeleton: View {
+    @LubaEnvironment private var luba
 
     /// The visual style of the skeleton placeholder.
     public enum Style {
@@ -697,7 +713,6 @@ public struct LubaChartSkeleton: View {
     private let height: CGFloat
 
     @State private var isAnimating = false
-    @Environment(\.lubaConfig) private var config
 
     /// Create a chart skeleton.
     /// - Parameters:
@@ -719,8 +734,10 @@ public struct LubaChartSkeleton: View {
         }
         .frame(height: height)
         .onAppear {
-            guard config.animationsEnabled else { return }
-            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+            guard let pulse = luba.motion.repeatingOpacity(
+                .easeInOut(duration: 1.2).repeatForever(autoreverses: true)
+            ) else { return }
+            withAnimation(pulse) {
                 isAnimating = true
             }
         }
@@ -731,7 +748,7 @@ public struct LubaChartSkeleton: View {
             ForEach(0..<LubaChartTokens.skeletonBarCount, id: \.self) { index in
                 let ratio = barRatio(for: index)
                 RoundedRectangle(cornerRadius: LubaChartTokens.barCornerRadius, style: .continuous)
-                    .fill(LubaColors.gray200)
+                    .fill(luba.colors.fill)
                     .frame(height: height * ratio)
                     .opacity(isAnimating ? 0.4 : 0.8)
             }
@@ -749,7 +766,7 @@ public struct LubaChartSkeleton: View {
                     path.addLine(to: point)
                 }
             }
-            .stroke(LubaColors.gray200, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+            .stroke(luba.colors.fill, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
             .opacity(isAnimating ? 0.4 : 0.8)
         }
     }
@@ -782,6 +799,7 @@ public struct LubaChartSkeleton: View {
 /// LubaChartEmptyState(message: "No sales this week", icon: "chart.line.downtrend.xyaxis")
 /// ```
 public struct LubaChartEmptyState: View {
+    @LubaEnvironment private var luba
     private let height: CGFloat
     private let message: String
     private let icon: String
@@ -793,7 +811,7 @@ public struct LubaChartEmptyState: View {
     ///   - icon: SF Symbol name. Defaults to `"chart.bar"`.
     public init(
         height: CGFloat = LubaChartTokens.defaultHeight,
-        message: String = "No data",
+        message: String = LubaStrings.noData,
         icon: String = "chart.bar"
     ) {
         self.height = height
@@ -804,16 +822,16 @@ public struct LubaChartEmptyState: View {
     public var body: some View {
         VStack(spacing: LubaSpacing.sm) {
             Image(systemName: icon)
-                .font(LubaTypography.title)
-                .foregroundStyle(LubaColors.textDisabled)
+                .font(luba.fonts.title)
+                .foregroundStyle(luba.colors.textDisabled)
 
             Text(message)
-                .font(LubaTypography.caption)
-                .foregroundStyle(LubaColors.textTertiary)
+                .font(luba.fonts.caption)
+                .foregroundStyle(luba.colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
         .frame(height: height)
-        .background(LubaColors.surfaceSecondary)
+        .background(luba.colors.surfaceSecondary)
         .lubaCornerRadius(LubaRadius.md)
     }
 }
@@ -833,6 +851,7 @@ public struct LubaChartEmptyState: View {
 /// LubaChartLegend(items: [...], layout: .vertical)
 /// ```
 public struct LubaChartLegend: View {
+    @LubaEnvironment private var luba
 
     /// Legend layout direction.
     public enum Layout {
@@ -876,8 +895,8 @@ public struct LubaChartLegend: View {
                     .frame(width: LubaChartTokens.legendDotSize, height: LubaChartTokens.legendDotSize)
 
                 Text(item.label)
-                    .font(LubaTypography.caption)
-                    .foregroundStyle(LubaColors.textSecondary)
+                    .font(luba.fonts.caption)
+                    .foregroundStyle(luba.colors.textSecondary)
             }
         }
     }

@@ -15,7 +15,7 @@ final class TokenTests: XCTestCase {
     // MARK: - Version
 
     func testVersion() {
-        XCTAssertEqual(LubaUI.version, "0.1.0")
+        XCTAssertEqual(LubaUI.version, "0.2.0")
         XCTAssertEqual(LubaUI.name, "LubaUI")
     }
 

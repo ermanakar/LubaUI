@@ -137,6 +137,7 @@ public enum LubaCardTokens {
 ///     .lubaPressable(scale: LubaMotion.pressScaleProminent) { action() }
 /// ```
 public struct LubaCard<Content: View>: View {
+    @LubaEnvironment private var luba
     private let elevation: LubaCardElevation
     private let style: LubaCardStyle
     private let cornerRadius: CGFloat
@@ -198,7 +199,7 @@ public struct LubaCard<Content: View>: View {
     // MARK: - Computed Properties
 
     private var backgroundColor: Color {
-        style.hasBackground ? LubaColors.surface : .clear
+        style.hasBackground ? luba.colors.surface : .clear
     }
 
     @ViewBuilder
@@ -222,7 +223,7 @@ public struct LubaCard<Content: View>: View {
         if showBorder {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .strokeBorder(
-                    LubaColors.border.opacity(colorScheme == .dark ? LubaCardTokens.darkModeBorderOpacity : 1),
+                    luba.colors.border.opacity(colorScheme == .dark ? LubaCardTokens.darkModeBorderOpacity : 1),
                     lineWidth: LubaCardTokens.borderWidth
                 )
         }

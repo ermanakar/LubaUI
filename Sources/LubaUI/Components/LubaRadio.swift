@@ -37,7 +37,7 @@ public struct LubaRadioGroup<T: Hashable>: View {
     private let options: [(value: T, label: String)]
     private let isDisabled: Bool
 
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     /// Creates a radio group.
     ///
@@ -74,12 +74,12 @@ public struct LubaRadioGroup<T: Hashable>: View {
 
 /// A single radio button (typically used within LubaRadioGroup).
 public struct LubaRadioButton: View {
+    @LubaEnvironment private var luba
     private let label: String
     private let isSelected: Bool
     private let isDisabled: Bool
     private let action: () -> Void
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a radio button.
     ///
@@ -113,10 +113,10 @@ public struct LubaRadioButton: View {
         .buttonStyle(.plain)
         .disabled(isDisabled)
         .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
-        .animation(LubaMotion.micro, value: isSelected)
+        .animation(luba.motion.animation(LubaMotion.micro), value: isSelected)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
-        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+        .accessibilityValue(isSelected ? LubaStrings.selected : LubaStrings.notSelected)
         .accessibilityAddTraits(.isButton)
     }
 
@@ -127,7 +127,7 @@ public struct LubaRadioButton: View {
             // Outer circle
             Circle()
                 .strokeBorder(
-                    isSelected ? LubaColors.accent : LubaColors.gray400,
+                    isSelected ? luba.colors.accent : luba.colors.borderStrong,
                     lineWidth: LubaSelectionTokens.borderWidth
                 )
                 .frame(width: LubaSelectionTokens.controlSize, height: LubaSelectionTokens.controlSize)
@@ -135,17 +135,17 @@ public struct LubaRadioButton: View {
             // Inner dot
             if isSelected {
                 Circle()
-                    .fill(LubaColors.accent)
+                    .fill(luba.colors.accent)
                     .frame(width: LubaSelectionTokens.indicatorSize, height: LubaSelectionTokens.indicatorSize)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
             }
         }
     }
 
     private var labelView: some View {
         Text(label)
-            .font(LubaTypography.custom(size: LubaSelectionTokens.labelFontSize, weight: .regular))
-            .foregroundStyle(LubaColors.textPrimary)
+            .font(luba.fonts.bodySmall)
+            .foregroundStyle(luba.colors.textPrimary)
     }
 
     // MARK: - Actions
@@ -153,7 +153,7 @@ public struct LubaRadioButton: View {
     private func performAction() {
         guard !isSelected else { return }
 
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             LubaHaptics.selection()
         }
         action()

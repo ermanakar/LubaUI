@@ -101,8 +101,8 @@ public struct LubaMenu<Label: View>: View {
         } label: {
             label
         }
-        .accessibilityLabel("Menu")
-        .accessibilityHint("Shows menu options")
+        .accessibilityLabel(LubaStrings.menu)
+        .accessibilityHint(LubaStrings.menuHint)
     }
 }
 
@@ -120,10 +120,11 @@ public extension LubaMenu where Label == LubaMenuLabel {
 
 /// Default menu trigger label — ellipsis icon.
 public struct LubaMenuLabel: View {
+    @LubaEnvironment private var luba
     public var body: some View {
         Image(systemName: "ellipsis")
-            .font(LubaTypography.custom(size: 16, weight: .medium))
-            .foregroundStyle(LubaColors.textSecondary)
+            .font(luba.fonts.body.weight(.medium))
+            .foregroundStyle(luba.colors.textSecondary)
             .frame(width: LubaMenuTokens.itemHeight, height: LubaMenuTokens.itemHeight)
             .contentShape(Rectangle())
     }

@@ -36,13 +36,15 @@ public enum LubaBadgeSize {
     case small
     case medium
     
-    var fontSize: CGFloat {
+    /// The text role for the badge label — 11pt (small) / 12pt (medium) at the
+    /// default content size, scaling with Dynamic Type from there.
+    var role: LubaTextRole {
         switch self {
-        case .small: return 11
-        case .medium: return 12
+        case .small: return .caption2   // 11pt
+        case .medium: return .caption   // 12pt
         }
     }
-    
+
     var iconSize: CGFloat {
         switch self {
         case .small: return 10
@@ -77,6 +79,7 @@ public enum LubaBadgeSize {
 /// LubaBadge("Pro", style: .subtle, icon: Image(systemName: "crown"))
 /// ```
 public struct LubaBadge: View {
+    @LubaEnvironment private var luba
     private let text: String
     private let style: LubaBadgeStyle
     private let size: LubaBadgeSize
@@ -109,7 +112,7 @@ public struct LubaBadge: View {
             }
             
             Text(text)
-                .font(LubaTypography.custom(size: size.fontSize, weight: .semibold))
+                .font(luba.fonts(size.role).weight(.semibold))
         }
         .padding(.horizontal, size.horizontalPadding)
         .padding(.vertical, size.verticalPadding)
@@ -123,15 +126,15 @@ public struct LubaBadge: View {
     private var foregroundColor: Color {
         switch style {
         case .accent:
-            return LubaColors.textOnAccent
+            return luba.colors.textOnAccent
         case .subtle:
-            return LubaColors.accent
+            return luba.colors.accent
         case .neutral:
-            return LubaColors.textSecondary
+            return luba.colors.textSecondary
         case .success:
             return .white
         case .warning:
-            return LubaColors.textOnAccent
+            return luba.colors.textOnAccent
         case .error:
             return .white
         }
@@ -139,12 +142,12 @@ public struct LubaBadge: View {
     
     private var backgroundColor: Color {
         switch style {
-        case .accent: return LubaColors.accent
-        case .subtle: return LubaColors.accentSubtle
-        case .neutral: return LubaColors.gray100
-        case .success: return LubaColors.success
-        case .warning: return LubaColors.warning
-        case .error: return LubaColors.error
+        case .accent: return luba.colors.accent
+        case .subtle: return luba.colors.accentSubtle
+        case .neutral: return luba.colors.surfaceHover
+        case .success: return luba.colors.success
+        case .warning: return luba.colors.warning
+        case .error: return luba.colors.error
         }
     }
 }

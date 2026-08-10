@@ -31,6 +31,7 @@ public enum LubaSelectionTokens {
     public static let labelSpacing: CGFloat = LubaSpacing.sm
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.bodySmall, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 15
 
     /// Minimum touch target height
@@ -63,6 +64,7 @@ public enum LubaToggleTokens {
     public static let labelSpacing: CGFloat = 12
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.bodySmall, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 15
 
     /// Minimum touch target height
@@ -95,8 +97,10 @@ public enum LubaSliderTokens {
     public static let labelSpacing: CGFloat = 8
 
     /// Label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.bodySmall, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let labelFontSize: CGFloat = 15
 
     /// Value label font size
+    @available(*, deprecated, message: "Superseded by LubaTextRole.code, which scales with Dynamic Type. This fixed size is no longer what the component renders.")
     public static let valueFontSize: CGFloat = 13
 }

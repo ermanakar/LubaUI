@@ -103,12 +103,12 @@ public extension View {
 ///
 /// Set `useGlass: true` for a frosted glass background on the header.
 public struct LubaSheetHeader: View {
+    @LubaEnvironment private var luba
     private let title: String
     private let subtitle: String?
     private let useGlass: Bool
     private let onClose: () -> Void
 
-    @Environment(\.lubaConfig) private var config
 
     /// Creates a sheet header.
     ///
@@ -133,33 +133,35 @@ public struct LubaSheetHeader: View {
         let header = HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: LubaSheetTokens.titleSpacing) {
                 Text(title)
-                    .font(LubaTypography.custom(size: LubaSheetTokens.titleFontSize, weight: .semibold))
-                    .foregroundStyle(LubaColors.textPrimary)
+                    .font(luba.fonts.title3)
+                    .foregroundStyle(luba.colors.textPrimary)
 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(LubaTypography.footnote)
-                        .foregroundStyle(LubaColors.textSecondary)
+                        .font(luba.fonts.footnote)
+                        .foregroundStyle(luba.colors.textSecondary)
                 }
             }
 
             Spacer()
 
             Button {
-                if config.hapticsEnabled {
+                if luba.hapticsEnabled {
                     LubaHaptics.light()
                 }
                 onClose()
             } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: LubaSheetTokens.closeIconSize, weight: .bold))
-                    .foregroundStyle(LubaColors.textSecondary)
+                    .foregroundStyle(luba.colors.textSecondary)
                     .frame(width: LubaSheetTokens.closeButtonSize, height: LubaSheetTokens.closeButtonSize)
-                    .background(LubaColors.gray100)
+                    .background(luba.colors.surfaceHover)
                     .clipShape(Circle())
+                    .frame(minWidth: luba.minimumTouchTarget, minHeight: luba.minimumTouchTarget)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Close")
+            .accessibilityLabel(LubaStrings.close)
             .accessibilityAddTraits(.isButton)
         }
         .padding(LubaSheetTokens.headerPadding)
@@ -167,7 +169,7 @@ public struct LubaSheetHeader: View {
         if useGlass {
             header.lubaGlass(.subtle)
         } else {
-            header.background(LubaColors.surface)
+            header.background(luba.colors.surface)
         }
     }
 }

@@ -16,10 +16,10 @@ import SwiftUI
 
 /// A refined linear progress bar.
 public struct LubaProgressBar: View {
+    @LubaEnvironment private var luba
     private let value: Double
     private let showLabel: Bool
 
-    @Environment(\.lubaConfig) private var config
 
     /// Create a progress bar.
     /// - Parameters:
@@ -34,8 +34,8 @@ public struct LubaProgressBar: View {
         VStack(alignment: .trailing, spacing: LubaSpacing.xs) {
             if showLabel {
                 Text("\(Int(value * 100))%")
-                    .font(LubaTypography.caption)
-                    .foregroundStyle(LubaColors.textSecondary)
+                    .font(luba.fonts.caption)
+                    .foregroundStyle(luba.colors.textSecondary)
                     .monospacedDigit()
             }
 
@@ -43,20 +43,20 @@ public struct LubaProgressBar: View {
                 ZStack(alignment: .leading) {
                     // Background
                     Capsule()
-                        .fill(LubaColors.gray200)
+                        .fill(luba.colors.fill)
 
                     // Filled
                     Capsule()
-                        .fill(LubaColors.accent)
+                        .fill(luba.colors.accent)
                         .frame(width: geometry.size.width * CGFloat(value))
-                        .animation(config.animationsEnabled ? LubaMotion.stateAnimation : nil, value: value)
+                        .animation(luba.motion.animation(LubaMotion.stateAnimation), value: value)
                 }
             }
             .frame(height: LubaProgressTokens.barHeight)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Progress")
-        .accessibilityValue("\(Int(value * 100)) percent")
+        .accessibilityLabel(LubaStrings.progress)
+        .accessibilityValue(LubaStrings.percent(Int(value * 100)))
     }
 }
 
@@ -64,12 +64,12 @@ public struct LubaProgressBar: View {
 
 /// A refined circular progress indicator.
 public struct LubaCircularProgress: View {
+    @LubaEnvironment private var luba
     private let value: Double
     private let size: CGFloat
     private let lineWidth: CGFloat
     private let showLabel: Bool
 
-    @Environment(\.lubaConfig) private var config
 
     /// Create a circular progress indicator.
     /// - Parameters:
@@ -93,26 +93,26 @@ public struct LubaCircularProgress: View {
         ZStack {
             // Background circle
             Circle()
-                .strokeBorder(LubaColors.gray200, lineWidth: lineWidth)
+                .strokeBorder(luba.colors.fill, lineWidth: lineWidth)
 
             // Progress arc
             Circle()
                 .trim(from: 0, to: CGFloat(value))
-                .stroke(LubaColors.accent, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .stroke(luba.colors.accent, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .animation(config.animationsEnabled ? LubaMotion.stateAnimation : nil, value: value)
+                .animation(luba.motion.animation(LubaMotion.stateAnimation), value: value)
 
             // Label
             if showLabel {
                 Text("\(Int(value * 100))")
-                    .font(LubaTypography.custom(size: size * LubaProgressTokens.labelFontRatio, weight: .semibold))
-                    .foregroundStyle(LubaColors.textPrimary)
+                    .font(luba.fonts.custom(size: size * LubaProgressTokens.labelFontRatio, weight: .semibold))
+                    .foregroundStyle(luba.colors.textPrimary)
             }
         }
         .frame(width: size, height: size)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Progress")
-        .accessibilityValue("\(Int(value * 100)) percent")
+        .accessibilityLabel(LubaStrings.progress)
+        .accessibilityValue(LubaStrings.percent(Int(value * 100)))
     }
 }
 
@@ -128,10 +128,10 @@ public enum LubaSpinnerStyle {
 
 /// A refined loading indicator.
 public struct LubaSpinner: View {
+    @LubaEnvironment private var luba
     private let size: CGFloat
     private let style: LubaSpinnerStyle
 
-    @Environment(\.lubaConfig) private var config
     @State private var isAnimating = false
 
     /// Creates a loading spinner.
@@ -158,33 +158,50 @@ public struct LubaSpinner: View {
             }
         }
         .onAppear {
-            guard config.animationsEnabled else {
-                isAnimating = true
-                return
-            }
-            withAnimation {
-                isAnimating = true
-            }
+            // The style views own their repeat animations; this just flips the
+            // driving flag once, without an implicit animation of its own.
+            //
+            // Only flip it if something can actually animate. Each style reads
+            // the flag to pick its *target* value, so leaving it false when
+            // animations are off is what makes them settle on their resting
+            // state — a full-opacity arc, a visible pulse ring — rather than
+            // freezing mid-cycle at zero opacity.
+            isAnimating = luba.motion.allowsAnimation
         }
     }
 
     // MARK: - Arc Style (Clean rotation)
 
     private var arcSpinner: some View {
+        // Under Reduce Motion the arc stops rotating and breathes in opacity
+        // instead — still legibly "busy", with no movement.
         Circle()
             .trim(from: 0, to: LubaSpinnerTokens.arcTrim)
             .stroke(
-                LubaColors.accent,
+                luba.colors.accent,
                 style: StrokeStyle(lineWidth: size * LubaSpinnerTokens.strokeRatio, lineCap: .round)
             )
             .frame(width: size, height: size)
-            .rotationEffect(.degrees(isAnimating ? 360 : 0))
+            .rotationEffect(.degrees(spins && isAnimating ? 360 : 0))
+            .opacity(breathes && isAnimating ? LubaSpinnerTokens.breatheMinOpacity : 1)
             .animation(
-                config.animationsEnabled
-                    ? .linear(duration: LubaSpinnerTokens.arcDuration).repeatForever(autoreverses: false)
-                    : nil,
+                spins
+                    ? luba.motion.repeating(.linear(duration: LubaSpinnerTokens.arcDuration).repeatForever(autoreverses: false))
+                    : luba.motion.repeatingOpacity(.easeInOut(duration: LubaSpinnerTokens.arcDuration).repeatForever(autoreverses: true)),
                 value: isAnimating
             )
+    }
+
+    /// Whether this spinner may use rotation/scale, or must fall back to opacity.
+    private var spins: Bool { luba.motion.allowsDecorativeMotion }
+
+    /// Whether the opacity fallback should run in place of rotation.
+    ///
+    /// Only under Reduce Motion. When animations are switched off entirely there
+    /// is nothing to fall back *to* — dimming a static arc to its breathe-minimum
+    /// would leave it permanently faded rather than simply still.
+    private var breathes: Bool {
+        luba.motion.allowsAnimation && luba.motion.prefersReducedMotion
     }
 
     // MARK: - Pulse Style (No spinning)
@@ -193,19 +210,19 @@ public struct LubaSpinner: View {
         ZStack {
             // Outer ring
             Circle()
-                .strokeBorder(LubaColors.accent.opacity(0.2), lineWidth: size * 0.08)
+                .strokeBorder(luba.colors.accent.opacity(0.2), lineWidth: size * 0.08)
                 .frame(width: size, height: size)
 
             // Pulsing ring
             Circle()
-                .strokeBorder(LubaColors.accent, lineWidth: size * 0.08)
+                .strokeBorder(luba.colors.accent, lineWidth: size * 0.08)
                 .frame(width: size, height: size)
-                .scaleEffect(isAnimating ? 1.0 : LubaSpinnerTokens.pulseMinScale)
+                .scaleEffect(spins ? (isAnimating ? 1.0 : LubaSpinnerTokens.pulseMinScale) : 1.0)
                 .opacity(isAnimating ? 0.0 : 1.0)
                 .animation(
-                    config.animationsEnabled
-                        ? .easeOut(duration: LubaSpinnerTokens.pulseDuration).repeatForever(autoreverses: false)
-                        : nil,
+                    luba.motion.repeatingOpacity(
+                        .easeOut(duration: LubaSpinnerTokens.pulseDuration).repeatForever(autoreverses: false)
+                    ),
                     value: isAnimating
                 )
         }
@@ -217,15 +234,15 @@ public struct LubaSpinner: View {
         HStack(spacing: size * LubaSpinnerTokens.dotsSpacingRatio) {
             ForEach(0..<3, id: \.self) { index in
                 Circle()
-                    .fill(LubaColors.accent)
+                    .fill(luba.colors.accent)
                     .frame(width: size * LubaSpinnerTokens.dotSizeRatio, height: size * LubaSpinnerTokens.dotSizeRatio)
                     .opacity(isAnimating ? [0.3, 0.6, 1.0][index] : [1.0, 0.6, 0.3][index])
                     .animation(
-                        config.animationsEnabled
-                            ? .easeInOut(duration: LubaSpinnerTokens.dotsDuration)
+                        luba.motion.repeatingOpacity(
+                            .easeInOut(duration: LubaSpinnerTokens.dotsDuration)
                                 .repeatForever(autoreverses: true)
-                                .delay(Double(index) * LubaSpinnerTokens.dotsStagger)
-                            : nil,
+                                .delay(luba.motion.staggerDelay(index: index, base: LubaSpinnerTokens.dotsStagger))
+                        ),
                         value: isAnimating
                     )
             }
@@ -237,14 +254,16 @@ public struct LubaSpinner: View {
 
     private var breatheSpinner: some View {
         Circle()
-            .fill(LubaColors.accent)
+            .fill(luba.colors.accent)
             .frame(width: size * 0.5, height: size * 0.5)
-            .scaleEffect(isAnimating ? 1.0 : LubaSpinnerTokens.breatheMinScale)
-            .opacity(isAnimating ? 1.0 : LubaSpinnerTokens.breatheMinOpacity)
+            .scaleEffect(spins ? (isAnimating ? 1.0 : LubaSpinnerTokens.breatheMinScale) : 1.0)
+            // Resting state is full opacity; the cycle autoreverses, so starting
+            // from the dim end is visually identical while animating.
+            .opacity(isAnimating ? LubaSpinnerTokens.breatheMinOpacity : 1.0)
             .animation(
-                config.animationsEnabled
-                    ? .easeInOut(duration: LubaSpinnerTokens.breatheDuration).repeatForever(autoreverses: true)
-                    : nil,
+                luba.motion.repeatingOpacity(
+                    .easeInOut(duration: LubaSpinnerTokens.breatheDuration).repeatForever(autoreverses: true)
+                ),
                 value: isAnimating
             )
             .frame(width: size, height: size)

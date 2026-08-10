@@ -51,14 +51,46 @@ public enum LubaSwipeTokens {
 
 // MARK: - Swipe Action
 
+/// How a swipe action picks its color.
+///
+/// Semantic roles follow the active theme; `.custom` pins an exact color.
+public enum LubaSwipeActionColor {
+    case accent
+    case error
+    case warning
+    case success
+    case custom(Color)
+
+    /// Resolve against a theme palette.
+    public func resolve(_ colors: LubaThemeColors) -> Color {
+        switch self {
+        case .accent: return colors.accent
+        case .error: return colors.error
+        case .warning: return colors.warning
+        case .success: return colors.success
+        case .custom(let color): return color
+        }
+    }
+}
+
 /// A swipe action with icon, color, and callback.
 public struct LubaSwipeAction: Identifiable {
     public let id = UUID()
     public let icon: String
     public let label: String?
-    public let color: Color
+    /// How this action colors itself. Preset actions use semantic roles so they
+    /// follow `.lubaTheme(…)`; explicitly constructed actions use `.custom`.
+    public let colorRole: LubaSwipeActionColor
     public let haptic: LubaHapticStyle
     public let action: () -> Void
+
+    /// The action's color under the default palette.
+    ///
+    /// Views should call ``color(_:)`` with the active theme instead.
+    public var color: Color { colorRole.resolve(.default) }
+
+    /// The action's color, resolved against a theme palette.
+    public func color(_ colors: LubaThemeColors) -> Color { colorRole.resolve(colors) }
 
     public init(
         icon: String,
@@ -69,19 +101,37 @@ public struct LubaSwipeAction: Identifiable {
     ) {
         self.icon = icon
         self.label = label
-        self.color = color
+        self.colorRole = .custom(color)
+        self.haptic = haptic
+        self.action = action
+    }
+
+    /// Create an action that follows the active theme.
+    public init(
+        icon: String,
+        label: String? = nil,
+        role: LubaSwipeActionColor,
+        haptic: LubaHapticStyle = .medium,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.label = label
+        self.colorRole = role
         self.haptic = haptic
         self.action = action
     }
 
     // MARK: - Preset Actions
+    //
+    // Labels are localized by the package (see LubaStrings), so these read
+    // correctly inside a non-English app without any caller involvement.
 
-    /// Delete action (red, trash icon)
+    /// Delete action (error color, trash icon)
     public static func delete(action: @escaping () -> Void) -> LubaSwipeAction {
         LubaSwipeAction(
             icon: "trash.fill",
-            label: "Delete",
-            color: LubaColors.error,
+            label: LubaStrings.delete,
+            role: .error,
             haptic: .warning,
             action: action
         )
@@ -91,19 +141,19 @@ public struct LubaSwipeAction: Identifiable {
     public static func archive(action: @escaping () -> Void) -> LubaSwipeAction {
         LubaSwipeAction(
             icon: "archivebox.fill",
-            label: "Archive",
-            color: LubaColors.accent,
+            label: LubaStrings.archive,
+            role: .accent,
             haptic: .medium,
             action: action
         )
     }
 
-    /// Pin action (warning/yellow, pin icon)
+    /// Pin action (warning, pin icon)
     public static func pin(action: @escaping () -> Void) -> LubaSwipeAction {
         LubaSwipeAction(
             icon: "pin.fill",
-            label: "Pin",
-            color: LubaColors.warning,
+            label: LubaStrings.pin,
+            role: .warning,
             haptic: .light,
             action: action
         )
@@ -113,8 +163,8 @@ public struct LubaSwipeAction: Identifiable {
     public static func unread(action: @escaping () -> Void) -> LubaSwipeAction {
         LubaSwipeAction(
             icon: "envelope.badge.fill",
-            label: "Unread",
-            color: LubaColors.accent,
+            label: LubaStrings.unread,
+            role: .accent,
             haptic: .light,
             action: action
         )
@@ -124,8 +174,8 @@ public struct LubaSwipeAction: Identifiable {
     public static func flag(action: @escaping () -> Void) -> LubaSwipeAction {
         LubaSwipeAction(
             icon: "flag.fill",
-            label: "Flag",
-            color: LubaColors.warning,
+            label: LubaStrings.flag,
+            role: .warning,
             haptic: .light,
             action: action
         )
@@ -135,8 +185,8 @@ public struct LubaSwipeAction: Identifiable {
     public static func share(action: @escaping () -> Void) -> LubaSwipeAction {
         LubaSwipeAction(
             icon: "square.and.arrow.up",
-            label: "Share",
-            color: LubaColors.accent,
+            label: LubaStrings.share,
+            role: .accent,
             haptic: .light,
             action: action
         )
@@ -153,7 +203,7 @@ public struct LubaSwipeableModifier: ViewModifier {
 
     @State private var offset: CGFloat = 0
     @State private var isRevealed: Bool = false
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
 
     public init(
         leading: [LubaSwipeAction] = [],
@@ -222,13 +272,16 @@ public struct LubaSwipeableModifier: ViewModifier {
 
                 if let label = action.label {
                     Text(label)
-                        .font(LubaTypography.custom(size: 11, weight: .medium))
+                        .font(luba.fonts.caption2)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.8)
                 }
             }
             .foregroundStyle(.white)
             .frame(width: width)
             .frame(maxHeight: .infinity)
-            .background(action.color)
+            .background(action.color(luba.colors))
         }
         .buttonStyle(.plain)
     }
@@ -272,7 +325,7 @@ public struct LubaSwipeableModifier: ViewModifier {
         }
 
         // Snap to revealed or reset
-        withAnimation(LubaSwipeTokens.resetAnimation) {
+        luba.motion.run(LubaSwipeTokens.resetAnimation) {
             if translation > LubaSwipeTokens.revealThreshold && !leading.isEmpty {
                 offset = leadingWidth
                 isRevealed = true
@@ -287,25 +340,25 @@ public struct LubaSwipeableModifier: ViewModifier {
     }
 
     private func performFullSwipe(action: LubaSwipeAction, direction: CGFloat, width: CGFloat) {
-        withAnimation(LubaSwipeTokens.animation) {
+        luba.motion.run(LubaSwipeTokens.animation) {
             offset = direction * width
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             triggerAction(action)
-            withAnimation(LubaSwipeTokens.resetAnimation) {
+            luba.motion.run(LubaSwipeTokens.resetAnimation) {
                 offset = 0
             }
         }
     }
 
     private func triggerAction(_ action: LubaSwipeAction) {
-        if config.hapticsEnabled {
+        if luba.hapticsEnabled {
             action.haptic.trigger()
         }
         action.action()
 
-        withAnimation(LubaSwipeTokens.resetAnimation) {
+        luba.motion.run(LubaSwipeTokens.resetAnimation) {
             offset = 0
             isRevealed = false
         }

@@ -107,7 +107,7 @@ public struct LubaTooltip<Content: View>: View {
     private let content: Content
 
     @State private var anchorRect: CGRect = .zero
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
     private let tooltipController = LubaTooltipController.shared
 
     public init(
@@ -139,7 +139,7 @@ public struct LubaTooltip<Content: View>: View {
             .simultaneousGesture(TapGesture().onEnded {
                 guard anchorRect.width > 1, anchorRect.height > 1 else { return }
 
-                if config.hapticsEnabled {
+                if luba.hapticsEnabled {
                     LubaHaptics.light()
                 }
 
@@ -152,13 +152,9 @@ public struct LubaTooltip<Content: View>: View {
                         dismissAfter: LubaTooltipTokens.dismissDuration
                     )
                 }
-                if config.animationsEnabled {
-                    withAnimation(LubaMotion.micro) { performToggle() }
-                } else {
-                    performToggle()
-                }
+                luba.motion.run(LubaMotion.micro) { performToggle() }
             })
-            .accessibilityHint("Tap for more information")
+            .accessibilityHint(LubaStrings.tooltipHint)
             .onDisappear {
                 tooltipController.dismiss(id: id)
             }
@@ -169,7 +165,7 @@ public struct LubaTooltip<Content: View>: View {
 
 private struct LubaTooltipHostModifier: ViewModifier {
     @ObservedObject private var tooltipController = LubaTooltipController.shared
-    @Environment(\.lubaConfig) private var config
+    @LubaEnvironment private var luba
     @State private var bubbleSize: CGSize = .zero
 
     func body(content: Content) -> some View {
@@ -210,7 +206,7 @@ private struct LubaTooltipHostModifier: ViewModifier {
             .onChange(of: tooltipController.active?.id) { _ in
                 bubbleSize = .zero
             }
-            .animation(config.animationsEnabled ? LubaMotion.micro : nil, value: tooltipController.active?.id)
+            .animation(luba.motion.animation(LubaMotion.micro), value: tooltipController.active?.id)
     }
 
     private func placement(
@@ -282,29 +278,30 @@ public extension View {
 // MARK: - Bubble
 
 private struct TooltipBubble: View {
+    @LubaEnvironment private var luba
     let message: String
     let position: LubaTooltipPosition
     let arrowOffset: CGFloat
 
     var body: some View {
         Text(message)
-            .font(LubaTypography.custom(size: LubaTooltipTokens.fontSize, weight: .regular))
-            .foregroundStyle(LubaColors.textPrimary)
+            .font(luba.fonts.footnote)
+            .foregroundStyle(luba.colors.textPrimary)
             .padding(LubaTooltipTokens.padding)
             .frame(maxWidth: LubaTooltipTokens.maxWidth, alignment: .leading)
-            .background(LubaColors.surface)
+            .background(luba.colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: LubaTooltipTokens.cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: LubaTooltipTokens.cornerRadius, style: .continuous)
-                    .strokeBorder(LubaColors.border, lineWidth: 1)
+                    .strokeBorder(luba.colors.border, lineWidth: 1)
             )
             .overlay(alignment: position == .top ? .bottom : .top) {
                 TooltipArrow(position: position)
-                    .fill(LubaColors.surface)
+                    .fill(luba.colors.surface)
                     .frame(width: LubaTooltipTokens.arrowSize * 2, height: LubaTooltipTokens.arrowSize)
                     .overlay(
                         TooltipArrow(position: position)
-                            .stroke(LubaColors.border, lineWidth: 1)
+                            .stroke(luba.colors.border, lineWidth: 1)
                     )
                     .offset(x: arrowOffset, y: position == .top ? LubaTooltipTokens.arrowSize - 1 : -LubaTooltipTokens.arrowSize + 1)
             }
