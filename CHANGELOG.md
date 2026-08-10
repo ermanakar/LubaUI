@@ -5,7 +5,7 @@ All notable changes to LubaUI are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] — Unreleased
+## [0.2.0] — 2026-08-10
 
 The release that makes LubaUI's existing promises real. `.lubaTheme(…)` now
 repaints components, Reduce Motion is honored system-wide, the type scale grows
