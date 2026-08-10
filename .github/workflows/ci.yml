@@ -35,14 +35,19 @@ jobs:
   ios-library-build:
     name: iOS Simulator (library only)
     runs-on: macos-15
-    strategy:
-      matrix:
-        xcode: ['16.2']
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode ${{ matrix.xcode }}
-        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      # Deliberately uses the runner's *default* Xcode instead of pinning a
+      # version. GitHub installs simulator runtimes only for the default
+      # Xcode; a pinned older Xcode can still be on the image with its iOS
+      # platform stripped, which fails as "iOS <version> is not installed"
+      # and an empty destination list — not as a missing SDK, which makes it
+      # easy to misread as a bad destination specifier.
+      - name: Show toolchain and available iOS SDKs
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i "ios" || echo "no iOS SDK on this runner"
 
       # Builds the LubaUI *library* target against the iOS SDK.
       #
