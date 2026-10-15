@@ -8,26 +8,59 @@ colors, and motion consistent.
 
 [Get started](#get-started) · [Guide](docs/Guide.md) · [API documentation](Sources/LubaUI/LubaUI.docc/LubaUI.md) · [Website](https://shopofluba.de/lubaui) · [Releases](https://github.com/ermanakar/LubaUI/releases)
 
-## The system in use
+## Explore the showcase
 
-These screens from Wirkraum show LubaUI in a complete interface. The application
-supplies its own content, maps, and navigation; LubaUI supplies shared components
-and a custom semantic theme.
+The native showcase runs against **LubaUI 0.3.0**. The same composition in sage,
+ocean, and dark mode shows how semantic tokens connect the pieces. Forms and
+interaction examples are working demos you can run and inspect.
 
 <table>
   <tr>
-    <td width="33%"><img src="assets/in-use/results.png" alt="Results screen with repeated cards, status badges, and a shared type hierarchy" width="250" /></td>
-    <td width="33%"><img src="assets/in-use/dossier.png" alt="Detail screen combining cards, tabs, search, and status labels" width="250" /></td>
-    <td width="33%"><img src="assets/in-use/sources.png" alt="Source-status screen with a warning alert, information cards, and links" width="250" /></td>
+    <td width="33%"><a href="assets/showcase/theme-sage.png"><img src="assets/showcase/theme-sage.png" alt="Shared foundation: Cards, chips, progress, and a toggle in one composition." width="250" /></a></td>
+    <td width="33%"><a href="assets/showcase/theme-ocean.png"><img src="assets/showcase/theme-ocean.png" alt="Your own identity: The same view with an ocean palette and tighter spacing." width="250" /></a></td>
+    <td width="33%"><a href="assets/showcase/theme-dark.png"><img src="assets/showcase/theme-dark.png" alt="Light to dark: Semantic surfaces and text follow the color scheme." width="250" /></a></td>
   </tr>
   <tr>
-    <td><strong>Repeated information</strong><br />Cards, badges, and typography keep a results list consistent.</td>
-    <td><strong>Dense detail</strong><br />Tabs, search, and semantic colors organize a longer screen.</td>
-    <td><strong>Clear status</strong><br />Alerts, cards, and links distinguish warnings from supporting information.</td>
+    <td><strong>Shared foundation</strong><br />Cards, chips, progress, and a toggle in one composition.</td>
+    <td><strong>Your own identity</strong><br />The same view with an ocean palette and tighter spacing.</td>
+    <td><strong>Light to dark</strong><br />Semantic surfaces and text follow the color scheme.</td>
+  </tr>
+  <tr>
+    <td width="33%"><a href="assets/showcase/forms.png"><img src="assets/showcase/forms.png" alt="Forms that guide: Persistent labels, validation, and grouped preferences." width="250" /></a></td>
+    <td width="33%"><a href="assets/showcase/buttons.png"><img src="assets/showcase/buttons.png" alt="Everyday controls: Semantic styles, configurable targets, and scalable type." width="250" /></a></td>
+    <td width="33%"><a href="assets/showcase/composition.png"><img src="assets/showcase/composition.png" alt="Behaviors that compose: Native activation, press feedback, and expandable detail." width="250" /></a></td>
+  </tr>
+  <tr>
+    <td><strong>Forms that guide</strong><br />Persistent labels, validation, and grouped preferences.</td>
+    <td><strong>Everyday controls</strong><br />Semantic styles, configurable targets, and scalable type.</td>
+    <td><strong>Behaviors that compose</strong><br />Native activation, press feedback, and expandable detail.</td>
   </tr>
 </table>
 
-[About these screenshots](assets/in-use/README.md)
+[Run the showcase](LubaUIShowcase/README.md) · [Capture notes and validation example](assets/showcase/README.md)
+
+## In a complete app
+
+These fresh Wirkraum captures show a custom LubaUI theme in an application with
+its own content and navigation. They use the app's existing **0.2.0** integration
+and bundled QA examples; the showcase above demonstrates **0.3.0**.
+
+<table>
+  <tr>
+    <td width="25%"><a href="assets/in-use/results.png"><img src="assets/in-use/results.png" alt="Repeated result cards and status badges" width="200" /></a></td>
+    <td width="25%"><a href="assets/in-use/dossier.png"><img src="assets/in-use/dossier.png" alt="Detail view with tabs, search, and summary cards" width="200" /></a></td>
+    <td width="25%"><a href="assets/in-use/projects.png"><img src="assets/in-use/projects.png" alt="Saved example project with provenance and a resume action" width="200" /></a></td>
+    <td width="25%"><a href="assets/in-use/sources.png"><img src="assets/in-use/sources.png" alt="Source-status warning, information cards, and links" width="200" /></a></td>
+  </tr>
+  <tr>
+    <td><strong>Results</strong><br />Repeated cards and badges.</td>
+    <td><strong>Detail</strong><br />Tabs, search, and type hierarchy.</td>
+    <td><strong>Saved work</strong><br />Supporting details and actions.</td>
+    <td><strong>Sources</strong><br />Alerts, information cards, and links.</td>
+  </tr>
+</table>
+
+[About these application screenshots](assets/in-use/README.md)
 
 ## Choose what you need
 

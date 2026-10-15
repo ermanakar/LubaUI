@@ -1,220 +1,124 @@
-//
-//  ThemeScreen.swift
-//  LubaUIShowcase
-//
-//  Theme system showcase with custom theme creation and live preview.
-//
-
 import SwiftUI
 import LubaUI
 
+/// The preview is a child view so its environment reads resolve *below* `.lubaTheme`.
 struct ThemeScreen: View {
-    @State private var selectedTheme = "default"
+    @State private var selectedTheme = "Sage"
+    private let themes = ["Sage", "Ocean", "Warm", "Mono"]
 
     private var currentTheme: LubaThemeConfiguration {
         switch selectedTheme {
-        case "warm": return warmTheme
-        case "ocean": return oceanTheme
-        case "mono": return monoTheme
+        case "Ocean":
+            return LubaThemeConfiguration(
+                colors: .accented(Color(hex: 0x2F5FD0)),
+                spacing: LubaThemeSpacing(xs: 4, sm: 8, md: 12, lg: 16, xl: 20)
+            )
+        case "Warm":
+            return LubaThemeConfiguration(
+                colors: .accented(Color(hex: 0xA84832)),
+                radius: LubaThemeRadius(sm: 12, md: 16, lg: 24)
+            )
+        case "Mono":
+            return LubaThemeConfiguration(
+                colors: .accented(LubaColors.textPrimary, onAccent: LubaColors.background),
+                radius: LubaThemeRadius(sm: 0, md: 0, lg: 2, full: 4)
+            )
         default: return .default
         }
     }
 
     var body: some View {
         ShowcaseScreen("Theming") {
-            ShowcaseHeader(
-                title: "Theming",
-                description: "Override colors, typography, spacing, and radius per-subtree via the environment."
-            )
+            ShowcaseHeader(title: "Theming", description: "One composition. Four visual identities. Change the theme and every child inherits it.")
 
-            // Theme Picker
-            DemoSection(title: "Select Theme") {
-                VStack(spacing: LubaSpacing.sm) {
-                    themeOption(id: "default", name: "Default", desc: "Greyscale + sage accent", icon: "leaf.fill")
-                    themeOption(id: "warm", name: "Warm", desc: "Coral accent, rounded corners", icon: "sun.max.fill")
-                    themeOption(id: "ocean", name: "Ocean", desc: "Blue accent, tighter spacing", icon: "drop.fill")
-                    themeOption(id: "mono", name: "Mono", desc: "Monochrome, sharp corners", icon: "circle.lefthalf.filled")
+            Picker("Theme", selection: $selectedTheme) {
+                ForEach(themes, id: \.self) { Text($0).tag($0) }
+            }
+            .pickerStyle(.segmented)
+
+            ThemePreview()
+                .lubaTheme(currentTheme)
+
+            DemoSection(title: "Inside the subtree") {
+                CodeBlock {
+                    Text("@LubaEnvironment private var luba")
+                    Text(".foregroundStyle(luba.colors.accent)")
+                    Text(".padding(luba.spacing.lg)")
                 }
             }
 
-            // Live Preview
-            DemoSection(title: "Live Preview") {
-                LubaCard(elevation: .low) {
-                    VStack(spacing: LubaSpacing.lg) {
-                        Text("Components inherit the theme")
-                            .font(LubaTypography.caption)
-                            .foregroundStyle(LubaColors.textTertiary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        previewArea
-                            .lubaTheme(currentTheme)
-                    }
-                }
-            }
-
-            // Structure
-            DemoSection(title: "Theme Structure") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    VStack(alignment: .leading, spacing: LubaSpacing.md) {
-                        structureRow(token: "colors", desc: "primary, secondary, accent, background, surface, text")
-                        LubaDivider()
-                        structureRow(token: "typography", desc: "title, headline, body, caption, button")
-                        LubaDivider()
-                        structureRow(token: "spacing", desc: "xs, sm, md, lg, xl")
-                        LubaDivider()
-                        structureRow(token: "radius", desc: "sm, md, lg, full")
-                    }
-                }
-            }
-
-            // Usage
-            DemoSection(title: "Usage") {
-                LubaCard(elevation: .flat, style: .outlined) {
-                    VStack(alignment: .leading, spacing: LubaSpacing.md) {
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Apply to a subtree")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-                            Text(".lubaTheme(myTheme)")
-                                .font(LubaTypography.code)
-                                .foregroundStyle(LubaColors.accent)
-                        }
-
-                        LubaDivider()
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Read in any view")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-                            Text("@Environment(\\.lubaTheme) var theme")
-                                .font(LubaTypography.code)
-                                .foregroundStyle(LubaColors.accent)
-                        }
-
-                        LubaDivider()
-
-                        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-                            Text("Customize colors only")
-                                .font(LubaTypography.headline)
-                                .foregroundStyle(LubaColors.textPrimary)
-                            Text("LubaThemeConfiguration(colors: .init(accent: .blue))")
-                                .font(LubaTypography.code)
-                                .foregroundStyle(LubaColors.accent)
-                        }
-                    }
-                }
-            }
-
-            // Philosophy
             PhilosophyCard(
                 icon: "paintpalette",
-                title: "Theme vs. Config",
-                description: "LubaTheme overrides visual tokens (colors, fonts, spacing). LubaConfig controls behavior (haptics, animations, accessibility). Both flow through SwiftUI's environment — set once, inherited everywhere."
+                title: "A palette is more than one color",
+                description: "Use .accented(...) to derive the accent ramp, subtle surfaces, focus borders, and info color together. A palette-only override preserves the surrounding type, spacing, and radii."
             )
+            CopyableCode(code: ".lubaTheme(colors: .accented(.indigo))")
         }
     }
+}
 
-    // MARK: - Components
+private struct ThemePreview: View {
+    @LubaEnvironment private var luba
+    @State private var notifications = true
+    @State private var saved = false
+    @State private var selected = "Design"
 
-    private func themeOption(id: String, name: String, desc: String, icon: String) -> some View {
-        let isSelected = selectedTheme == id
-        return HStack(spacing: LubaSpacing.md) {
-            LubaCircledIcon(icon, size: .sm, style: .subtle)
-
-            VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
-                Text(name)
-                    .font(LubaTypography.headline)
-                    .foregroundStyle(LubaColors.textPrimary)
-                Text(desc)
-                    .font(LubaTypography.caption)
-                    .foregroundStyle(LubaColors.textSecondary)
-            }
-
-            Spacer()
-
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(LubaColors.accent)
-            }
-        }
-        .padding(LubaSpacing.md)
-        .background(isSelected ? LubaColors.accentSubtle : LubaColors.surface)
-        .clipShape(RoundedRectangle.luba(LubaRadius.md))
-        .overlay(
-            RoundedRectangle.luba(LubaRadius.md)
-                .strokeBorder(isSelected ? LubaColors.accent : LubaColors.border, lineWidth: isSelected ? 1.5 : 1)
-        )
-        .lubaPressable { selectedTheme = id }
-    }
-
-    private var previewArea: some View {
-        VStack(spacing: LubaSpacing.md) {
-            HStack(spacing: LubaSpacing.md) {
-                LubaButton("Primary", style: .primary, size: .small) { }
-                LubaButton("Secondary", style: .secondary, size: .small) { }
-                LubaButton("Ghost", style: .ghost, size: .small) { }
-            }
-
-            LubaCard(elevation: .flat, style: .outlined) {
-                HStack(spacing: LubaSpacing.md) {
-                    LubaAvatar(name: "Theme Demo", size: .medium)
-                    VStack(alignment: .leading, spacing: LubaSpacing.xxs) {
-                        Text("Themed Card")
-                            .font(LubaTypography.headline)
-                            .foregroundStyle(LubaColors.textPrimary)
-                        Text("Colors adapt to theme")
-                            .font(LubaTypography.caption)
-                            .foregroundStyle(LubaColors.textSecondary)
+    var body: some View {
+        VStack(alignment: .leading, spacing: luba.spacing.lg) {
+            LubaCard {
+                VStack(alignment: .leading, spacing: luba.spacing.lg) {
+                    HStack(spacing: luba.spacing.md) {
+                        LubaCircledIcon("leaf", size: .md, style: .subtle)
+                        VStack(alignment: .leading, spacing: luba.spacing.xs) {
+                            Text("Studio workspace")
+                                .font(luba.fonts.title3)
+                                .foregroundStyle(luba.colors.textPrimary)
+                            Text("A little room to make things.")
+                                .font(luba.fonts.caption)
+                                .foregroundStyle(luba.colors.textSecondary)
+                        }
+                        Spacer(minLength: 0)
                     }
-                    Spacer()
+
+                    LubaDivider()
+                    HStack {
+                        Text("Spring collection")
+                            .font(luba.fonts.headline)
+                            .foregroundStyle(luba.colors.textPrimary)
+                        Spacer()
+                        LubaBadge("In progress", style: .accent)
+                    }
+                    Text("Six of eight details, ready to go.")
+                        .font(luba.fonts.body)
+                        .foregroundStyle(luba.colors.textSecondary)
+                    LubaProgressBar(value: 0.75, showLabel: true)
+                    HStack(spacing: luba.spacing.sm) {
+                        ForEach(["Design", "Build", "Review"], id: \.self) { label in
+                            LubaChip(label, isSelected: selected == label, onTap: { selected = label })
+                        }
+                    }
+                    LubaDivider()
+                    LubaToggle(isOn: $notifications, label: "Project updates")
+                    LubaButton(saved ? "Changes saved" : "Save changes", icon: Image(systemName: saved ? "checkmark" : "arrow.right"), fullWidth: true) {
+                        saved.toggle()
+                    }
                 }
             }
-
-            HStack(spacing: LubaSpacing.sm) {
-                LubaBadge("Active", style: .accent)
-                LubaBadge("Subtle", style: .subtle)
-                LubaBadge("Neutral", style: .neutral)
+            HStack(spacing: luba.spacing.sm) {
+                ForEach(["Accent", "Surface", "Text"], id: \.self) { role in
+                    HStack(spacing: luba.spacing.xs) {
+                        Circle()
+                            .fill(role == "Accent" ? luba.colors.accent : role == "Surface" ? luba.colors.accentSubtle : luba.colors.textPrimary)
+                            .frame(width: 10, height: 10)
+                        Text(role).font(luba.fonts.caption)
+                    }
+                }
             }
+            .foregroundStyle(luba.colors.textSecondary)
         }
-    }
-
-    private func structureRow(token: String, desc: String) -> some View {
-        VStack(alignment: .leading, spacing: LubaSpacing.xs) {
-            Text(token)
-                .font(LubaTypography.headline)
-                .foregroundStyle(LubaColors.textPrimary)
-            Text(desc)
-                .font(LubaTypography.caption)
-                .foregroundStyle(LubaColors.textTertiary)
-        }
-    }
-
-    // MARK: - Theme Definitions
-
-    private var warmTheme: LubaThemeConfiguration {
-        LubaThemeConfiguration(
-            colors: LubaThemeColors(accent: Color(red: 0.9, green: 0.4, blue: 0.3)),
-            radius: LubaThemeRadius(sm: 12, md: 16, lg: 24)
-        )
-    }
-
-    private var oceanTheme: LubaThemeConfiguration {
-        LubaThemeConfiguration(
-            colors: LubaThemeColors(accent: Color(red: 0.2, green: 0.5, blue: 0.85)),
-            spacing: LubaThemeSpacing(xs: 2, sm: 6, md: 10, lg: 14, xl: 20)
-        )
-    }
-
-    private var monoTheme: LubaThemeConfiguration {
-        LubaThemeConfiguration(
-            colors: LubaThemeColors(accent: LubaColors.gray800),
-            radius: LubaThemeRadius(sm: 0, md: 0, lg: 2, full: 4)
-        )
     }
 }
 
 #Preview {
-    NavigationStack {
-        ThemeScreen()
-    }
+    NavigationStack { ThemeScreen() }
 }

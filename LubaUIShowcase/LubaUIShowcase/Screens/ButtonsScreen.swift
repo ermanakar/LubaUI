@@ -16,7 +16,7 @@ struct ButtonsScreen: View {
         ShowcaseScreen("Buttons") {
             ShowcaseHeader(
                 title: "Buttons",
-                description: "Refined buttons with subtle press animations (0.97 scale), haptic feedback, and multiple variants."
+                description: "Semantic actions with native activation. Base sizes grow with type and configured touch targets."
             )
 
             // Styles
@@ -45,14 +45,14 @@ struct ButtonsScreen: View {
                         HStack(spacing: LubaSpacing.md) {
                             VStack(spacing: LubaSpacing.xs) {
                                 LubaButton("Small", size: .small) { }
-                                Text("32pt")
+                                Text("32pt base")
                                     .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                     .foregroundStyle(LubaColors.textTertiary)
                             }
 
                             VStack(spacing: LubaSpacing.xs) {
                                 LubaButton("Medium", size: .medium) { }
-                                Text("44pt")
+                                Text("44pt base")
                                     .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                     .foregroundStyle(LubaColors.textTertiary)
                             }
@@ -60,7 +60,7 @@ struct ButtonsScreen: View {
 
                         VStack(spacing: LubaSpacing.xs) {
                             LubaButton("Large", size: .large) { }
-                            Text("52pt")
+                            Text("52pt base")
                                 .font(LubaTypography.custom(size: 11, weight: .regular, design: .monospaced))
                                 .foregroundStyle(LubaColors.textTertiary)
                         }

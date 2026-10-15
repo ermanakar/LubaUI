@@ -22,41 +22,37 @@ struct ComposabilityScreen: View {
         ShowcaseScreen("Composability") {
             ShowcaseHeader(
                 title: "Composability",
-                description: "LubaUI's core innovation — behaviors as modifiers, not subclasses. Any view gains interactive powers through composition."
-            )
-
-            // The Big Idea
-            PhilosophyCard(
-                icon: "puzzlepiece.extension",
-                title: "Modifiers Over Inheritance",
-                description: "Traditional design systems lock behaviors into component subclasses. LubaUI extracts them into primitives — small, composable modifiers that work on any view."
+                description: "Start with a native button. Add press feedback, expansion, and a shared theme."
             )
 
             // Stacking Primitives
             DemoSection(title: "Stacking Primitives") {
                 VStack(spacing: LubaSpacing.md) {
-                    LubaCard(elevation: .low) {
-                        VStack(alignment: .leading, spacing: LubaSpacing.sm) {
-                            HStack {
-                                LubaCircledIcon("hand.tap.fill", size: .sm, style: .subtle)
-                                Text("Pressable + Expandable")
-                                    .font(LubaTypography.headline)
-                                    .foregroundStyle(LubaColors.textPrimary)
-                            }
+                    Button { isExpanded.toggle() } label: {
+                        LubaCard(elevation: .low) {
+                            VStack(alignment: .leading, spacing: LubaSpacing.sm) {
+                                HStack {
+                                    LubaCircledIcon("hand.tap.fill", size: .sm, style: .subtle)
+                                    Text("Pressable + Expandable")
+                                        .font(LubaTypography.headline)
+                                        .foregroundStyle(LubaColors.textPrimary)
+                                }
 
-                            Text("This card is both tappable and expandable — two primitives composed together.")
-                                .font(LubaTypography.bodySmall)
-                                .foregroundStyle(LubaColors.textSecondary)
+                                Text("A native button keeps activation semantics. The style adds feedback; the modifier reveals detail.")
+                                    .font(LubaTypography.bodySmall)
+                                    .foregroundStyle(LubaColors.textSecondary)
+                            }
                         }
                     }
-                    .lubaPressable { isExpanded.toggle() }
+                    .buttonStyle(LubaPressableButtonStyle())
+                    .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
                     .lubaExpandable(isExpanded: $isExpanded) {
                         LubaCard(elevation: .flat, style: .outlined) {
                             VStack(alignment: .leading, spacing: LubaSpacing.sm) {
                                 Text("Expanded content")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
-                                Text("This section appeared because the card above uses .lubaExpandable(). The press came from .lubaPressable(). Neither knows about the other — they just compose.")
+                                Text("This section appeared because the card above uses .lubaExpandable(). The press feedback came from LubaPressableButtonStyle. Neither knows about the other — they just compose.")
                                     .font(LubaTypography.caption)
                                     .foregroundStyle(LubaColors.textSecondary)
                             }
@@ -158,7 +154,7 @@ struct ComposabilityScreen: View {
             PhilosophyCard(
                 icon: "arrow.triangle.branch",
                 title: "Infinite Combinations",
-                description: "6 primitives don't give you 6 features — they give you 2^6 = 64 combinations. Every primitive works with every other, and with every component. That's radical composability."
+                description: "Compose the behaviors your interface needs. Test combined gestures in context, and use native controls for keyboard and VoiceOver activation."
             )
         }
     }

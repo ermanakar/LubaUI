@@ -38,7 +38,7 @@ enum ShowcaseSection: String, CaseIterable {
         switch self {
         case .primitives:
             return [
-                ShowcaseItem(icon: "hand.tap.fill", title: "Pressable", description: "Make any view tappable", destination: AnyView(PressableScreen())),
+                ShowcaseItem(icon: "hand.tap.fill", title: "Pressable", description: "Press feedback for custom views", destination: AnyView(PressableScreen())),
                 ShowcaseItem(icon: "hand.tap", title: "Long Pressable", description: "Long press with progress", destination: AnyView(LongPressableScreen())),
                 ShowcaseItem(icon: "sparkles", title: "Shimmerable", description: "Loading shimmer on any view", destination: AnyView(ShimmerableScreen())),
                 ShowcaseItem(icon: "hand.draw.fill", title: "Swipeable", description: "Swipe actions for any row", destination: AnyView(SwipeableScreen())),
@@ -50,13 +50,14 @@ enum ShowcaseSection: String, CaseIterable {
             ]
         case .foundation:
             return [
+                ShowcaseItem(icon: "shippingbox", title: "Package Products", description: "Core, Components, or both", destination: AnyView(PackageProductsScreen())),
                 ShowcaseItem(icon: "circle.lefthalf.filled", title: "Colors", description: "Greyscale palette with sage accent", destination: AnyView(ColorsScreen())),
                 ShowcaseItem(icon: "textformat", title: "Typography", description: "SF Rounded type scale", destination: AnyView(TypographyScreen())),
-                ShowcaseItem(icon: "square.split.2x2", title: "Spacing", description: "4pt grid system", destination: AnyView(SpacingScreen())),
+                ShowcaseItem(icon: "square.split.2x2", title: "Spacing", description: "4pt grid, with a 2pt detail step", destination: AnyView(SpacingScreen())),
                 ShowcaseItem(icon: "square.on.circle", title: "Radius", description: "Continuous corner radius tokens", destination: AnyView(RadiusScreen())),
                 ShowcaseItem(icon: "paintpalette", title: "Theme", description: "Colors, typography & spacing themes", destination: AnyView(ThemeScreen())),
                 ShowcaseItem(icon: "bolt.fill", title: "Animations", description: "Spring & eased motion presets", destination: AnyView(AnimationsScreen())),
-                ShowcaseItem(icon: "accessibility", title: "Accessibility", description: "WCAG contrast & VoiceOver", destination: AnyView(AccessibilityScreen())),
+                ShowcaseItem(icon: "accessibility", title: "Accessibility", description: "Contrast tools & VoiceOver examples", destination: AnyView(AccessibilityScreen())),
                 ShowcaseItem(icon: "moon.stars", title: "Dark Mode", description: "Adaptive tokens in action", destination: AnyView(DarkModeScreen())),
                 ShowcaseItem(icon: "gearshape", title: "Configuration", description: "Presets, haptics & accessibility", destination: AnyView(ConfigScreen()))
             ]
@@ -93,7 +94,7 @@ enum ShowcaseSection: String, CaseIterable {
                 ShowcaseItem(icon: "checklist", title: "Form Controls", description: "Toggle, checkbox, radio, slider", destination: AnyView(FormControlsScreen())),
                 ShowcaseItem(icon: "tray", title: "Empty States", description: "Onboarding, errors & permissions", destination: AnyView(EmptyStatesScreen())),
                 ShowcaseItem(icon: "hourglass", title: "Loading Patterns", description: "Skeletons, progress & spinners", destination: AnyView(LoadingPatternsScreen())),
-                ShowcaseItem(icon: "doc.text", title: "Form Patterns", description: "Signup, settings & payment flows", destination: AnyView(FormPatternsScreen()))
+                ShowcaseItem(icon: "doc.text", title: "Form Patterns", description: "Validation & grouped preferences", destination: AnyView(FormPatternsScreen()))
             ]
         }
     }
@@ -112,10 +113,12 @@ struct ShowcaseItem: Identifiable {
 struct ContentView: View {
     @State private var searchText = ""
     @State private var isDarkMode = false
+    @State private var previewPath: [String] = []
+    @State private var didApplyLaunchOptions = false
     @Environment(\.colorScheme) private var systemColorScheme
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $previewPath) {
             ScrollView {
                 VStack(spacing: 0) {
                     heroSection
@@ -132,13 +135,32 @@ struct ContentView: View {
                     }
                 }
             }
+            .navigationDestination(for: String.self) { title in
+                if let item = ShowcaseSection.allCases.flatMap(\.items).first(where: { $0.title == title }) {
+                    item.destination
+                }
+            }
             .background(LubaColors.background)
             .navigationBarBackButtonHidden(true)
             .toolbar(.hidden, for: .navigationBar)
             .preferredColorScheme(isDarkMode ? .dark : .light)
         }
         .onAppear {
+            guard !didApplyLaunchOptions else { return }
+            didApplyLaunchOptions = true
             isDarkMode = systemColorScheme == .dark
+            #if DEBUG
+            // Deterministic routes for documentation captures; ordinary launches still use the catalog.
+            let arguments = ProcessInfo.processInfo.arguments
+            if arguments.contains("-showcase-dark") { isDarkMode = true }
+            if arguments.contains("-showcase-light") { isDarkMode = false }
+            if let flag = arguments.firstIndex(of: "-showcase-screen"), arguments.indices.contains(flag + 1), previewPath.isEmpty {
+                let title = arguments[flag + 1]
+                if ShowcaseSection.allCases.flatMap(\.items).contains(where: { $0.title == title }) {
+                    previewPath = [title]
+                }
+            }
+            #endif
         }
     }
 
@@ -146,27 +168,28 @@ struct ContentView: View {
 
     private var heroSection: some View {
         VStack(spacing: LubaSpacing.lg) {
-            ZStack {
-                Circle()
-                    .fill(LubaColors.accentSubtle)
-                    .frame(width: 72, height: 72)
+            Button {
+                withAnimation(LubaMotion.stateAnimation) { isDarkMode.toggle() }
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(LubaColors.accentSubtle)
+                        .frame(width: 72, height: 72)
 
-                Image(systemName: isDarkMode ? "moon.fill" : "leaf.fill")
-                    .font(LubaTypography.custom(size: 28, weight: .regular))
-                    .foregroundStyle(LubaColors.accent)
-            }
-            .lubaPressable(scale: LubaMotion.pressScaleCompact, haptic: .medium) {
-                withAnimation(LubaMotion.stateAnimation) {
-                    isDarkMode.toggle()
+                    Image(systemName: isDarkMode ? "moon.fill" : "leaf.fill")
+                        .font(LubaTypography.custom(size: 28, weight: .regular))
+                        .foregroundStyle(LubaColors.accent)
                 }
             }
+            .buttonStyle(LubaPressableButtonStyle())
+            .accessibilityLabel(isDarkMode ? "Switch to light mode" : "Switch to dark mode")
 
             VStack(spacing: LubaSpacing.xs) {
                 Text("LubaUI")
                     .font(LubaTypography.title)
                     .foregroundStyle(LubaColors.textPrimary)
 
-                Text("The design system that feels alive")
+                Text("Explore the system · 0.3.0")
                     .font(LubaTypography.subheadline)
                     .foregroundStyle(LubaColors.textSecondary)
             }
@@ -183,7 +206,7 @@ struct ContentView: View {
             .background(LubaColors.gray100)
             .clipShape(Capsule())
 
-            Text("Radically composable · AI-native · Low-friction")
+            Text("Core for foundations. Components when you need them.")
                 .font(LubaTypography.caption2)
                 .foregroundStyle(LubaColors.textTertiary)
                 .multilineTextAlignment(.center)
@@ -379,4 +402,17 @@ struct ComponentRow: View {
 
 #Preview {
     ContentView()
+}
+
+// The showcase keeps `import LubaUI` above, exercising the compatibility umbrella.
+private struct PackageProductsScreen: View {
+    var body: some View {
+        ShowcaseScreen("Package Products") {
+            ShowcaseHeader(title: "Package Products", description: "LubaUI 0.3.0 separates the foundation from the component catalog. Choose a product in your target dependencies.")
+            PhilosophyCard(icon: "atom", title: "import LubaCore", description: "Tokens, themes, typography, motion, haptics, and interaction primitives. Build your own views on the foundation.")
+            PhilosophyCard(icon: "square.stack.3d.up", title: "import LubaComponents", description: "Ready-made controls and containers, with Core re-exported. Add the catalog when you need it.")
+            PhilosophyCard(icon: "shippingbox", title: "import LubaUI", description: "The convenience umbrella used by this showcase. Existing non-chart imports continue to work.")
+            PhilosophyCard(icon: "chart.xyaxis.line", title: "Charts belong in the app", description: "Chart wrappers and their layout tokens were removed in 0.3.0. Use Swift Charts directly when your application needs charts.")
+        }
+    }
 }

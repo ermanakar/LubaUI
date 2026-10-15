@@ -12,13 +12,14 @@ import LubaUI
 
 /// Standard header for all showcase screens.
 struct ShowcaseHeader: View {
+    @LubaEnvironment private var luba
     let title: String // Retained for compatibility with existing screens
     let description: String
 
     var body: some View {
         Text(description)
-            .font(LubaTypography.body)
-            .foregroundStyle(LubaColors.textSecondary)
+            .font(luba.fonts.body)
+            .foregroundStyle(luba.colors.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -27,6 +28,7 @@ struct ShowcaseHeader: View {
 
 /// Section wrapper with uppercase label — used in every showcase screen.
 struct DemoSection<Content: View>: View {
+    @LubaEnvironment private var luba
     let title: String
     @ViewBuilder let content: Content
 
@@ -36,10 +38,10 @@ struct DemoSection<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LubaSpacing.md) {
+        VStack(alignment: .leading, spacing: luba.spacing.md) {
             Text(title)
-                .font(LubaTypography.caption)
-                .foregroundStyle(LubaColors.textTertiary)
+                .font(luba.fonts.caption)
+                .foregroundStyle(luba.colors.textTertiary)
                 .textCase(.uppercase)
                 .tracking(0.5)
 
@@ -52,23 +54,24 @@ struct DemoSection<Content: View>: View {
 
 /// Callout card for explaining design rationale.
 struct PhilosophyCard: View {
+    @LubaEnvironment private var luba
     let icon: String
     let title: String
     let description: String
 
     var body: some View {
         LubaCard(elevation: .flat, style: .outlined) {
-            HStack(alignment: .top, spacing: LubaSpacing.md) {
+            HStack(alignment: .top, spacing: luba.spacing.md) {
                 LubaCircledIcon(icon, size: .md, style: .subtle)
 
-                VStack(alignment: .leading, spacing: LubaSpacing.xs) {
+                VStack(alignment: .leading, spacing: luba.spacing.xs) {
                     Text(title)
-                        .font(LubaTypography.headline)
-                        .foregroundStyle(LubaColors.textPrimary)
+                        .font(luba.fonts.headline)
+                        .foregroundStyle(luba.colors.textPrimary)
 
                     Text(description)
-                        .font(LubaTypography.caption)
-                        .foregroundStyle(LubaColors.textSecondary)
+                        .font(luba.fonts.caption)
+                        .foregroundStyle(luba.colors.textSecondary)
                 }
             }
         }
@@ -79,6 +82,7 @@ struct PhilosophyCard: View {
 
 /// Monospaced code display inside a card.
 struct CodeBlock<Content: View>: View {
+    @LubaEnvironment private var luba
     @ViewBuilder let content: Content
 
     init(@ViewBuilder content: () -> Content) {
@@ -87,10 +91,10 @@ struct CodeBlock<Content: View>: View {
 
     var body: some View {
         LubaCard(elevation: .flat, style: .outlined) {
-            VStack(alignment: .leading, spacing: LubaSpacing.sm) {
+            VStack(alignment: .leading, spacing: luba.spacing.sm) {
                 content
             }
-            .font(LubaTypography.code)
+            .font(luba.fonts.code)
         }
     }
 }
@@ -99,34 +103,38 @@ struct CodeBlock<Content: View>: View {
 
 /// A single-line code snippet with tap-to-copy.
 struct CopyableCode: View {
+    @LubaEnvironment private var luba
     let code: String
     @State private var copied = false
 
     var body: some View {
-        HStack {
-            Text(code)
-                .font(LubaTypography.code)
-                .foregroundStyle(LubaColors.accent)
-                .lineLimit(1)
-
-            Spacer()
-
-            Image(systemName: copied ? "checkmark" : "doc.on.doc")
-                .font(LubaTypography.custom(size: 12, weight: .medium))
-                .foregroundStyle(copied ? LubaColors.success : LubaColors.textTertiary)
-        }
-        .padding(LubaSpacing.md)
-        .background(LubaColors.surfaceSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: LubaRadius.sm, style: .continuous))
-        .lubaPressable {
+        Button {
             #if os(iOS)
             UIPasteboard.general.string = code
             #endif
-            withAnimation(LubaAnimations.quick) { copied = true }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation(LubaAnimations.quick) { copied = false }
+            copied = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copied = false }
+        } label: {
+            HStack {
+                Text(code)
+                    .font(luba.fonts.code)
+                    .foregroundStyle(luba.colors.accent)
+                    .lineLimit(1)
+
+                Spacer()
+
+                Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                    .font(luba.fonts.caption)
+                    .foregroundStyle(copied ? luba.colors.success : luba.colors.textTertiary)
             }
+            .padding(luba.spacing.md)
+            .background(luba.colors.surfaceSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: luba.radius.sm, style: .continuous))
         }
+        .buttonStyle(LubaPressableButtonStyle())
+        .lubaMinTouchTarget(luba)
+        .accessibilityLabel("Copy code: \(code)")
+        .accessibilityValue(copied ? "Copied" : "")
     }
 }
 
@@ -134,6 +142,7 @@ struct CopyableCode: View {
 
 /// Standard scroll layout used by every showcase screen.
 struct ShowcaseScreen<Content: View>: View {
+    @LubaEnvironment private var luba
     let navigationTitle: String
     @ViewBuilder let content: Content
 
@@ -144,12 +153,12 @@ struct ShowcaseScreen<Content: View>: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: LubaSpacing.xxl) {
+            VStack(spacing: luba.spacing.xxl) {
                 content
             }
-            .padding(LubaSpacing.lg)
+            .padding(luba.spacing.lg)
         }
-        .background(LubaColors.background)
+        .background(luba.colors.background)
         .lubaTooltipHost()
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.large)
