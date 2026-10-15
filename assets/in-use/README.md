@@ -3,7 +3,8 @@
 iPhone captures from the Wirkraum release screenshot set, captured
 1 October 2026. Used here to document LubaUI components in a complete interface.
 Original screenshot pixels are preserved; embedded EXIF/XMP metadata was removed
-before publication. These images show the app at that date, not the unreleased library fixes.
+before publication. These images show the app at that date; they do not demonstrate the changes
+introduced in LubaUI 0.3.0.
 
 - `results.png`: repeated cards and badges; the map is application code.
 - `dossier.png`: tabs, search, cards, and semantic status.
