@@ -9,13 +9,15 @@
 import XCTest
 import SwiftUI
 @testable import LubaUI
+@testable import LubaCore
+@testable import LubaComponents
 
 final class TokenTests: XCTestCase {
 
     // MARK: - Version
 
     func testVersion() {
-        XCTAssertEqual(LubaUI.version, "0.2.0")
+        XCTAssertEqual(LubaUI.version, "0.3.0")
         XCTAssertEqual(LubaUI.name, "LubaUI")
     }
 

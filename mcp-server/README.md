@@ -4,44 +4,32 @@ An MCP (Model Context Protocol) server that makes the LubaUI design system activ
 
 ---
 
+## Version status
+
+MCP **1.4.0** targets LubaUI **0.3.0**: independently selectable modules, retired chart APIs, Dynamic Type and `@LubaEnvironment` guidance, and the valid 2pt spacing token. It includes catalog parity, packed-artifact, and adversarial stdio checks. MCP versions are independent of Swift library versions.
+
 ## Setup
 
-### Using LubaUI in your own project (recommended)
+### Current checkout
 
-One command — works from any project directory:
-
-```bash
-claude mcp add lubaui -- npx lubaui-mcp@latest
-```
-
-Using `@latest` ensures you always get the newest version. Without it, `npx` caches the first version it downloads.
-
-That's it. Next time you start Claude Code, the LubaUI tools are available. Ask "What spacing should I use for card padding?" and Claude will query the server.
-
-### Updating
-
-If you installed without `@latest`, you can update manually:
+Build and register the server from source:
 
 ```bash
-npx lubaui-mcp@latest
+cd /absolute/path/LubaUI/mcp-server
+npm ci
+npm run build
+claude mcp add lubaui -- node /absolute/path/LubaUI/mcp-server/bin/lubaui-mcp.js
 ```
 
-Or re-add with auto-updates:
+Replace the example path with your checkout path. Other MCP clients can use the same `node` command and absolute script path in their server configuration. This repository does not supply a project-level `.mcp.json`.
+
+### Published package
 
 ```bash
-claude mcp remove lubaui
-claude mcp add lubaui -- npx lubaui-mcp@latest
+claude mcp add lubaui -- npx -y lubaui-mcp@1.4.0
 ```
 
-### Contributing to LubaUI
-
-If you're working inside the LubaUI repo itself, the `.mcp.json` at the project root auto-discovers the server. Just install dependencies:
-
-```bash
-cd mcp-server && npm install
-```
-
-The server starts on demand when Claude Code opens the project.
+The explicit version selects the catalog for LubaUI 0.3.0. Restart the client after changing its configuration. The older MCP 1.3.1 catalog targets the single-module library.
 
 ---
 
@@ -121,7 +109,7 @@ queries: ["spacing large", "radius medium", "press scale", "accent"]
 
 #### `validate_spacing`
 
-Check if a spacing value is on the 4pt grid and maps to a named token.
+Check whether spacing matches the named scale. Most values use a 4pt grid; `LubaSpacing.xxs` is the explicit 2pt exception.
 
 ```
 "Is 14pt valid?"
@@ -226,7 +214,7 @@ mcp-server/
     ├── index.ts              # Server entry, tool/resource registration
     ├── data/
     │   ├── tokens.json       # Spacing, radius, colors, typography, motion, glass
-    │   ├── components.json   # 26 component APIs with parameters and examples
+    │   ├── components.json   # Component APIs with parameters and examples
     │   └── primitives.json   # 7 primitives with modifiers and patterns
     ├── tools/
     │   ├── lookup.ts         # lookup_token, lookup_component, lookup_primitive, get_color_palette
@@ -239,11 +227,11 @@ mcp-server/
         └── search.ts         # Scored fuzzy search (camelCase-aware)
 ```
 
-**Data strategy:** Hand-authored JSON files transcribed from the Swift sources. The data files include usage guidance, cross-references, and design rationale that don't exist in source code. The token system changes infrequently, so static JSON is reliable and avoids runtime Swift parsing.
+**Data strategy:** Hand-authored JSON files transcribed from the Swift sources. The data files include usage guidance, cross-references, and design rationale that don't exist in source code. Tests compare the spacing catalog with Swift source and verify the packed distribution. Other catalog entries still require review when APIs change.
 
 **Search:** Simple scored matching — exact (100) > starts-with (80) > contains (60) > camelCase part match (50). No external dependencies.
 
-**Transport:** stdio via `@modelcontextprotocol/sdk`. Runs with `npx tsx` (no build step).
+**Transport:** stdio via `@modelcontextprotocol/sdk`. The published package runs compiled JavaScript through `bin/lubaui-mcp.js`. Use `npm start` for source development.
 
 ---
 
@@ -263,7 +251,7 @@ The JSON structure is self-documenting. Match the existing patterns when adding 
 
 ```bash
 # Install
-cd mcp-server && npm install
+cd mcp-server && npm ci
 
 # Test manually (sends JSON-RPC over stdin)
 echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | npx tsx src/index.ts
@@ -275,6 +263,9 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 # Type check
 npx tsc --noEmit
 
-# Build for publishing
-npx tsc
+# Build, validate data, and exercise the packed MCP over stdio
+npm test
+
+# Inspect the release archive without publishing
+npm pack --dry-run
 ```

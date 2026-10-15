@@ -165,7 +165,7 @@ server.tool(
       .array(
         z.object({
           name: z.string().min(1).max(200).describe("Source color token name (e.g. 'DS.Colors.accent')"),
-          value: z.string().min(1).max(50).describe("Hex color value (e.g. '#A78BFA')"),
+          value: z.string().regex(/^#?[0-9a-fA-F]{6}$/).describe("Six-digit hex color value (e.g. '#A78BFA')"),
           usage: z.string().max(200).optional().describe("How this color is used (e.g. 'primary accent')"),
         })
       )
@@ -239,12 +239,16 @@ server.resource(
   "lubaui://reference/full",
   {
     description:
-      "Complete LubaUI design system reference — architecture, all tokens, all 25 components with full specs, and all 7 primitives. Read this once to understand the entire system without making individual lookup calls.",
+      "Complete LubaUI design system reference — architecture, all tokens, all cataloged components with full specs, and all primitives. Read this once to understand the entire system without making individual lookup calls.",
   },
   async () => {
     const fullReference = {
       system: "LubaUI Design System",
       version: pkg.version,
+      libraryVersion: "0.3.0",
+      libraryStatus: "released",
+      products: ["LubaCore", "LubaComponents", "LubaUI"],
+      libraryNotes: "0.3.0: Core and Components are independently selectable; LubaUI re-exports both. Chart APIs are removed; use native Swift Charts. Theme palette helpers remain. Includes config inheritance, haptic policy, and touch-target fixes. See CHANGELOG.md.",
       philosophy:
         "Composability over inheritance. Behaviors are extracted into primitives (modifiers) so any view can gain interactive powers without subclassing. Every magic number has a name, a token, and documented rationale.",
       platforms: "iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, visionOS 1.0+",
@@ -257,7 +261,7 @@ server.resource(
           },
           tier2: {
             name: "Semantic Tokens",
-            rule: "Human-readable, context-aware names. USE THESE in components.",
+            rule: "Authoring defaults. In component bodies read luba.colors, luba.fonts, luba.spacing, and luba.radius through @LubaEnvironment so subtree themes apply.",
             modules: [
               "LubaColors",
               "LubaSpacing",
@@ -279,11 +283,11 @@ server.resource(
           accentColor: "Sage green (#5F7360 light / #9AB897 dark) — WCAG AA compliant",
         },
         motionSystems: {
-          LubaMotion: "Raw constants (scale values, animation parameters) — use with .scaleEffect(), .opacity()",
-          LubaAnimations: "Applied Animation objects — use with withAnimation(), .animation(), .transition()",
+          LubaMotion: "Motion constants — neutralize decorative transforms with luba.motion.pressScale or motionAmount.",
+          LubaAnimations: "Animation curves — resolve through luba.motion.animation/decorative/transition or luba.motion.run. Never bypass the motion policy.",
         },
         configuration: {
-          environment: "@Environment(\\.lubaConfig) for runtime settings, @Environment(\\.lubaTheme) for theming",
+          environment: "@LubaEnvironment private var luba resolves the nearest theme, config, and system Reduce Motion setting",
           presets: [".minimal", ".accessible", ".debug"],
         },
       },
@@ -359,6 +363,14 @@ server.resource(
   { description: "LubaUI design system architecture — three-tier token system, design philosophy, and conventions" },
   async () => {
     const architecture = {
+      libraryVersion: "0.3.0",
+      libraryStatus: "released",
+      products: {
+        LubaCore: "Theme, tokens, localization, motion, haptics, and interaction primitives. No component target.",
+        LubaComponents: "Ready-made views and component tokens; depends on and re-exports LubaCore.",
+        LubaUI: "Compatibility import re-exporting LubaCore and LubaComponents.",
+      },
+      chartMigration: "Chart wrappers, protocols, layout tokens, and styling modifier are removed in 0.3.0. Use native Swift Charts. Existing theme palette helpers remain in Core.",
       philosophy: "Composability over inheritance. Behaviors are extracted into primitives so any view can gain interactive powers through modifiers, not subclassing. Every magic number has a name, a token, and documented rationale.",
       tokenSystem: {
         tier1: {
@@ -368,7 +380,7 @@ server.resource(
         },
         tier2: {
           name: "Semantic Tokens",
-          rule: "Human-readable, context-aware names. USE THESE in components.",
+          rule: "Authoring defaults. In component bodies read luba.colors, luba.fonts, luba.spacing, and luba.radius through @LubaEnvironment so subtree themes apply.",
           modules: ["LubaColors", "LubaSpacing", "LubaRadius", "LubaTypography", "LubaMotion", "LubaAnimations"],
           examples: ["LubaColors.textPrimary → adaptive grey900", "LubaSpacing.lg → 16pt", "LubaMotion.pressScale → 0.97"],
         },
@@ -384,16 +396,16 @@ server.resource(
         surfaceHierarchy: "background → surface → surfaceSecondary → surfaceTertiary",
         accentColor: "Sage green (#5F7360 light / #9AB897 dark) — WCAG AA compliant",
       },
-      spacingGrid: "4pt base grid. Named tokens: xs(4), sm(8), md(12), lg(16), xl(24), xxl(32), xxxl(48), huge(64)",
+      spacingGrid: "4pt base grid. Named tokens: xxs(2, half-grid exception), xs(4), sm(8), md(12), lg(16), xl(24), xxl(32), xxxl(48), huge(64)",
       radiusScale: "none(0), xs(4), sm(8), md(12), lg(16), xl(24), full(9999)",
-      typography: "SF Rounded by default. Config-aware via LubaConfig.shared.useRoundedFont",
+      typography: "15 Dynamic Type-aware roles. Use luba.fonts for theme and subtree config; use fixed custom sizes only for decorative glyphs.",
       motionSystems: {
-        LubaMotion: "Raw constants (scale values, animation parameters) — use with .scaleEffect(), .opacity()",
-        LubaAnimations: "Applied Animation objects — use with withAnimation(), .animation(), .transition()",
+        LubaMotion: "Motion constants — neutralize decorative transforms with luba.motion.pressScale or motionAmount.",
+        LubaAnimations: "Animation curves — resolve through luba.motion.animation/decorative/transition or luba.motion.run. Never bypass the motion policy.",
       },
       platforms: "iOS 16+, macOS 13+, watchOS 9+, tvOS 16+, visionOS 1.0+",
       configuration: {
-        environment: "@Environment(\\.lubaConfig) for runtime settings, @Environment(\\.lubaTheme) for theming",
+        environment: "@LubaEnvironment private var luba resolves the nearest theme, config, and system Reduce Motion setting",
         presets: [".minimal", ".accessible", ".debug"],
       },
     };

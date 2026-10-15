@@ -196,9 +196,9 @@ struct SkeletonScreen: View {
                                 LubaSkeleton(width: 80, height: 36)
                             }
                         } else {
-                            LubaAvatar(name: "Erman Akar", size: .xlarge)
+                            LubaAvatar(name: "Alex Morgan", size: .xlarge)
                             VStack(spacing: LubaSpacing.xs) {
-                                Text("Erman Akar")
+                                Text("Alex Morgan")
                                     .font(LubaTypography.title)
                                     .foregroundStyle(LubaColors.textPrimary)
                                 Text("Creator of LubaUI")

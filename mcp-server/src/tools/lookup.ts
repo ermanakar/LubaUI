@@ -165,6 +165,12 @@ export function lookupToken(query: string, category?: string) {
 }
 
 export function lookupComponent(query: string) {
+  if (/chart|sparkline/i.test(query)) {
+    return {
+      found: false,
+      message: "LubaUI chart components were removed in 0.3.0. Use Apple's Swift Charts directly; existing theme palette helpers remain available in LubaCore.",
+    };
+  }
   const searchable: (ComponentEntry & SearchableItem)[] = componentsData.map(
     (c) => ({
       ...c,

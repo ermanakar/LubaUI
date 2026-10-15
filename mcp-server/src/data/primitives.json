@@ -92,17 +92,17 @@
   {
     "name": "lubaGlass",
     "modifier": ".lubaGlass(_:tint:cornerRadius:isInteractive:)",
-    "description": "Applies a glass/frosted effect to any view. Uses SwiftUI materials (iOS 16-25) with native Liquid Glass ready for iOS 26+.",
+    "description": "Applies a glass/frosted effect to any view. Uses SwiftUI materials on every supported OS version. Native Liquid Glass is not implemented.",
     "parameters": [
       { "name": "style", "type": "LubaGlassStyle", "default": ".regular", "options": [".subtle", ".regular", ".prominent"], "description": "Glass intensity level" },
       { "name": "tint", "type": "Color?", "default": "nil", "description": "Optional color tint over glass" },
       { "name": "cornerRadius", "type": "CGFloat", "default": "12", "description": "Corner radius" },
-      { "name": "isInteractive", "type": "Bool", "default": "false", "description": "Touch response (iOS 26+ only)" }
+      { "name": "isInteractive", "type": "Bool", "default": "false", "description": "Reserved for future native glass support; currently has no effect" }
     ],
-    "example": "VStack {\n    Text(\"Glass Card\")\n    Text(\"Frosted content\")\n}\n.padding(LubaSpacing.lg)\n.lubaGlass(.regular, tint: LubaColors.accent)\n\n// Glass container for compositing\nZStack {\n    GlassCard1()\n    GlassCard2()\n}\n.lubaGlassContainer()",
+    "example": "VStack {\n    Text(\"Glass Card\")\n    Text(\"Frosted content\")\n}\n.padding(LubaSpacing.lg)\n.lubaGlass(.regular, tint: LubaColors.accent)\n\n// Compatibility placeholder; currently a no-op\nZStack {\n    GlassCard1()\n    GlassCard2()\n}\n.lubaGlassContainer()",
     "variants": [
       { "name": ".lubaGlass()", "description": "Apply glass effect to a single view" },
-      { "name": ".lubaGlassContainer()", "description": "Group glass elements for shared compositing (iOS 26+)" }
+      { "name": ".lubaGlassContainer()", "description": "Compatibility placeholder; currently a no-op on every OS version" }
     ],
     "tokens": ["LubaGlassTokens", "LubaGlassStyle"],
     "composability": "Used by LubaButton(.glass), LubaCard(.glass), LubaToast(useGlass:), LubaAlert(useGlass:), LubaSheetHeader(useGlass:), LubaTabs(useGlass:). Solid fallback for reduceTransparency/highContrastMode."
@@ -128,7 +128,7 @@
       { "name": ".subtle", "struct": "LubaSubtleStyle", "description": "Minimal presence, secondary text color, soft haptic" },
       { "name": ".glass", "struct": "LubaGlassButtonStyle", "description": "Clear background (glass modifier handles visual), light haptic" }
     ],
-    "tokens": ["LubaButtonStyleType"],
+    "tokens": ["LubaButtonStyle"],
     "composability": "Any struct conforming to LubaButtonStyling works with LubaButton via the `styling:` parameter."
   }
 ]

@@ -5,7 +5,8 @@
 //  A modern SwiftUI design system with design tokens, theming, and reusable components.
 //
 
-import SwiftUI
+@_exported import LubaCore
+@_exported import LubaComponents
 
 // MARK: - Public Exports
 
@@ -22,11 +23,11 @@ import SwiftUI
 /// import LubaUI
 ///
 /// Text(LubaUI.name)       // "LubaUI"
-/// Text(LubaUI.version)    // "0.2.0"
+/// Text(LubaUI.version)    // "0.3.0"
 /// ```
 public enum LubaUI {
     /// The current library version.
-    public static let version = "0.2.0"
+    public static let version = "0.3.0"
 
     /// The library name.
     public static let name = "LubaUI"

@@ -14,6 +14,8 @@ let package = Package(
         .visionOS(.v1)
     ],
     products: [
+        .library(name: "LubaCore", targets: ["LubaCore"]),
+        .library(name: "LubaComponents", targets: ["LubaComponents"]),
         .library(
             name: "LubaUI",
             targets: ["LubaUI"]
@@ -24,17 +26,18 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "LubaUI",
+            name: "LubaCore",
             dependencies: [],
-            path: "Sources/LubaUI",
             resources: [
                 // Built-in accessibility / UI strings (en, de).
                 .process("Resources")
             ]
         ),
+        .target(name: "LubaComponents", dependencies: ["LubaCore"]),
+        .target(name: "LubaUI", dependencies: ["LubaCore", "LubaComponents"]),
         .testTarget(
             name: "LubaUITests",
-            dependencies: ["LubaUI"],
+            dependencies: ["LubaUI", "LubaCore", "LubaComponents"],
             path: "Tests/LubaUITests"
         ),
     ],

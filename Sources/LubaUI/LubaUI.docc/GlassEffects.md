@@ -1,10 +1,10 @@
 # Glass Effects
 
-Apply frosted glass surfaces with automatic fallbacks for accessibility and older OS versions.
+Apply frosted glass surfaces using SwiftUI materials, with an opaque accessibility fallback.
 
 ## Overview
 
-The glass primitive provides translucent blur effects that adapt to the platform and user's accessibility settings. On iOS 16–25 it uses SwiftUI materials; on iOS 26+ it's ready for native Liquid Glass.
+The glass primitive provides translucent blur effects that adapt to the platform and user's accessibility settings. It uses SwiftUI materials on every supported OS version. Native Liquid Glass is not implemented; the `isInteractive` parameter currently has no effect.
 
 ### Basic Usage
 
@@ -69,21 +69,11 @@ LubaToast("Message", useGlass: true)
 
 ### Accessibility Fallbacks
 
-When the user enables **Reduce Transparency** or when `LubaConfig.highContrastMode` is active, glass effects automatically fall back to a solid opaque surface. This ensures readability is never compromised.
+When the user enables **Reduce Transparency** or when `LubaConfig.highContrastMode` is active, glass effects automatically fall back to a solid opaque surface. Check contrast with your actual foreground colors and content.
 
 ### Glass Containers
 
-On iOS 26+, overlapping glass views need a shared compositing container. Use `.lubaGlassContainer()` on the parent:
-
-```swift
-ZStack {
-    GlassCard()
-    GlassOverlay()
-}
-.lubaGlassContainer()
-```
-
-This is a no-op on iOS 16–25.
+`.lubaGlassContainer()` is a compatibility placeholder. It currently returns its content unchanged on every OS version and does not merge overlapping glass surfaces.
 
 ## Topics
 

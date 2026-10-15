@@ -1,0 +1,185 @@
+//
+//  LubaRadio.swift
+//  LubaUI
+//
+//  A refined radio button group with haptic feedback.
+//
+//  Architecture:
+//  - Uses LubaSelectionTokens for sizing
+//  - Uses LubaMotion for animations
+//  - Reads LubaConfig for haptics
+//
+
+import SwiftUI
+import LubaCore
+
+// MARK: - LubaRadio (Convenience Alias)
+
+/// Convenience alias for `LubaRadioButton`.
+/// Usage: `LubaRadio(label: "Option A", isSelected: isSelected) { select() }`
+public typealias LubaRadio = LubaRadioButton
+
+// MARK: - LubaRadioGroup
+
+/// A group of radio buttons for single selection.
+///
+/// Usage:
+/// ```swift
+/// LubaRadioGroup(
+///     selection: $shippingMethod,
+///     options: [
+///         (value: "standard", label: "Standard Shipping"),
+///         (value: "express", label: "Express Shipping")
+///     ]
+/// )
+/// ```
+public struct LubaRadioGroup<T: Hashable>: View {
+    @Binding private var selection: T
+    private let options: [(value: T, label: String)]
+    private let isDisabled: Bool
+
+    @LubaEnvironment private var luba
+
+    /// Creates a radio group.
+    ///
+    /// - Parameters:
+    ///   - selection: Binding to the currently selected value.
+    ///   - options: The available choices, each with a value and display label.
+    ///   - isDisabled: When `true`, all options are non-interactive.
+    public init(
+        selection: Binding<T>,
+        options: [(value: T, label: String)],
+        isDisabled: Bool = false
+    ) {
+        self._selection = selection
+        self.options = options
+        self.isDisabled = isDisabled
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(options, id: \.value) { option in
+                LubaRadioButton(
+                    label: option.label,
+                    isSelected: selection == option.value,
+                    isDisabled: isDisabled
+                ) {
+                    selection = option.value
+                }
+            }
+        }
+    }
+}
+
+// MARK: - LubaRadioButton
+
+/// A single radio button (typically used within LubaRadioGroup).
+public struct LubaRadioButton: View {
+    @LubaEnvironment private var luba
+    private let label: String
+    private let isSelected: Bool
+    private let isDisabled: Bool
+    private let action: () -> Void
+
+
+    /// Creates a radio button.
+    ///
+    /// - Parameters:
+    ///   - label: The text displayed next to the radio indicator.
+    ///   - isSelected: Whether this option is currently selected.
+    ///   - isDisabled: When `true`, the button is non-interactive.
+    ///   - action: Closure invoked when the button is tapped.
+    public init(
+        label: String,
+        isSelected: Bool,
+        isDisabled: Bool = false,
+        action: @escaping () -> Void
+    ) {
+        self.label = label
+        self.isSelected = isSelected
+        self.isDisabled = isDisabled
+        self.action = action
+    }
+
+    public var body: some View {
+        Button(action: performAction) {
+            HStack(spacing: LubaSelectionTokens.labelSpacing(luba.spacing)) {
+                radioControl
+                labelView
+                Spacer(minLength: 0)
+            }
+            .frame(minHeight: LubaSelectionTokens.minTouchTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? LubaMotion.disabledOpacity : 1)
+        .animation(luba.motion.animation(LubaMotion.micro), value: isSelected)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(isSelected ? LubaStrings.selected : LubaStrings.notSelected)
+        .accessibilityAddTraits(.isButton)
+    }
+
+    // MARK: - Subviews
+
+    private var radioControl: some View {
+        ZStack {
+            // Outer circle
+            Circle()
+                .strokeBorder(
+                    isSelected ? luba.colors.accent : luba.colors.borderStrong,
+                    lineWidth: LubaSelectionTokens.borderWidth
+                )
+                .frame(width: LubaSelectionTokens.controlSize, height: LubaSelectionTokens.controlSize)
+
+            // Inner dot
+            if isSelected {
+                Circle()
+                    .fill(luba.colors.accent)
+                    .frame(width: LubaSelectionTokens.indicatorSize, height: LubaSelectionTokens.indicatorSize)
+                    .transition(luba.motion.transition(.scale.combined(with: .opacity)))
+            }
+        }
+    }
+
+    private var labelView: some View {
+        Text(label)
+            .font(luba.fonts.bodySmall)
+            .foregroundStyle(luba.colors.textPrimary)
+    }
+
+    // MARK: - Actions
+
+    private func performAction() {
+        guard !isSelected else { return }
+
+        if luba.hapticsEnabled {
+            luba.haptics.trigger(.selection)
+        }
+        action()
+    }
+}
+
+// MARK: - Preview
+
+#Preview("Radio Group") {
+    struct PreviewWrapper: View {
+        @State private var selection = "option1"
+
+        var body: some View {
+            LubaRadioGroup(
+                selection: $selection,
+                options: [
+                    (value: "option1", label: "Standard Shipping"),
+                    (value: "option2", label: "Express Shipping"),
+                    (value: "option3", label: "Overnight Shipping")
+                ]
+            )
+            .padding(20)
+            .background(LubaColors.background)
+        }
+    }
+
+    return PreviewWrapper()
+}

@@ -8,6 +8,8 @@
 import XCTest
 import SwiftUI
 @testable import LubaUI
+@testable import LubaCore
+@testable import LubaComponents
 
 final class ThemeConfigTests: XCTestCase {
 

@@ -1,23 +1,9 @@
-const spacingScale = [
-  { name: "xs", api: "LubaSpacing.xs", value: 4 },
-  { name: "sm", api: "LubaSpacing.sm", value: 8 },
-  { name: "md", api: "LubaSpacing.md", value: 12 },
-  { name: "lg", api: "LubaSpacing.lg", value: 16 },
-  { name: "xl", api: "LubaSpacing.xl", value: 24 },
-  { name: "xxl", api: "LubaSpacing.xxl", value: 32 },
-  { name: "xxxl", api: "LubaSpacing.xxxl", value: 48 },
-  { name: "huge", api: "LubaSpacing.huge", value: 64 },
-];
+import { tokensData } from "./lookup.js";
 
-const radiusScale = [
-  { name: "none", api: "LubaRadius.none", value: 0 },
-  { name: "xs", api: "LubaRadius.xs", value: 4 },
-  { name: "sm", api: "LubaRadius.sm", value: 8 },
-  { name: "md", api: "LubaRadius.md", value: 12 },
-  { name: "lg", api: "LubaRadius.lg", value: 16 },
-  { name: "xl", api: "LubaRadius.xl", value: 24 },
-  { name: "full", api: "LubaRadius.full", value: 9999 },
-];
+type ScaleEntry = { name: string; api: string; value: number };
+// Lookup and validation must share the same catalog, including half-grid tokens.
+const spacingScale: ScaleEntry[] = tokensData.spacing.tokens;
+const radiusScale: ScaleEntry[] = tokensData.radius.tokens;
 
 function findNearest(value: number, scale: typeof spacingScale) {
   let closest = scale[0];

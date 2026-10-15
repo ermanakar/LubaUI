@@ -8,7 +8,7 @@ LubaUI's spacing and radius tokens replace hardcoded values with named constants
 
 ### The 4pt Grid
 
-All spacing values are multiples of 4pt. The scale starts with a 2x jump, then alternates between 1.5x and 1.33x multipliers — landing on clean grid values with perceptible gaps between each step.
+The scale uses multiples of 4pt, with a deliberate 2pt exception: `LubaSpacing.xxs`. The scale starts with a 2x jump, then alternates between 1.5x and 1.33x multipliers — landing on clean grid values with perceptible gaps between each step.
 
 | Token | Value | Multiplier | Use Case |
 |-------|-------|------------|----------|

@@ -4,7 +4,7 @@ Install LubaUI and build your first screen with design tokens and components.
 
 ## Overview
 
-LubaUI is distributed as a Swift Package. Once added to your project, you get immediate access to the full token system, all 25 components, and the composable primitives.
+LubaUI is distributed as a Swift Package. Once added to your project, you get immediate access to the full token system, the component catalog, and the composable primitives.
 
 ### Add the Package
 
@@ -14,7 +14,7 @@ Or add it to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ermanakar/LubaUI", from: "0.2.0"),
+    .package(url: "https://github.com/ermanakar/LubaUI", from: "0.3.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: ["LubaUI"]),
@@ -29,23 +29,23 @@ Import the module and start using tokens and components:
 import SwiftUI
 import LubaUI
 
-struct ContentView: View {
+struct SettingsExample: View {
+    @LubaEnvironment private var luba
     @State private var name = ""
+    @State private var notifications = true
 
     var body: some View {
-        VStack(spacing: LubaSpacing.lg) {
-            Text("Welcome")
-                .font(LubaTypography.title)
-                .foregroundStyle(LubaColors.textPrimary)
-
-            LubaTextField("Name", text: $name, placeholder: "Enter your name")
-
-            LubaButton("Continue", style: .primary) {
-                // handle tap
+        LubaCard {
+            VStack(alignment: .leading, spacing: luba.spacing.lg) {
+                Text("Preferences")
+                    .font(luba.fonts.title)
+                    .foregroundStyle(luba.colors.textPrimary)
+                LubaTextField("Name", text: $name)
+                LubaToggle(isOn: $notifications, label: "Notifications")
             }
         }
-        .padding(LubaSpacing.xl)
-        .background(LubaColors.background)
+        .padding(luba.spacing.xl)
+        .lubaTheme(colors: .accented(.indigo))
     }
 }
 ```
@@ -54,7 +54,7 @@ struct ContentView: View {
 
 **Use tokens, not magic numbers.** Instead of `.padding(16)`, write `.padding(LubaSpacing.lg)`. Tokens give every value a name and make refactoring trivial.
 
-**Compose behaviors with primitives.** Instead of wrapping views in custom gesture handlers, apply modifiers like `.lubaPressable()` or `.lubaExpandable()`.
+**Compose behaviors with primitives.** Instead of wrapping views in custom gesture handlers, apply modifiers like `.lubaPressable()` or the `LubaExpandable` container.
 
 **Configure globally with LubaConfig.** Disable haptics, adjust animation speed, or enable high-contrast mode for an entire view hierarchy:
 

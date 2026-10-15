@@ -26,26 +26,10 @@ const primitivesData: Array<{
 
 // --- Scales for value-based matching ---
 
-const spacingScale = [
-  { name: "xs", api: "LubaSpacing.xs", value: 4 },
-  { name: "sm", api: "LubaSpacing.sm", value: 8 },
-  { name: "md", api: "LubaSpacing.md", value: 12 },
-  { name: "lg", api: "LubaSpacing.lg", value: 16 },
-  { name: "xl", api: "LubaSpacing.xl", value: 24 },
-  { name: "xxl", api: "LubaSpacing.xxl", value: 32 },
-  { name: "xxxl", api: "LubaSpacing.xxxl", value: 48 },
-  { name: "huge", api: "LubaSpacing.huge", value: 64 },
-];
-
-const radiusScale = [
-  { name: "none", api: "LubaRadius.none", value: 0 },
-  { name: "xs", api: "LubaRadius.xs", value: 4 },
-  { name: "sm", api: "LubaRadius.sm", value: 8 },
-  { name: "md", api: "LubaRadius.md", value: 12 },
-  { name: "lg", api: "LubaRadius.lg", value: 16 },
-  { name: "xl", api: "LubaRadius.xl", value: 24 },
-  { name: "full", api: "LubaRadius.full", value: 9999 },
-];
+// Share the catalog with lookup and validation so new tokens cannot drift.
+type ScaleToken = { name: string; api: string; value: number };
+const spacingScale: ScaleToken[] = tokensData.spacing.tokens;
+const radiusScale: ScaleToken[] = tokensData.radius.tokens;
 
 // All LubaUI colors with hex values for matching
 const allColors: Array<{
@@ -102,7 +86,7 @@ function findNearestScale(
 
 function hexToRgb(hex: string): [number, number, number] | null {
   const clean = hex.replace(/^#/, "");
-  if (clean.length !== 6) return null;
+  if (!/^[0-9a-fA-F]{6}$/.test(clean)) return null;
   const n = parseInt(clean, 16);
   return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
 }

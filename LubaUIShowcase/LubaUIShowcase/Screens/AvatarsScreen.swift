@@ -58,8 +58,8 @@ struct AvatarsScreen: View {
                     VStack(spacing: LubaSpacing.md) {
                         HStack(spacing: LubaSpacing.lg) {
                             VStack(spacing: LubaSpacing.xs) {
-                                LubaAvatar(name: "Erman Akar", size: .large)
-                                Text("EA")
+                                LubaAvatar(name: "Alex Morgan", size: .large)
+                                Text("AM")
                                     .font(LubaTypography.caption)
                                     .foregroundStyle(LubaColors.textSecondary)
                             }
@@ -179,10 +179,10 @@ struct AvatarsScreen: View {
             DemoSection(title: "Profile Header Example") {
                 LubaCard(elevation: .low) {
                     VStack(spacing: LubaSpacing.lg) {
-                        LubaAvatar(name: "Erman Akar", size: .xlarge, showBorder: true)
+                        LubaAvatar(name: "Alex Morgan", size: .xlarge, showBorder: true)
 
                         VStack(spacing: LubaSpacing.xs) {
-                            Text("Erman Akar")
+                            Text("Alex Morgan")
                                 .font(LubaTypography.title)
                                 .foregroundStyle(LubaColors.textPrimary)
 

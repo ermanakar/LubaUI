@@ -107,9 +107,11 @@ should use a ``LubaTextRole``.
 - Compact tokens whose silhouette carries meaning — chips, segmented tab labels
   — stay on one line and truncate. Wrapping makes a chip outgrow its capsule;
   the full text remains available to VoiceOver.
-- Interactive targets honor `minimumTouchTarget` (44pt by default) even when the
-  visible glyph is smaller — ``LubaRating`` stars, the alert dismiss button, and
-  the sheet close button all expand their hit area without growing visually.
+- `minimumTouchTarget` defaults to 44pt. Components including ``LubaRating``,
+  alert dismissal, and sheet closure expand small glyphs to this target.
+  Version 0.3.0 extends it to interactive ``LubaChip``
+  controls and text-field clearing; 0.2.0 still has smaller targets there.
+  Verify each composed screen rather than assuming a package-wide guarantee.
 
 Test at the `AX3`–`AX5` content sizes before shipping.
 
@@ -130,7 +132,7 @@ Caller-provided labels always win. Nothing built in overrides an explicit
 
 ### Adding a language
 
-Add `<lang>.lproj/Localizable.strings` under `Sources/LubaUI/Resources/` using
+Add `<lang>.lproj/Localizable.strings` under `Sources/LubaCore/Resources/` using
 the same keys as `en.lproj`. Keys are namespaced `luba.<area>.<name>`. A test
 enforces key parity between shipped languages.
 

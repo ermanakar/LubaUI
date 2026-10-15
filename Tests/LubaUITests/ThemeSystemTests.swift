@@ -14,6 +14,8 @@
 import XCTest
 import SwiftUI
 @testable import LubaUI
+@testable import LubaCore
+@testable import LubaComponents
 
 final class ThemeSystemTests: XCTestCase {
 
@@ -206,12 +208,7 @@ final class ThemeSystemTests: XCTestCase {
         XCTAssertEqual(action.color, .purple)
     }
 
-    func testSparklineTrendFollowsTheme() {
-        let colors = LubaThemeColors(success: .green, error: .red)
-        XCTAssertEqual(LubaSparklineTrend.up.color(colors), .green)
-        XCTAssertEqual(LubaSparklineTrend.down.color(colors), .red)
-        XCTAssertEqual(LubaSparklineTrend.flat.color(colors), colors.textTertiary)
-    }
+
 
     // MARK: - Theme Composition
 
@@ -253,8 +250,9 @@ final class ThemeSystemTests: XCTestCase {
         /// Roles for **app** surfaces. LubaUI components are placed onto these
         /// by the host app; the library never paints a full page itself.
         let appFacing: Set<String> = ["background", "surfaceTertiary"]
-        /// Superseded by the semantic roles, kept so existing themes compile.
-        let legacy: Set<String> = ["primary", "secondary"]
+        /// Legacy roles and chart color helpers remain for existing custom themes;
+        /// chart views themselves were removed in 0.3.0.
+        let legacy: Set<String> = ["primary", "secondary", "chartGrid", "chartAxisLabel"]
 
         let exempt = viaStatusResolver.union(appFacing).union(legacy)
 
@@ -262,9 +260,9 @@ final class ThemeSystemTests: XCTestCase {
             .deletingLastPathComponent()   // LubaUITests
             .deletingLastPathComponent()   // Tests
             .deletingLastPathComponent()   // package root
-            .appendingPathComponent("Sources/LubaUI")
+            .appendingPathComponent("Sources")
 
-        let themeFile = sources.appendingPathComponent("Theme/LubaTheme.swift")
+        let themeFile = sources.appendingPathComponent("LubaCore/Theme/LubaTheme.swift")
         let declarations = try String(contentsOf: themeFile, encoding: .utf8)
             .split(separator: "\n")
             .compactMap { line -> String? in
@@ -275,7 +273,7 @@ final class ThemeSystemTests: XCTestCase {
         XCTAssertFalse(declarations.isEmpty, "Could not parse any roles from \(themeFile.path)")
 
         var componentSource = ""
-        for directory in ["Components", "Primitives"] {
+        for directory in ["LubaComponents/Components", "LubaCore/Primitives"] {
             let root = sources.appendingPathComponent(directory)
             let files = try FileManager.default
                 .contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
@@ -330,11 +328,11 @@ final class ThemeSystemTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
-            .appendingPathComponent("Sources/LubaUI")
+            .appendingPathComponent("Sources")
 
         var offenders: [String] = []
 
-        for directory in ["Components", "Primitives"] {
+        for directory in ["LubaComponents/Components", "LubaCore/Primitives"] {
             let root = sources.appendingPathComponent(directory)
             let files = try FileManager.default
                 .contentsOfDirectory(at: root, includingPropertiesForKeys: nil)

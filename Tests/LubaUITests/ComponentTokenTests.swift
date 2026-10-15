@@ -10,6 +10,8 @@
 import XCTest
 import SwiftUI
 @testable import LubaUI
+@testable import LubaCore
+@testable import LubaComponents
 
 final class ComponentTokenTests: XCTestCase {
 
@@ -305,52 +307,4 @@ final class ComponentTokenTests: XCTestCase {
 
     // MARK: - Chart Tokens
 
-    func testChartTokens() {
-        // Height progression
-        XCTAssertLessThan(LubaChartTokens.sparklineHeight, LubaChartTokens.compactHeight)
-        XCTAssertLessThan(LubaChartTokens.compactHeight, LubaChartTokens.defaultHeight)
-        XCTAssertLessThan(LubaChartTokens.defaultHeight, LubaChartTokens.expandedHeight)
-
-        // Height values
-        XCTAssertEqual(LubaChartTokens.sparklineHeight, 40)
-        XCTAssertEqual(LubaChartTokens.compactHeight, 140)
-        XCTAssertEqual(LubaChartTokens.defaultHeight, 200)
-        XCTAssertEqual(LubaChartTokens.expandedHeight, 300)
-
-        // Mark dimensions
-        XCTAssertEqual(LubaChartTokens.barCornerRadius, LubaRadius.xs)
-        XCTAssertEqual(LubaChartTokens.lineWidth, 2.5)
-        XCTAssertEqual(LubaChartTokens.pointSize, 6)
-        XCTAssertEqual(LubaChartTokens.areaOpacity, 0.15)
-
-        // Grid
-        XCTAssertEqual(LubaChartTokens.gridOpacity, 0.12)
-        XCTAssertEqual(LubaChartTokens.gridLineWidth, 0.5)
-
-        // Legend
-        XCTAssertEqual(LubaChartTokens.legendSpacing, LubaSpacing.md)
-        XCTAssertEqual(LubaChartTokens.legendDotSize, 8)
-
-        // Skeleton
-        XCTAssertEqual(LubaChartTokens.skeletonBarCount, 5)
-        XCTAssertEqual(LubaChartTokens.skeletonLinePointCount, 8)
-        XCTAssertGreaterThan(LubaChartTokens.skeletonBarMaxRatio, LubaChartTokens.skeletonBarMinRatio)
-
-        // Palette
-        XCTAssertEqual(LubaColors.Chart.palette.count, 6)
-
-        // New tokens — sparkline, annotations, selection, legend
-        XCTAssertEqual(LubaChartTokens.sparklineLineWidth, 1.5)
-        XCTAssertLessThan(LubaChartTokens.sparklineLineWidth, LubaChartTokens.lineWidth)
-        XCTAssertEqual(LubaChartTokens.sectorAngularInset, 1.5)
-        XCTAssertEqual(LubaChartTokens.annotationOffset, -8)
-        XCTAssertEqual(LubaChartTokens.selectionLineWidth, 1)
-        XCTAssertEqual(LubaChartTokens.selectionDashPattern, [5, 3])
-        XCTAssertEqual(LubaChartTokens.legendRowSpacing, LubaSpacing.xs)
-
-        // Sparkline trend
-        XCTAssertEqual(LubaSparklineTrend.up.iconName, "arrow.up.right")
-        XCTAssertEqual(LubaSparklineTrend.down.iconName, "arrow.down.right")
-        XCTAssertEqual(LubaSparklineTrend.flat.iconName, "arrow.right")
-    }
 }

@@ -70,6 +70,6 @@ LubaButton uses `LubaInteractiveButtonStyle` internally, which propagates press 
 
 - ``LubaButtonStyling``
 - ``LubaButton``
-- ``LubaButtonStyleType``
+- ``LubaButtonStyle``
 - ``LubaPressableButtonStyle``
 - ``LubaInteractiveButtonStyle``

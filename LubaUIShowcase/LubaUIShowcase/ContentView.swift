@@ -85,7 +85,6 @@ enum ShowcaseSection: String, CaseIterable {
                 ShowcaseItem(icon: "checkmark.square", title: "Checkbox", description: "Multi-select controls", destination: AnyView(CheckboxScreen())),
                 ShowcaseItem(icon: "circle.inset.filled", title: "Radio", description: "Exclusive selection groups", destination: AnyView(RadioScreen())),
                 ShowcaseItem(icon: "slider.horizontal.3", title: "Slider", description: "Continuous & stepped range input", destination: AnyView(SliderScreen())),
-                ShowcaseItem(icon: "chart.xyaxis.line", title: "Charts", description: "Bar, line, pie & sparkline", destination: AnyView(ChartsScreen()))
             ]
         case .patterns:
             return [

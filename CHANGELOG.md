@@ -5,6 +5,33 @@ All notable changes to LubaUI are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-10-15
+
+### Changed
+
+- Split the package into independently selectable `LubaCore` and `LubaComponents` products. `LubaUI` re-exports both so existing non-chart imports continue to work.
+- Remove chart wrappers, protocols, `.lubaChartStyle()`, chart tokens, and the chart showcase. Apps that used those APIs must migrate to native Swift Charts; no optional chart product is retained.
+- Keep existing theme palette/grid/axis color values for source compatibility. No library target imports the Charts framework.
+- Route component haptics through the nearest configuration, including impact intensity.
+- Move localized resources into Core, shared by all products.
+
+### Fixed
+
+- Buttons with omitted `style:` and cards with omitted `elevation:` inherit the nearest `LubaConfig`. Explicit and custom styles retain precedence.
+- Interactive chips use separate native selection/dismiss buttons and honor `minimumTouchTarget`; static chips remain compact.
+- Text fields pad their native input vertically for larger type, honor configured minimum height, and give their clear action a full target and localized label.
+- MCP validation and migration read their scales from the lookup catalog and accept `LubaSpacing.xxs` (2pt). Migration rejects malformed hex colors. The MCP 1.4.0 package describes LubaUI 0.3.0 and explains migration for retired chart queries.
+- README, DocC, and agent guidance describe the released tag, theme dimension resolution, accessibility limits, and material-only glass behavior accurately.
+
+### Documentation and validation
+
+- Add real interface screenshots focused on component usage, with source/attribution notes and no app download promotion.
+- Shorten the README and move detailed usage into `docs/Guide.md`.
+- Add configuration and rendered-layout regressions, downstream import checks, a typechecked example, and MCP archive/stdio tests including malformed inputs, file traversal, and shell-like queries.
+- Refresh compatible MCP dependencies; the dependency audit reports no known advisories.
+- Remove personal demo names, embedded screenshot metadata, and the showcase signing team. Pin CI actions and limit workflow credentials to read-only repository access.
+
+
 ## [0.2.0] — 2026-08-10
 
 The release that makes LubaUI's existing promises real. `.lubaTheme(…)` now

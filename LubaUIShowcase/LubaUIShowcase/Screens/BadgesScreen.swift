@@ -136,11 +136,11 @@ struct BadgesScreen: View {
             DemoSection(title: "User Profile Example") {
                 LubaCard(elevation: .low) {
                     HStack(spacing: LubaSpacing.md) {
-                        LubaAvatar(name: "Erman Akar", size: .large)
+                        LubaAvatar(name: "Alex Morgan", size: .large)
 
                         VStack(alignment: .leading, spacing: LubaSpacing.xs) {
                             HStack(spacing: LubaSpacing.sm) {
-                                Text("Erman Akar")
+                                Text("Alex Morgan")
                                     .font(LubaTypography.headline)
                                     .foregroundStyle(LubaColors.textPrimary)
 
@@ -177,8 +177,8 @@ struct BadgesScreen: View {
                             .foregroundStyle(LubaColors.textSecondary)
 
                         HStack {
-                            LubaAvatar(name: "Erman Akar", size: .small)
-                            Text("Erman Akar")
+                            LubaAvatar(name: "Alex Morgan", size: .small)
+                            Text("Alex Morgan")
                                 .font(LubaTypography.caption)
                                 .foregroundStyle(LubaColors.textSecondary)
                             Spacer()

@@ -9,10 +9,9 @@ LubaUI has two environment systems, and the split is deliberate:
 - ``LubaThemeConfiguration`` decides how things **look** — colors, fonts, spacing, radii.
 - ``LubaConfig`` decides how things **behave** — haptics, motion, accessibility, font family.
 
-Components resolve their **colors and fonts** from the theme. Spacing and radius
-scales are carried on the theme and available to your own views; inside LubaUI,
-dimensions still come from the Tier-3 component tokens, with ``LubaButton``
-honoring `theme.radius`.
+Components resolve colors, fonts, spacing, and radii from the theme. Tier-3
+component tokens have resolver forms such as `LubaCardTokens.padding(luba.spacing)`.
+Explicit component overrides take precedence over the theme.
 
 Components read both through a single property wrapper, ``LubaEnvironment``, which
 hands back a ``LubaContext`` with everything already resolved for the subtree.
@@ -87,7 +86,7 @@ PromoBanner().lubaTheme(colors: .accented(.orange))
 | Text | `textPrimary`, `textSecondary`, `textTertiary`, `textDisabled` |
 | Lines | `border`, `borderStrong`, `borderFocused`, `divider`, `fill` |
 | Status | `success`, `warning`, `error`, `info` (+ each `…Subtle`) |
-| Charts | `chartPalette`, `chartGrid`, `chartAxisLabel` |
+| Custom chart colors (compatibility) | `chartPalette`, `chartGrid`, `chartAxisLabel` |
 | Glass | `glassBorder`, `glassShadow` |
 
 Every role in that table is read by at least one component, with two deliberate
@@ -136,7 +135,7 @@ affects views that have not been given their own value.
 
 **Haptics:**
 - `hapticsEnabled` — Master haptic toggle
-- `hapticIntensity` — Scale factor for haptic strength (0.0–1.0)
+- `hapticIntensity` — Impact strength (0.0–1.0); subtree-aware through `luba.haptics` in 0.3.0. Selection and notification feedback use system-defined strength.
 
 **Animations:**
 - `animationsEnabled` — Master animation toggle
@@ -169,3 +168,10 @@ affects views that have not been given their own value.
 - ``LubaThemeTypography``
 - ``LubaThemeSpacing``
 - ``LubaThemeRadius``
+
+## Release differences
+
+In 0.2.0, `defaultButtonStyle` and `defaultCardElevation` are stored but ignored.
+Version 0.3.0 reads the nearest configuration when `style:` or
+`elevation:` is omitted. Explicit styles, custom button styling, and explicit
+card elevations still win.

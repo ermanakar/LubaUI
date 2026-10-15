@@ -1,0 +1,281 @@
+//
+//  LubaSkeleton.swift
+//  LubaUI
+//
+//  Skeleton loader components with shimmer animation.
+//
+//  Architecture:
+//  - Uses LubaSkeletonTokens for all dimensions
+//  - Respects LubaConfig for animations
+//
+
+import SwiftUI
+import LubaCore
+
+// MARK: - LubaSkeleton
+
+/// A skeleton placeholder with shimmer animation.
+public struct LubaSkeleton: View {
+    @LubaEnvironment private var luba
+    private let width: CGFloat?
+    private let height: CGFloat
+    private let cornerRadius: CGFloat
+
+    @State private var shimmerOffset: CGFloat = LubaSkeletonTokens.shimmerStart
+
+    /// Creates a skeleton placeholder.
+    ///
+    /// - Parameters:
+    ///   - width: Optional fixed width; fills available space when `nil`.
+    ///   - height: Height of the skeleton shape.
+    ///   - cornerRadius: Corner radius of the rounded rectangle.
+    public init(
+        width: CGFloat? = nil,
+        height: CGFloat = LubaSkeletonTokens.defaultHeight,
+        cornerRadius: CGFloat = LubaSkeletonTokens.cornerRadius
+    ) {
+        self.width = width
+        self.height = height
+        self.cornerRadius = cornerRadius
+    }
+
+    public var body: some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .fill(luba.colors.fill)
+            .frame(width: width, height: height)
+            .overlay(
+                GeometryReader { geo in
+                    shimmerGradient
+                        .frame(width: geo.size.width * LubaSkeletonTokens.shimmerWidthRatio)
+                        .offset(x: shimmerOffset * geo.size.width)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .accessibilityHidden(true)
+            .onAppear {
+                guard let shimmer = luba.motion.repeating(
+                    .easeInOut(duration: LubaSkeletonTokens.shimmerDuration).repeatForever(autoreverses: false)
+                ) else { return }
+                withAnimation(shimmer) {
+                    shimmerOffset = LubaSkeletonTokens.shimmerEndRect
+                }
+            }
+    }
+
+    private var shimmerGradient: some View {
+        LinearGradient(
+            colors: [
+                Color.clear,
+                luba.colors.surface.opacity(LubaSkeletonTokens.shimmerOpacity),
+                Color.clear
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
+}
+
+// MARK: - Circle Skeleton
+
+/// A circular skeleton placeholder.
+public struct LubaSkeletonCircle: View {
+    @LubaEnvironment private var luba
+    private let size: CGFloat
+
+    @State private var shimmerOffset: CGFloat = LubaSkeletonTokens.shimmerStart
+
+    /// Creates a circular skeleton placeholder.
+    ///
+    /// - Parameters:
+    ///   - size: Diameter of the circle.
+    public init(size: CGFloat = LubaSkeletonTokens.defaultCircleSize) {
+        self.size = size
+    }
+
+    public var body: some View {
+        Circle()
+            .fill(luba.colors.fill)
+            .frame(width: size, height: size)
+            .overlay(
+                LinearGradient(
+                    colors: [
+                        Color.clear,
+                        luba.colors.surface.opacity(LubaSkeletonTokens.shimmerOpacity),
+                        Color.clear
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: size * 0.5)
+                .offset(x: shimmerOffset * size)
+            )
+            .clipShape(Circle())
+            .accessibilityHidden(true)
+            .onAppear {
+                guard let shimmer = luba.motion.repeating(
+                    .easeInOut(duration: LubaSkeletonTokens.shimmerDuration).repeatForever(autoreverses: false)
+                ) else { return }
+                withAnimation(shimmer) {
+                    shimmerOffset = LubaSkeletonTokens.shimmerEndCircle
+                }
+            }
+    }
+}
+
+// MARK: - Text Skeleton
+
+/// Multiple lines of skeleton text.
+public struct LubaSkeletonText: View {
+    private let lines: Int
+    private let lastLineRatio: CGFloat
+    private let lineHeight: CGFloat
+    private let spacing: CGFloat
+
+    /// Creates a multi-line skeleton text block.
+    ///
+    /// - Parameters:
+    ///   - lines: Number of skeleton lines to display.
+    ///   - lastLineRatio: Width ratio of the last line (0 to 1).
+    ///   - lineHeight: Height of each skeleton line.
+    ///   - spacing: Vertical spacing between lines.
+    public init(
+        lines: Int = LubaSkeletonTokens.defaultLineCount,
+        lastLineRatio: CGFloat = LubaSkeletonTokens.lastLineRatio,
+        lineHeight: CGFloat = 12,
+        spacing: CGFloat = LubaSkeletonTokens.lineSpacing
+    ) {
+        self.lines = max(1, lines)
+        self.lastLineRatio = lastLineRatio
+        self.lineHeight = lineHeight
+        self.spacing = spacing
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: spacing) {
+            ForEach(0..<lines, id: \.self) { index in
+                let isLast = index == lines - 1
+
+                GeometryReader { geo in
+                    LubaSkeleton(
+                        width: isLast ? geo.size.width * lastLineRatio : nil,
+                        height: lineHeight
+                    )
+                }
+                .frame(height: lineHeight)
+            }
+        }
+    }
+}
+
+// MARK: - Card Skeleton
+
+/// A skeleton placeholder for a card with avatar + text pattern.
+public struct LubaSkeletonCard: View {
+    @LubaEnvironment private var luba
+    private let avatarSize: CGFloat
+    private let showBody: Bool
+
+    /// Creates a card skeleton with an avatar and text lines.
+    ///
+    /// - Parameters:
+    ///   - avatarSize: Diameter of the avatar circle.
+    ///   - showBody: Whether to show body text lines below the header.
+    public init(avatarSize: CGFloat = LubaSkeletonTokens.cardAvatarSize, showBody: Bool = true) {
+        self.avatarSize = avatarSize
+        self.showBody = showBody
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: LubaSkeletonTokens.sectionSpacing(luba.spacing)) {
+            // Header row
+            HStack(spacing: LubaSkeletonTokens.headerSpacing) {
+                LubaSkeletonCircle(size: avatarSize)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    LubaSkeleton(width: 100, height: LubaSkeletonTokens.defaultHeight)
+                    LubaSkeleton(width: 60, height: 11)
+                }
+
+                Spacer()
+            }
+
+            // Body
+            if showBody {
+                LubaSkeletonText(lines: 2, lineHeight: 12)
+            }
+        }
+        .padding(LubaSkeletonTokens.cardPadding)
+        .background(luba.colors.surface)
+        .clipShape(RoundedRectangle(cornerRadius: LubaSkeletonTokens.cardCornerRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: LubaSkeletonTokens.cardCornerRadius, style: .continuous)
+                .strokeBorder(luba.colors.border, lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Row Skeleton
+
+/// A skeleton for a list row.
+public struct LubaSkeletonRow: View {
+    public init() {}
+
+    public var body: some View {
+        HStack(spacing: LubaSkeletonTokens.headerSpacing) {
+            LubaSkeletonCircle(size: LubaSkeletonTokens.rowAvatarSize)
+
+            VStack(alignment: .leading, spacing: 6) {
+                LubaSkeleton(height: LubaSkeletonTokens.defaultHeight)
+                LubaSkeleton(width: 80, height: 11)
+            }
+        }
+        .frame(height: LubaSkeletonTokens.rowHeight)
+    }
+}
+
+// MARK: - Preview
+
+#Preview("Skeleton") {
+    ScrollView {
+        VStack(spacing: 24) {
+            // Basic
+            VStack(alignment: .leading, spacing: 8) {
+                Text("BASIC").font(.caption).foregroundStyle(.secondary)
+                LubaSkeleton(height: 16)
+            }
+            
+            // Avatar + text
+            VStack(alignment: .leading, spacing: 8) {
+                Text("AVATAR + TEXT").font(.caption).foregroundStyle(.secondary)
+                HStack(spacing: 12) {
+                    LubaSkeletonCircle(size: 44)
+                    VStack(alignment: .leading, spacing: 6) {
+                        LubaSkeleton(width: 120, height: 14)
+                        LubaSkeleton(width: 80, height: 11)
+                    }
+                }
+            }
+            
+            // Text block
+            VStack(alignment: .leading, spacing: 8) {
+                Text("TEXT BLOCK").font(.caption).foregroundStyle(.secondary)
+                LubaSkeletonText(lines: 3)
+            }
+            
+            // Card
+            VStack(alignment: .leading, spacing: 8) {
+                Text("CARD").font(.caption).foregroundStyle(.secondary)
+                LubaSkeletonCard()
+            }
+            
+            // List rows
+            VStack(alignment: .leading, spacing: 8) {
+                Text("LIST").font(.caption).foregroundStyle(.secondary)
+                LubaSkeletonRow()
+                LubaSkeletonRow()
+            }
+        }
+        .padding(20)
+    }
+    .background(LubaColors.background)
+}
